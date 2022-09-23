@@ -1,0 +1,134 @@
+#shader vertex
+#version 330 core  
+
+layout(location = 0) in vec4 position; 
+layout(location = 1) in vec2 textCoord; //for uv coordnate
+//vec4:opengl中位置就是一个vec4,没办法,后两个直接补零了. 
+//loaction 对应属性索引 position:为属性命的名
+
+out vec2 v_TexCoord //in out 标记
+//为了顶点数据以及不同着色器之间的通信(使用叫varying的东西)
+//输出纹理坐标
+void main()
+{
+	gl_Position = position;  //gl_Position大概率自带的屏幕空间
+	v_TexCoord = textCoord;
+}
+; //完成,强行赋值
+
+#shader fragment
+#version 330 core  //使用 glsl(opengl语言)330version ,core:不允许使用已弃用方法
+
+in vec2 v_TexCoord; //读入 v_TexCoord
+//统一变量
+uniform vec4 u_Color;
+uniform sampler2D u_Texture;//取样插槽
+
+layout(location = 0) out vec4 color;   //vec4:opengl中颜色也是一个vec4. 
+void main()
+{
+	vec4 texColor =  texture(u_Texture,v_TexCoord)
+	color = texColor;  //指定颜色 rgba
+}
+; //完成
+
+
+//application
+			{
+				glm::mat4 modle = glm::translate(glm::mat4(1.0f), translationA); //平移
+				glm::mat4 mvp = proj * view * modle;
+				shader.SetUniformMat4f("u_MVP", mvp);
+				render.Drawer(va, ib, shader);
+			}
+			{
+				glm::mat4 modle = glm::translate(glm::mat4(1.0f), translationB); //平移
+				glm::mat4 mvp = proj * view * modle;
+				shader.SetUniformMat4f("u_MVP", mvp);
+				render.Drawer(va, ib, shader); //批渲染(渲染多次)
+
+			}
+				//shader.SetUniform4f("u_Color", r, 0.3f, 0.8f, 1.0f);
+
+			
+
+			//GLCall(glDrawElements(GL_TRIANGLES, 6, GL_INT, nullptr));//errorgettest1 _ p10//glGetError();
+			//顶点缓冲区需要每次使用时都询问缓冲区排布方式(顶点布局/属性)(隐式使用顶点数组)
+			//而gl带的 顶点数组则自(将顶点缓冲区与顶点布局结合),是gl实际使用的对象,简化了绑定布局的过程
+			if (r > 1.0f)
+				increment = -0.05f;
+			else if (r < 0.0f)
+				increment = 0.05f;
+			r += increment;
+			//已绑定,不需要指定索引数组(严格类型指定)
+			//没有索引缓冲区时的方法(绘制类型 , 起始索引 , 渲染索引数(渲染几个)(这里是以顶点为步长) ),它已经画出来了,用的是指定属性和默认渲染器(这取决于驱动)
+			//shader即是在gpu上编程,因此要用gpu必须要有shader
+			//顶点着色器 , 每个顶点调用一次, 它会计算顶点的屏幕坐标
+			//下一个着色器:片段(片元)着色器 用来实现光栅化,它会为每个需要光栅化的像素运行一次
+
+			{
+				// Display some text (you can use a format string too)
+				ImGui::SliderFloat3("Translation A", &translationA.x, 0.0f, 960.0f); //一个设置滑块,传值到translation // Edit 3 float using a slider from 0.0f to 960.0f    
+				ImGui::SliderFloat3("Translation B", &translationB.x, 0.0f, 960.0f); //一个设置滑块,传值到translation  
+				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+			}
+
+			
+		float Position[] = //position + uv
+		{
+		-50.0f,-50.0f,0.0f,0.0f,
+		50.0f ,-50.0f,1.0f,0.0f,
+		50.0f ,50.0f ,1.0f,1.0f,
+		-50.0f,50.0f ,0.0f,1.0f
+		};
+		//除了数据缓冲区,我们还需要索引缓冲区	
+		//省重复内存 0,1,2,2,3,0
+		unsigned int indices[] =
+		{
+			0,1,2,
+			2,3,0
+		};
+
+				//关于opengl的函数  , 你可以去 docs.gl 网站查询详细信息	
+		VertexArray va;
+		VertexBuffer vb(Position, 4 * 4 * sizeof(float));
+
+		BufferLayout Layout;
+		Layout.Push<float>(2);
+		Layout.Push<float>(2);
+		va.AddBuffer(vb,Layout);
+
+		IndexBuffer ib(indices, 6);
+
+		//m模型 v视图 p投影 矩阵
+		//投影(正交/透视) //模型(模型变换) //视图(模拟相机,位置与方向,对模型进行逆变换)
+		glm::mat4 proj = glm::ortho(0.0f,960.0f,0.0f, 640.0f, -1.0f, 1.0f); //lrbt nf:目标框/屏幕框范围
+		//返回的 proj*(l,b,n,1)T = (-1~1, -1~1, -1~1 1)T
+		//a view : glm 的矩阵是以列向量排布的
+// 		for (int i =0; i <proj.length();i++)
+// 		{
+// 			std::cout<< proj[i].x<<" "<<proj[i].y << " " << proj[i].z << " " << proj[i].w << std::endl;
+// 		}
+		//glm::mat4 modle = glm::translate(glm::mat4(1.0f),glm::vec3(300,200,0)); //平移
+		glm::mat4 view= glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+		//glm::mat4 mvp = proj * view * modle;
+		
+		//pvm m
+		Shader shader("res/shaders/basic.shader");
+		shader.Bind();
+
+		//不要把图片通过vs拖进来!!!!!vs会骗人的!!!!!
+		//但是 资源管理器 不会 ^ . ^
+		Texture texture("res/tex/theChernoLogo.png");
+		texture.Bind();
+		shader.SetUniform1i("u_Texture", 0);//使用纹理插槽0
+		shader.SetUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);
+
+
+		//解绑
+		va.Unbind();
+		shader.Unbind();
+		vb.Unbind();
+		ib.Unbind();
+
+		float r = 0.0f;
+		float increment = 0.05f;
