@@ -2,6 +2,7 @@
 #include <iostream>
 #include<unordered_map>//for hashmap
 #include "glm/glm.hpp"
+#include <unordered_map>
 
 
 struct shaderPSource
@@ -17,8 +18,7 @@ class Shader
 private:
 	unsigned int m_renderer;
 	std::string m_Filepath;
-	std::unordered_map<std::string, int> m_UniformLocationCache;
-
+	mutable std::unordered_map<std::string, int> m_UniformLocationCache;
 
 
 public:
@@ -33,7 +33,7 @@ public:
 	void SetUniform1i(const std::string name,int i0);
 private:
 	shaderPSource parseShader(const std::string& filepath);
-	int GetUniformLocation(const std::string& name);
+	int GetUniformLocation(const std::string& name) const;
 	unsigned int CompileShader(const std::string& source, unsigned int type);
 	unsigned int createshader(const std::string& vertexshader, const std::string& fragmentshader);
 

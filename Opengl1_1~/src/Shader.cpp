@@ -108,7 +108,7 @@ void Shader::SetUniform1i(const std::string name, int v0)
 
 }
 
-int Shader::GetUniformLocation(const std::string& name)
+int Shader::GetUniformLocation(const std::string& name) const
 {
 	if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
 		return m_UniformLocationCache[name];
