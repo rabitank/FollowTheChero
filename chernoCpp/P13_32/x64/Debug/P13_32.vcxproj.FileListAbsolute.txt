@@ -1,0 +1,2 @@
+F:\C++VC\P13_32\x64\Debug\P13_32.exe
+F:\C++VC\P13_32\x64\Debug\P13_32.pdb

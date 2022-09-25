@@ -1,0 +1,2 @@
+F:\C++VC\p10_25~\Debug\p10_25~.exe
+F:\C++VC\p10_25~\Debug\p10_25~.pdb

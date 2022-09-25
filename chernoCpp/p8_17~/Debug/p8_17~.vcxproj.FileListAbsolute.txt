@@ -1,0 +1,2 @@
+F:\C++VC\p8_17~\Debug\p8_17~.exe
+F:\C++VC\p8_17~\Debug\p8_17~.pdb

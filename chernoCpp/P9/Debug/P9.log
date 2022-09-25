@@ -1,0 +1,7 @@
+﻿  main.cpp
+F:\C++VC\P9\main.cpp(5,30): error C4430: 缺少类型说明符 - 假定为 int。注意: C++ 不支持默认 int
+F:\C++VC\P9\main.cpp(5,30): error C2143: 语法错误: 缺少“,”(在“&”的前面)
+F:\C++VC\P9\main.cpp(51,1): error C2664: “void PrintEntity(const int)”: 无法将参数 1 从“Entity”转换为“const int”
+F:\C++VC\P9\main.cpp(51,15): message : 没有可用于执行该转换的用户定义的转换运算符，或者无法调用该运算符
+F:\C++VC\P9\main.cpp(5,6): message : 参见“PrintEntity”的声明
+F:\C++VC\P9\main.cpp(74,13): warning C4326: “main”的返回类型应为“int”而非“void”

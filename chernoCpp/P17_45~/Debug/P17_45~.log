@@ -1,0 +1,5 @@
+﻿  main.cpp
+F:\C++VC\P17_45~\main.cpp(90,5): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+F:\C++VC\P17_45~\main.cpp(214,9): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+F:\C++VC\P17_45~\main.cpp(223,9): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+  P17_45~.vcxproj -> F:\C++VC\P17_45~\Debug\P17_45~.exe

@@ -1,0 +1,6 @@
+﻿  p1.cpp
+F:\C++VC\p1\src\p1.cpp(38,9): warning C4101: “stu_nu3”: 未引用的局部变量
+F:\C++VC\p1\src\p1.cpp(34,9): warning C4101: “stu_nu”: 未引用的局部变量
+  main.cpp
+  正在生成代码...
+  p1.vcxproj -> F:\C++VC\p1\\bin\Win32\Debug\p1.exe

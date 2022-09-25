@@ -1,0 +1,16 @@
+﻿  Player.cpp
+F:\C++VC\p3_7~\Entity.h(9,7): warning C4244: “=”: 从“int”转换到“float”，可能丢失数据
+F:\C++VC\p3_7~\Entity.h(10,7): warning C4244: “=”: 从“int”转换到“float”，可能丢失数据
+F:\C++VC\p3_7~\Entity.h(11,7): warning C4244: “=”: 从“int”转换到“float”，可能丢失数据
+F:\C++VC\p3_7~\Entity.h(12,7): warning C4244: “=”: 从“int”转换到“float”，可能丢失数据
+F:\C++VC\p3_7~\Entity.h(30,7): warning C4244: “=”: 从“int”转换到“float”，可能丢失数据
+F:\C++VC\p3_7~\Entity.h(31,7): warning C4244: “=”: 从“int”转换到“float”，可能丢失数据
+  main.cpp
+F:\C++VC\p3_7~\Entity.h(9,7): warning C4244: “=”: 从“int”转换到“float”，可能丢失数据
+F:\C++VC\p3_7~\Entity.h(10,7): warning C4244: “=”: 从“int”转换到“float”，可能丢失数据
+F:\C++VC\p3_7~\Entity.h(11,7): warning C4244: “=”: 从“int”转换到“float”，可能丢失数据
+F:\C++VC\p3_7~\Entity.h(12,7): warning C4244: “=”: 从“int”转换到“float”，可能丢失数据
+F:\C++VC\p3_7~\Entity.h(30,7): warning C4244: “=”: 从“int”转换到“float”，可能丢失数据
+F:\C++VC\p3_7~\Entity.h(31,7): warning C4244: “=”: 从“int”转换到“float”，可能丢失数据
+  正在生成代码...
+  p3_7~.vcxproj -> F:\C++VC\p3_7~\Debug\p3_7~.exe

@@ -1,0 +1,5 @@
+﻿  main.cpp
+F:\C++VC\P14_33~\main.cpp(36,10): error C2275: “T”: 将此类型用作表达式非法
+F:\C++VC\P14_33~\main.cpp(35): message : 在编译 类 模板 成员函数“std::string array<int,6>::getType(void)”时
+F:\C++VC\P14_33~\main.cpp(92): message : 查看对正在编译的函数 模板 实例化“std::string array<int,6>::getType(void)”的引用
+F:\C++VC\P14_33~\main.cpp(90): message : 查看对正在编译的 类 模板 实例化“array<int,6>”的引用

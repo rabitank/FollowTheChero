@@ -1,0 +1,8 @@
+﻿  main.cpp
+F:\C++VC\p6_13~\main.cpp(37,17): warning C4834: 放弃具有 "nodiscard" 属性的函数的返回值
+  正在生成代码
+  28 of 103 functions (27.2%) were compiled, the rest were copied from previous compilation.
+    13 functions were new in current compilation
+    8 functions had inline decision re-evaluated but remain unchanged
+  已完成代码的生成
+  p6_13~.vcxproj -> F:\C++VC\p6_13~\Release\p6_13~.exe

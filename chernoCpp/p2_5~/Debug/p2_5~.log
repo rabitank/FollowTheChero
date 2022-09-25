@@ -1,0 +1,6 @@
+﻿  main.cpp
+F:\C++VC\p2_5~\src\main.cpp(26,13): warning C4326: “main”的返回类型应为“int”而非“void”
+F:\C++VC\p2_5~\src\main.cpp(33,9): warning C4101: “player”: 未引用的局部变量
+  sta.cpp
+  正在生成代码...
+  p2_5~.vcxproj -> F:\C++VC\p2_5~\Debug\p2_5~.exe
