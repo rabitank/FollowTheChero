@@ -60,13 +60,13 @@
     <ClCompile Include="src\test\TestClearColor.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="TestClearTexture.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="src\test\Test.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\test\TestTexture.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\test\TestBatchRender.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -405,6 +405,7 @@
     <None Include="src\vendor\glm\gtx\wrap.inl">
       <Filter>头文件</Filter>
     </None>
+    <None Include="res\shaders\Batch.shader" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\renderer.h">
@@ -887,10 +888,10 @@
     <ClInclude Include="src\test\TestClearColor.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="TestClearTexture.h">
+    <ClInclude Include="src\test\TestTexture.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="src\test\TestTexture.h">
+    <ClInclude Include="src\test\TestBatchRender.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -899,6 +900,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\tex\theChernoLogo.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\tex\yuan.png">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

@@ -168,10 +168,11 @@
     <ClCompile Include="src\vendor\stb_image\stb_image.h" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\test\TestClearColor.cpp" />
-    <ClCompile Include="TestClearTexture.cpp" />
+    <ClCompile Include="src\test\TestBatchRender.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\basic.shader" />
+    <None Include="res\shaders\Batch.shader" />
     <None Include="src\vendor\glm\detail\func_common.inl" />
     <None Include="src\vendor\glm\detail\func_common_simd.inl" />
     <None Include="src\vendor\glm\detail\func_exponential.inl" />
@@ -446,13 +447,14 @@
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\test\Test.h" />
     <ClInclude Include="src\test\TestClearColor.h" />
-    <ClInclude Include="TestClearTexture.h" />
+    <ClInclude Include="src\test\TestBatchRender.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="res\shaders\beifen.txt" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\tex\theChernoLogo.png" />
+    <Image Include="res\tex\yuan.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

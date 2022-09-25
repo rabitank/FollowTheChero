@@ -31,6 +31,7 @@ public:
 	void SetUniformMat4f(const std::string name,const glm::mat4& mat);
 	void SetUniform1f(const std::string name,float v0);
 	void SetUniform1i(const std::string name,int i0);
+	void SetUniform1iv(const std::string name,int size, int* v);
 private:
 	shaderPSource parseShader(const std::string& filepath);
 	int GetUniformLocation(const std::string& name) const;

@@ -18,6 +18,7 @@
 #include "ImGui/imgui_impl_glfw_gl3.h"
 #include "test/TestClearColor.h"
 #include "test/TestTexture.h"
+#include "test/TestBatchRender.h"
 
 
 
@@ -83,6 +84,7 @@ int main(void)
 		currentTest = testMenu;//当前测试是:menu
 		testMenu->RegisterTest<test::TestClearColor>("Clear Color");//向menu中添加可选测试,  tip: 能转的是 const char* 到 const std::string
 		testMenu->RegisterTest<test::TestTexture>("2D Texture");
+		testMenu->RegisterTest<test::TestBatchRender>("Batch Texture");
 
 
 		/* Loop until the user closes the window */
