@@ -894,6 +894,18 @@
     <ClInclude Include="src\test\TestBatchRender.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Dependence\GLEW\include\GL\eglew.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependence\GLEW\include\GL\glew.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependence\GLEW\include\GL\glxew.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependence\GLEW\include\GL\wglew.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="res\shaders\beifen.txt" />
@@ -905,5 +917,8 @@
     <Image Include="res\tex\yuan.png">
       <Filter>资源文件</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="Dependence\GLEW\lib\Release\x64\glew32.lib" />
   </ItemGroup>
 </Project>

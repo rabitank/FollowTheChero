@@ -1,6 +1,13 @@
 ﻿  Application.cpp
+  BufferLayout.cpp
+  IndexBuffer.cpp
+  Shader.cpp
   Texture.cpp
+  VertexArray.cpp
+  VertexBuffer.cpp
+  renderer.cpp
   TestBatchRender.cpp
+  TestClearColor.cpp
   TestTexture.cpp
   正在生成代码...
-  Opengl1_1~.vcxproj -> F:\C++VC\Opengl1_1~\Debug\Opengl1_1~.exe
+  Opengl1_1~.vcxproj -> F:\C++VC\FollowTheChero\Opengl1_1~\Debug\Opengl1_1~.exe

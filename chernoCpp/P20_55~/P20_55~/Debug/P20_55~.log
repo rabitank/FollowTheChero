@@ -1,0 +1,4 @@
+﻿  mian.cpp
+F:\C++VC\FollowTheChero\chernoCpp\P20_55~\P20_55~\mian.cpp(73,11): warning C4834: 放弃具有 "nodiscard" 属性的函数的返回值
+F:\C++VC\FollowTheChero\chernoCpp\P20_55~\P20_55~\mian.cpp(93,13): warning C4834: 放弃具有 "nodiscard" 属性的函数的返回值
+  P20_55~.vcxproj -> F:\C++VC\FollowTheChero\chernoCpp\P20_55~\Debug\P20_55~.exe

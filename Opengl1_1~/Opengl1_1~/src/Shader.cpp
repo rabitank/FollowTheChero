@@ -9,8 +9,8 @@
 Shader::Shader(const std::string& CodeFilePath)
 	:m_Filepath(CodeFilePath),m_renderer(0)
 {
-	shaderPSource shaderSource = parseShader(CodeFilePath); //vsdebug时相对部分来自工作目录(.vcxproj)
-	m_renderer = createshader(shaderSource.vertexshader, shaderSource.fragmentshader);
+	auto[vertexshader, fragmentshader]= parseShader(CodeFilePath); //vsdebug时相对部分来自工作目录(.vcxproj)
+	m_renderer = createshader(vertexshader, fragmentshader);
 
 }
 
@@ -31,7 +31,7 @@ void Shader::Unbind()const
 
 }
 
-shaderPSource Shader::parseShader(const std::string& filepath)
+std::tuple<std::string, std::string> Shader::parseShader(const std::string& filepath)
 {
 	enum class shadertype
 	{

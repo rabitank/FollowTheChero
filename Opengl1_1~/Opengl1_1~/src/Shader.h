@@ -4,14 +4,7 @@
 #include "glm/glm.hpp"
 #include <unordered_map>
 
-
-struct shaderPSource
-{
-
-	std::string vertexshader;
-	std::string fragmentshader;
-	
-};
+#include <tuple>
 
 class Shader
 {
@@ -33,7 +26,7 @@ public:
 	void SetUniform1i(const std::string name,int i0);
 	void SetUniform1iv(const std::string name,int size, int* v);
 private:
-	shaderPSource parseShader(const std::string& filepath);
+	std::tuple<std::string,std::string> parseShader(const std::string& filepath);
 	int GetUniformLocation(const std::string& name) const;
 	unsigned int CompileShader(const std::string& source, unsigned int type);
 	unsigned int createshader(const std::string& vertexshader, const std::string& fragmentshader);
