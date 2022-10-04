@@ -1,6 +1,29 @@
-﻿  Application.cpp
-F:\C++VC\FollowTheChero\chernoEngine\Hazel\Hazel\src\Hazel\Log.h(20,55): warning C4251: “Hazel::Log::s_CoreLogger”: class“std::shared_ptr<spdlog::logger>”需要有 dll 接口由 class“Hazel::Log”的客户端使用
+﻿cl : 命令行 warning D9025: 正在重写“/MTd”(用“/MDd”)
+  hzpch.cpp
+F:\C++VC\FollowTheChero\chernoEngine\Hazel\Hazel\src\Hazel\Log.h(19,55): warning C4251: “Hazel::Log::s_CoreLogger”: class“std::shared_ptr<spdlog::logger>”需要有 dll 接口由 class“Hazel::Log”的客户端使用
 F:\C++VC\FollowTheChero\chernoEngine\Hazel\Hazel\vendor\spdlog\include\spdlog\details\registry.h(34): message : 参见“std::shared_ptr<spdlog::logger>”的声明
-F:\C++VC\FollowTheChero\chernoEngine\Hazel\Hazel\src\Hazel\Log.h(21,57): warning C4251: “Hazel::Log::s_ClientLogger”: class“std::shared_ptr<spdlog::logger>”需要有 dll 接口由 class“Hazel::Log”的客户端使用
+F:\C++VC\FollowTheChero\chernoEngine\Hazel\Hazel\src\Hazel\Log.h(20,57): warning C4251: “Hazel::Log::s_ClientLogger”: class“std::shared_ptr<spdlog::logger>”需要有 dll 接口由 class“Hazel::Log”的客户端使用
 F:\C++VC\FollowTheChero\chernoEngine\Hazel\Hazel\vendor\spdlog\include\spdlog\details\registry.h(34): message : 参见“std::shared_ptr<spdlog::logger>”的声明
+cl : 命令行 warning D9025: 正在重写“/MTd”(用“/MDd”)
+  Application.cpp
+F:\C++VC\FollowTheChero\chernoEngine\Hazel\Hazel\src\Hazel\Layer.h(25,26): warning C4251: “Hazel::Layer::m_Debugname”: class“std::basic_string<char,std::char_traits<char>,std::allocator<char>>”需要有 dll 接口由 class“Hazel::Layer”的客户端使用
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\include\xstring(4564): message : 参见“std::basic_string<char,std::char_traits<char>,std::allocator<char>>”的声明
+F:\C++VC\FollowTheChero\chernoEngine\Hazel\Hazel\src\Hazel\Application.h(30,35): warning C4251: “Hazel::Application::m_window”: class“std::unique_ptr<Hazel::Window,std::default_delete<Hazel::Window>>”需要有 dll 接口由 class“Hazel::Application”的客户端使用
+F:\C++VC\FollowTheChero\chernoEngine\Hazel\Hazel\src\Hazel\Application.h(30): message : 参见“std::unique_ptr<Hazel::Window,std::default_delete<Hazel::Window>>”的声明
+F:\C++VC\FollowTheChero\chernoEngine\Hazel\Hazel\src\Hazel\Application.h(32,26): warning C4251: “Hazel::Application::m_LayerStack”: class“Hazel::LayerStack”需要有 dll 接口由 class“Hazel::Application”的客户端使用
+F:\C++VC\FollowTheChero\chernoEngine\Hazel\Hazel\src\Hazel\LayerStack.h(9): message : 参见“Hazel::LayerStack”的声明
+  Layer.cpp
+F:\C++VC\FollowTheChero\chernoEngine\Hazel\Hazel\src\Hazel\Layer.h(25,26): warning C4251: “Hazel::Layer::m_Debugname”: class“std::basic_string<char,std::char_traits<char>,std::allocator<char>>”需要有 dll 接口由 class“Hazel::Layer”的客户端使用
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\include\xstring(4564): message : 参见“std::basic_string<char,std::char_traits<char>,std::allocator<char>>”的声明
+  LayerStack.cpp
+F:\C++VC\FollowTheChero\chernoEngine\Hazel\Hazel\src\Hazel\Layer.h(25,26): warning C4251: “Hazel::Layer::m_Debugname”: class“std::basic_string<char,std::char_traits<char>,std::allocator<char>>”需要有 dll 接口由 class“Hazel::Layer”的客户端使用
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\include\xstring(4564): message : 参见“std::basic_string<char,std::char_traits<char>,std::allocator<char>>”的声明
+  Log.cpp
+  WindowsWindow.cpp
+F:\C++VC\FollowTheChero\chernoEngine\Hazel\Hazel\src\Hazel\Events\MouseEvent.h(13,36): warning C4244: “return”: 从“const float”转换到“int”，可能丢失数据
+F:\C++VC\FollowTheChero\chernoEngine\Hazel\Hazel\src\Hazel\Events\MouseEvent.h(14,36): warning C4244: “return”: 从“const float”转换到“int”，可能丢失数据
+F:\C++VC\FollowTheChero\chernoEngine\Hazel\Hazel\src\Hazel\Events\MouseEvent.h(36,42): warning C4244: “return”: 从“const float”转换到“int”，可能丢失数据
+F:\C++VC\FollowTheChero\chernoEngine\Hazel\Hazel\src\Hazel\Events\MouseEvent.h(37,42): warning C4244: “return”: 从“const float”转换到“int”，可能丢失数据
+  正在生成代码...
+    正在创建库 ..\bin\Debug--x86_64\Hazel\Hazel.lib 和对象 ..\bin\Debug--x86_64\Hazel\Hazel.exp
   Hazel.vcxproj -> F:\C++VC\FollowTheChero\chernoEngine\Hazel\Hazel\..\bin\Debug--x86_64\Hazel\Hazel.dll

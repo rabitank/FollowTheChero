@@ -1,0 +1,25 @@
+
+惨痛教训2:没有联想和报错的时候,一定要超认真地跟进视频,看清单词!
+
+
+img_XXXX 报错是识别XXX 符号 会加上 img__输出报错,其根本是没找到XXX的定义/实现
+
+c中只有头文件引用 而 c++中没有对应实现的lib的老旧基本函数 记得出现如上报错时 在本项目/或者c.lib项目里添加 msvcrtd.lib(msvc 微软c/c++编译器 c.lib编译使用它)引用
+如果有对应的lib,记得搜索对应lib名然后添加对应lib就是(大概没什么用哈哈)
+
+msvcrtd.lib
+"msvcrtd.lib" --this is for the basic old/basic c/c++ funcs realization ,like strcopy ,mcalloc ,wassert
+
+一般c++默认依赖:
+        		"kernel32.lib",
+		"user32.lib",
+		"gdi32.lib",
+		"winspool.lib",
+		"comdlg32.lib",
+		"advapi32.lib",
+		"shell32.lib",
+		"ole32.lib",
+		"oleaut32.lib",
+		"uuid.lib",
+		"odbc32.lib",
+		"odbccp32.lib",

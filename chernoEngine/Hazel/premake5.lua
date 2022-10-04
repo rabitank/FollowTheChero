@@ -5,14 +5,22 @@ workspace "Hazel"
 
  outputdir = "%{cfg.buildcfg}-%{cfg.sys}-%{cfg.architecture}"
 
+ IncludeDir = {}
+ IncludeDir["GLFW"] = "Hazel/vendor/GLFW/include"
+
+
+ include "Hazel/vendor/GLFW" --incldue(copy) the premake.lua in GLFW to here  = add project GLFW
+
 
 project "Hazel"
-   location "Hazel" --Ïà¶ÔÂ·¾¶
+   location "Hazel" --ï¿½ï¿½ï¿½Â·ï¿½ï¿½
    kind "SharedLib"  -- =dll
    language "C++"
 
    targetdir ("bin/"..outputdir.. "/%{prj.name}")
    objdir ("bin-int/"..outputdir.. "/%{prj.name}")
+
+
 
    files
    {
@@ -21,16 +29,30 @@ project "Hazel"
 
    }
 
+   
+   pchheader "hzpch.h"
+   pchsource "Hazel/src/hzpch.cpp" --vs ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø¹ï¿½
+
    includedirs
    {
         "%{prj.name}/src",
-        "%{prj.name}/vendor/spdlog/include"
+        "%{prj.name}/vendor/spdlog/include",
+        "%{IncludeDir.GLFW}"
+   }
+
+   links
+   {
+        "GLFW", --reference
+        "opengl32.lib"
+        
+        
+
    }
 
    filter "system:windows"
       cppdialect "C++17"
-      staticruntime "On" --¾²Ì¬Á´½ÓÔËĞĞÊ±¿â  ÔËĞĞÊ±¿âÊÇc++Ìá¹©µÄ±ê×¼¿âµÄ»ù´¡º¯Êı¿âdll("/MD")Ò»°ãÊÇ¶¯Ì¬Á´½Ó,µ«ÏàÍ¬´úÂë±àÒë³öµÄ¾²Ì¬¿âlibÒ²±»½ĞÔËĞĞÊ±¿â("/MT")
-      systemversion "10.0"
+      staticruntime "On" --ï¿½ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½  ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½c++ï¿½á¹©ï¿½Ä±ï¿½×¼ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½dll("/MD")Ò»ï¿½ï¿½ï¿½Ç¶ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¾ï¿½Ì¬ï¿½ï¿½libÒ²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½("/MT")
+      systemversion "latest"
 
       defines
       {
@@ -43,21 +65,26 @@ project "Hazel"
       {
         ("{COPY} %{cfg.buildtarget.relpath} ../bin/"..outputdir.."/Sandbox") --copy from to .todir is baed on fromdir
       }
+
+
    
    filter "configurations:Debug"
         defines "HZ_DEBUG"
+        buildoptions "/MDd" --è®¾ç½®è¿è¡Œæ—¶åº“ä¸º å¯¹åº”dll debug ç‰ˆæœ¬
         symbols "On"
 
    filter "configurations:Release"
         defines "HZ_RELEASE"
-        optimize "On" --¿ªÆô±àÒëÓÅ»¯
+        buildoptions "/MD"
+        optimize "On" --ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å»ï¿½
 
    filter "configurations:Dist"
       defines "HZ_DIST"
-      optimize "On" --¿ªÆô±àÒëÓÅ»¯
+      buildoptions "/MD"
+      optimize "On" --ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å»ï¿½
 
 project "Sandbox"
-   location "Sandbox" --Ïà¶ÔÂ·¾¶
+   location "Sandbox" --ï¿½ï¿½ï¿½Â·ï¿½ï¿½
    kind "ConsoleApp"  -- =dll
    language "C++"
 
@@ -84,8 +111,8 @@ project "Sandbox"
 
    filter "system:windows"
       cppdialect "C++17"
-      staticruntime "On" --¾²Ì¬Á´½ÓÔËĞĞÊ±¿â  ÔËĞĞÊ±¿âÊÇc++Ìá¹©µÄ±ê×¼¿âµÄ»ù´¡º¯Êı¿âdll("/MD")Ò»°ãÊÇ¶¯Ì¬Á´½Ó,µ«ÏàÍ¬´úÂë±àÒë³öµÄ¾²Ì¬¿âlibÒ²±»½ĞÔËĞĞÊ±¿â("/MT")
-      systemversion "10.0"
+      staticruntime "On" --ï¿½ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½  ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½c++ï¿½á¹©ï¿½Ä±ï¿½×¼ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½dll("/MD")Ò»ï¿½ï¿½ï¿½Ç¶ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¾ï¿½Ì¬ï¿½ï¿½libÒ²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½("/MT")
+      systemversion "latest"
 
       defines
       {
@@ -95,12 +122,15 @@ project "Sandbox"
    
    filter "configurations:Debug"
         defines "HZ_DEBUG"
+        buildoptions "/MDd"
         symbols "On"
 
-   filter "configurations:Release"
+   filter "configurations:Release"  
         defines "HZ_RELEASE"
-        optimize "On" --¿ªÆô±àÒëÓÅ»¯
+        buildoptions "/MD"
+        optimize "On" --ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å»ï¿½
 
    filter "configurations:Dist"
       defines "HZ_DIST"
-      optimize "On" --¿ª
+      buildoptions "/MD"
+      optimize "On" --ï¿½ï¿½

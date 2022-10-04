@@ -7,12 +7,7 @@
 #include <stdio.h>
 extern Hazel::Application* Hazel::CreateApplication();//Íâ²¿ÉùÃ÷
 
-bool func(Hazel::MouseButtonPressedEvent mos)
-{
 
-	printf("bbbbb");
-	return false;
-}
 
 int main(int argc,char** argv)
 {

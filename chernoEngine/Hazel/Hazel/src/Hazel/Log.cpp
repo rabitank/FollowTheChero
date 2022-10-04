@@ -1,4 +1,6 @@
-#include "Log.h"
+
+#include "hzpch.h"
+
 
 
 namespace Hazel
@@ -10,12 +12,16 @@ namespace Hazel
  	void Log::Init()
 	{
 
-		auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-		console_sink->set_level(spdlog::level::trace); //要高于trace 0.0才输出
-		console_sink->set_pattern("%^[%T] %n: %v%$");
+		s_CoreLogger = spdlog::stdout_color_mt("HAZEL");
+		s_CoreLogger->set_level(spdlog::level::trace);
+		s_CoreLogger->set_pattern("%^[%T] %n: %v%$");
+		
+		s_ClientLogger = spdlog::stdout_color_mt("APP");
+		s_ClientLogger->set_level(spdlog::level::trace);
+		s_ClientLogger->set_pattern("%^[%T] %n: %v%$");
+	//you can get help at https://spdlog.docsforge.com/v1.x/4.sinks/#available-sinks
 
-		s_CoreLogger= std::make_shared<spdlog::logger>(spdlog::logger("HAZEL", console_sink));
-		s_ClientLogger = std::make_shared<spdlog::logger>(spdlog::logger("APP", console_sink));
+		
 	}
 
 
