@@ -1,7 +1,7 @@
+#pragma once
 
 #include "Event.h"
-
-#include <sstream>
+#include "hzpch.h"
 namespace Hazel
 {
 
@@ -23,6 +23,7 @@ namespace Hazel
 		}
 	private:
 		unsigned int m_width, m_height;
+
 	};
 
 
@@ -37,7 +38,7 @@ namespace Hazel
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "WindowsResizeEvent" ;
+			ss << "WindowsCloseEvent" ;
 			return ss.str();
 		}
 	};

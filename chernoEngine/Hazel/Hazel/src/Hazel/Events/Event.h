@@ -2,8 +2,7 @@
 
 #include "Hazel/core.h"
 
-#include <string>
-#include <functional>
+#include "hzpch.h"
 
 
 //now it is block .
@@ -49,12 +48,14 @@ namespace Hazel
 		virtual int GetCategoryFlags() const = 0;
 		virtual std::string ToString() const { return GetName(); };
 
+		bool Handled = false;
+
 		inline bool IsInCategory(EventCategory eventcategory)
 		{
 			return GetCategoryFlags() & eventcategory; //位与运算
 		}
-	protected:
-		bool m_Handled = false;
+
+		
 
 	};
 
@@ -73,7 +74,7 @@ namespace Hazel
 		{
 			if (m_event.GetEventType() == T::GetStaticType())
 			{
-				m_Event.m_Handled = func(*(T*)&m_event) //调度器将会用事件调度 同类事件类的函数, 即 event 调度 对应event的动作/函数,这个event解决了吗?由func决定
+				m_event.Handled = func(*(T*)&m_event); //调度器将会用事件调度 同类事件类的函数, 即 event 调度 对应event的动作/函数,这个event解决了吗?由func决定
 					return true;
 			}
 			return false;//调度失败
