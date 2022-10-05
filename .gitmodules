@@ -7,3 +7,9 @@
 [submodule "chernoEngine/Hazel/Hazel/vendor/GLFW"]
 	path = chernoEngine/Hazel/Hazel/vendor/GLFW
 	url = https://github.com/theCherno/glfw
+[submodule "chernoEngine/Hazel/Hazel/vendor/imgui"]
+	path = chernoEngine/Hazel/Hazel/vendor/imgui
+	url = https://github.com/rabitank/imgui_followCherno
+[submodule "chernoEngine/Hazel/Hazel/vendor/glm"]
+	path = chernoEngine/Hazel/Hazel/vendor/glm
+	url = https://github.com/g-truc/glm

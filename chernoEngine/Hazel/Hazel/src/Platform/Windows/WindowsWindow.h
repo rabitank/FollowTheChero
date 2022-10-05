@@ -1,15 +1,10 @@
 #pragma once
+
+
+
+#include "GLFW/glfw3.h" // glad 已经同过定义宏 告知了glfw去除gl引用 ,另外,项目里也已经预定义了gl相关,良心glfw,低素质glad
+
 #include "Hazel/Window.h"
-
-#include <stdio.h>
-#include <string.h>
-#include <assert.h>
-#include <ObjIdl.h>
-
-
-#include <GLFW/glfw3.h>
-#include <GLFW/glfw3native.h>
-
 
 namespace Hazel
 {
@@ -28,6 +23,11 @@ namespace Hazel
 		void SetVSync(bool enabled) override;
 		bool IsVSync() const override;
 
+		inline virtual void* GetNativeWindow() const override { return m_Window; } ;
+		//virtual 为了后人!!
+		//不...其实 基类(或派生类)虚函数派生的函数结构上的所有函数都是虚函数(使用基类/多态类指针时多态起作用).... 这只是是提醒
+		
+		// window的使用实例在 静态的application里,想访问的话可以通过application单例访问
 	private:
 		virtual void Init(const WindowProps& props);
 		virtual void Shutdown();

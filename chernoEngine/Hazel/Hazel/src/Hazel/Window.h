@@ -35,6 +35,9 @@ namespace Hazel
 		virtual void SetVSync(bool enabled) = 0;
 		virtual bool IsVSync() const = 0;
 
+		virtual void* GetNativeWindow() const = 0;
+		//暴露m_window - for input,void*是因为不一定是glfwwindow
+
 		static Window* Create(const WindowProps& props = WindowProps());//  静态,单例成员?,例外定义
 		//Create 会有适应平台的多个版本,现在还不需要实现 window.h 作为接口
 

@@ -59,5 +59,26 @@ namespace Hazel
 
 	};
 
+	class HAZEL_API KeyTypedEvent :public KeyEvent //按下按键 只知道按了哪个键
+	{
+
+
+	public:
+
+		KeyTypedEvent(int keycode)
+			:KeyEvent(keycode) {}; //调用基类构造函数
+
+		std::string ToString() const override
+		{
+			std::stringstream ss;
+			ss << "KeyTypedEvent: " << m_keycode;
+			return ss.str();
+		}
+
+		EVENT_CLASS_TYPE(KeyTyped);
+
+	};
+
+
 
 }

@@ -5,21 +5,22 @@
 #include "hzpch.h"
 
 
+
 //now it is block .
 //when something happened ,for delivery of the message,
 //would stop other code
 namespace Hazel
 {
-	enum class EventType //enum class 为枚举提供了枚举类型作用域
+	enum class  EventType //enum class 为枚举提供了枚举类型作用域
 	{
 		None = 0,
 		WindowClose,WindowResize,WindowFocus,WindowLostFocus,WindowMoved,
 		AppTick,AppUpdate,AppRender,
-		KeyPressed,KeyReleased,
+		KeyPressed,KeyReleased,KeyTyped,
 		MouseButtonPressed,MouseButtonReleased,MouseMoved,MouseScrolled
 	};
 
-	enum EventCategory //过滤器,互相将使用位与运算判断
+	enum HAZEL_API EventCategory //过滤器,互相将使用位与运算判断
 	{
 		None = 0,
 		EventCategoryApplication	=BIT(0),
@@ -74,7 +75,7 @@ namespace Hazel
 		{
 			if (m_event.GetEventType() == T::GetStaticType())
 			{
-				m_event.Handled = func(*(T*)&m_event); //调度器将会用事件调度 同类事件类的函数, 即 event 调度 对应event的动作/函数,这个event解决了吗?由func决定
+				m_event.Handled = func(*(T*)&m_event); //调度器将会用事件调度 同类事件类的函数, 即 event 调度 对应event的动作/函数,这个event解决了吗,是否继续传递?由func决定
 					return true;
 			}
 			return false;//调度失败
@@ -86,4 +87,5 @@ namespace Hazel
 	{
 		return os << a.ToString(); //tostring自动化
 	}
+
 }

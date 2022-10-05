@@ -3,6 +3,8 @@
 //没有正确的程序入口点 是 dll没有更新,lib提供的函数入口与旧dll不对应引起的
 
 
+
+
 class ExampleLayer :public Hazel::Layer
 {
 public:
@@ -14,12 +16,23 @@ public:
 
 	void OnUpdate() override
 	{
-		HZ_INFO("ExampleLayer::Updata");
+		//HZ_INFO("ExampleLayer::Updata");
+		if (Hazel::Input::IsKeyPressed(HZ_KEY_C)) 
+		{
+			HZ_TRACE(" c is pressed");
+		}
 	}
 
 	void OnEvent(Hazel::Event& e) override
 	{
-		HZ_TRACE("{0}", e);
+	
+
+		if (e.GetEventType() == Hazel::EventType::KeyPressed)
+		{
+			Hazel::KeyPressedEvent& ep = (Hazel::KeyPressedEvent&) e;
+			HZ_TRACE("{0}", (char)ep.GetKeyCode());
+		}
+
 	}
 };
 
@@ -29,7 +42,9 @@ class SandBox:public Hazel::Application
 public:
 	SandBox()
 	{
-		PushLayer(new ExampleLayer());// ExampleLayer* -->Layer* 
+		PushOverLayer(new Hazel::ImGuiLayer());
+		PushOverLayer(new ExampleLayer());// ExampleLayer* -->Layer* 
+	
 	}
 	~SandBox()
 	{
@@ -41,6 +56,6 @@ public:
 
 Hazel::Application* Hazel::CreateApplication()
 {
-	return new SandBox;
+	return new SandBox;	
 
 }

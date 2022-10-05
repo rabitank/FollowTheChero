@@ -6,6 +6,10 @@
 #include "Hazel/Events/MouseEvent.h"
 #include "Hazel/Events/KeyEvent.h"
 
+#include <glad/glad.h> //glad 已经支持opengl ,引用的glfw中的opengl(gl可选)会引起冲突 (c 没有 pragma once??)
+						//glad与glfw共用gl标准,函数通用(除了扩展..),glad实际上支持的是4.6(现代高版本的)的gl
+
+
 namespace Hazel
 {
 	static bool s_GLFWInitialized = false;
@@ -52,8 +56,14 @@ namespace Hazel
 
 		m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.title.c_str(),nullptr,nullptr);
 		glfwMakeContextCurrent(m_Window);
+
+		int stauts = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress); //初始化 Glad 使用 glfw的入口
+		
+		HZ_CORE_ASSERT(stauts, "Failed to initialize Glad!");// false 触发断言
+
+
 		glfwSetWindowUserPointer(m_Window, &m_Data); //使m_Window的用户指针(void*) 指向 m_data: m_data这里主要是传递回调函数
-		SetVSync(true);
+		SetVSync(true);//yi bu
 
 		//SET GLFW CallBack
 		glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height)  //  回调函数形式已被glfw指定
@@ -75,6 +85,7 @@ namespace Hazel
 
 
 			});
+		//git clone https://github.com/CompVis/stable-diffusion.git repositories/stable-diffusion
 
 		glfwSetKeyCallback(m_Window, [](GLFWwindow* window,int key,int scancode,int action ,int mods) 
 			{
@@ -107,6 +118,18 @@ namespace Hazel
 				}
 
 			});
+		glfwSetCharCallback(m_Window, [](GLFWwindow* window, unsigned int keycode) //chartyped 把 KeyCallback挤掉了 ???,输入a~z事件类型是,glfw把它依然当作文本输入处理,charCallBack没有KeycallBack 
+			{
+				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+
+				KeyTypedEvent event((int)keycode);
+				data.EventCallback(event);
+
+
+				//event spread: window -> application.onevent(by binding to data) -> layer.onevent in layerstack -> dispatch in layer.onevent
+
+			});
+
 		glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int button, int action, int mods)
 			{
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
