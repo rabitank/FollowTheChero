@@ -1,0 +1,12 @@
+P24:刚刚意识到cherno要做一个抽象renderer,用多种图形库实现,体量似乎瞬间变大了,先用gl,其他以后(挖坑)
+renderAPI -> renderer ->base render what we want
+
+P25: 解决 exe 引用 dll引用的lib中的函数的链接错误 
+1-> 令其 __declsplac(dllexport) /__declsplac(dllimport)  
+(需要该函数在dll使用过,这样dll才包含该函数的实现二进制命令，lib中dll没调用过的部分会被dll丢弃，即使dll包含了，也需要设置该函数在dll中暴露才行)
+2-> module definition file , .def文件    不必使用过,需要在该文件中定义哪些函数(写的是函数签名)从模块中导入
+
+dll可以做 热更新 但是cherno想换lib了 .....
+
+p40?? : cherno 觉得换个图形api就要重新编译太麻烦,也许他想要的是像blender那样瞬间切换的渲染组件??
+	不同渲染平台api对应不同dll然后切换使用哪个即可,它不需要你在编译前做出选择,只要再写shader时注明使用api,hazel将会自动使用对应的dll来构建它

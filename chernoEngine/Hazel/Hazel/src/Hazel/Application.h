@@ -7,6 +7,13 @@
 #include "Events/ApplicationEvent.h"
 #include "LayerStack.h"
 
+#include "Hazel/ImGui/ImGuiLayer.h"
+
+#include "Renderer/Shader.h"
+#include "Renderer/Buffer.h"
+#include "Renderer/VertexArray.h"
+
+	
 
 namespace Hazel {
 
@@ -29,13 +36,24 @@ namespace Hazel {
 
 		
 	private:
-		
+
+		//不再在客户端暴露ImGui,让Hazel持有ImGuiLayer
+		 
+
 		bool OnWindowClose(WindowsCloseEvent& e);
-		std::unique_ptr<Window> m_window;
 		bool m_running = true;
+
+
+		std::unique_ptr<Window> m_window;
+		ImGuiLayer* m_ImGuiLayer;
+		
 		LayerStack m_LayerStack;
 
 		static Application* m_instance; //最后还是单例了
+
+		std::shared_ptr<VertexArray> m_VertexArray;  // VB,IB现在由 VA持有
+		std::shared_ptr<Shader> m_shader; //换shared_ptr了...大逃杀模式...// shader...,跟着application吧,你是唯一的 --中二病
+		std::shared_ptr<VertexArray> m_SquraVA; //for test
 
 	};
 	//To be definde in CLIENT 一个接口,在客户端实现

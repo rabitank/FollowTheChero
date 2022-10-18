@@ -6,7 +6,7 @@ namespace Hazel
 
 	LayerStack::LayerStack()
 	{
-		m_LayerInsert = m_layerstack.begin();
+		
 
 	}
 
@@ -18,7 +18,8 @@ namespace Hazel
 
 	void LayerStack::PushLayer(Layer* layer)
 	{
-		m_LayerInsert =  m_layerstack.emplace(m_LayerInsert,layer); 
+		m_layerstack.emplace(m_layerstack.begin()+m_LayerInsertIndex,layer); 
+		m_LayerInsertIndex++;	
 		//m_LayerInsert++,原位置插入新layer  例子: 1 2 3 4 _<-Insert ,over1,over2, 
 		//推送层 _ 覆盖层 ,覆盖层永远在推送层之上,m_layerInsert指推送层最后一个,在其前面进行推送层插入
 
@@ -36,7 +37,7 @@ namespace Hazel
 		if (it != m_layerstack.end()) 
 		{
 			m_layerstack.erase(it);
-			m_LayerInsert--;
+			m_LayerInsertIndex--;
 		}
 
 	}
@@ -48,8 +49,6 @@ namespace Hazel
 		{
 			m_layerstack.erase(it);
 		}
-		//就是pushback 只不过自动调用对应类型构造函数		//vecDate.push_back(Date(2021, 5, 30));
-														//vecDate.emplace_back(2021, 5, 31);
 	}
 
 }

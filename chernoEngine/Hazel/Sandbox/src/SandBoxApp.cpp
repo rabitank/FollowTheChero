@@ -1,9 +1,9 @@
 #include "Hazel.h"
 //app 对引擎启动细节不感兴趣, 引擎入口(main)应该由引擎定义, app只需要通过实现来控制
 //没有正确的程序入口点 是 dll没有更新,lib提供的函数入口与旧dll不对应引起的
-
-
-
+#include "imGui/imgui.h"
+// #include "imGui/backends/imgui_impl_opengl3.h"
+// #include "imGui/backends/imgui_impl_glfw.h"
 
 class ExampleLayer :public Hazel::Layer
 {
@@ -12,6 +12,15 @@ public:
 		:Layer("Example")
 	{
 
+
+
+
+	}
+	virtual void OnImGuiRender() override
+	{
+		ImGui::Begin("Test");
+		ImGui::Text("Hello World");
+		ImGui::End();
 	}
 
 	void OnUpdate() override
@@ -42,7 +51,7 @@ class SandBox:public Hazel::Application
 public:
 	SandBox()
 	{
-		PushOverLayer(new Hazel::ImGuiLayer());
+	//	PushOverLayer(new Hazel::ImGuiLayer()); //重复推了ImGUILayer!!!尼玛!!!
 		PushOverLayer(new ExampleLayer());// ExampleLayer* -->Layer* 
 	
 	}

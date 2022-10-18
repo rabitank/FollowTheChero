@@ -10,7 +10,7 @@ namespace Hazel
 	{
 	private:
 		std::vector<Hazel::Layer*> m_layerstack;
-		std::vector<Hazel::Layer*>::iterator m_LayerInsert; //类似pin指针,现在移动到哪里了???:用于反向遍历或调用渲染更新某个Layer
+		unsigned int m_LayerInsertIndex =0	; //类似pin指针,维护推送层尾部下标???用于反向遍历或调用渲染更新某个Layer
 		
 	public:
 		LayerStack();

@@ -1,13 +1,13 @@
 #include "hzpch.h"
 #include "WindowsWindow.h"
 #include "Hazel/Window.h"
+#include "Platform/openGl/OpenGLContext.h"
 
 #include "Hazel/Events/ApplicationEvent.h"
 #include "Hazel/Events/MouseEvent.h"
 #include "Hazel/Events/KeyEvent.h"
 
-#include <glad/glad.h> //glad 已经支持opengl ,引用的glfw中的opengl(gl可选)会引起冲突 (c 没有 pragma once??)
-						//glad与glfw共用gl标准,函数通用(除了扩展..),glad实际上支持的是4.6(现代高版本的)的gl
+
 
 
 namespace Hazel
@@ -41,6 +41,7 @@ namespace Hazel
 		m_Data.Height = props.Height;
 		m_Data.title = props.Title;
 
+
 		HZ_CORE_INFO("Create Window {0}({1}, {2})", props.Title, props.Width, props.Height);
 		
 		if (!s_GLFWInitialized)
@@ -55,11 +56,11 @@ namespace Hazel
 		}
 
 		m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.title.c_str(),nullptr,nullptr);
-		glfwMakeContextCurrent(m_Window);
-
-		int stauts = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress); //初始化 Glad 使用 glfw的入口
 		
-		HZ_CORE_ASSERT(stauts, "Failed to initialize Glad!");// false 触发断言
+		m_Context = new OpenGlContext(m_Window);//? m_Context 可能会是静态的,因为它可能只有一个即可 ,OpenGlContext是 GraphicContext()的派生实现类之一
+		m_Context->Init();
+		// ↓抽象以下代码
+
 
 
 		glfwSetWindowUserPointer(m_Window, &m_Data); //使m_Window的用户指针(void*) 指向 m_data: m_data这里主要是传递回调函数
@@ -185,7 +186,8 @@ namespace Hazel
 	void WindowsWindow::onUpdate()
 	{
 		glfwPollEvents();
-		glfwSwapBuffers(m_Window);
+		m_Context->SwapBuffers(); //↓ 我们将会抽象它(为了将来的多平台,先从opengl抽象一套)
+
 	}
 
 

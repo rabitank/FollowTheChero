@@ -10,8 +10,8 @@ namespace Hazel
 	public:
 		MouseMoveEvent(float x, float y)
 			:m_x(x), m_y(y) {};
-		inline int GetX() const { return m_x; }
-		inline int GetY() const { return m_y; }
+		inline float GetX() const { return m_x; }
+		inline float GetY() const { return m_y; }
 		EVENT_CLASS_TYPE(MouseMoved);
 		EVENT_CLASS_CATEGORY(EventCategoryInput | EventCategoryMouse); // | 按位或运算
 
@@ -33,8 +33,8 @@ namespace Hazel
 		MouseScorllEvent(float offsetx,float offsety)
 			:m_OffSetx(offsetx),m_OffSety(offsety) {};
 		
-		inline int GetXOffset() const { return m_OffSetx; }
-		inline int GetYOffset() const { return m_OffSety; }
+		inline float GetXOffset() const { return m_OffSetx; }
+		inline float GetYOffset() const { return m_OffSety; }
 
 		std::string ToString() const override
 		{

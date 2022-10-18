@@ -17,6 +17,7 @@ namespace Hazel
 		virtual void OnAttach() {};// 即 当Layer 被 推到 layerStack 上时使用
 		virtual void OnDetach() {};// 即		 从 layerStack放 下 时 使用
 		virtual void OnUpdate() {};// 层更新时使用 ,每帧调用
+		virtual void OnImGuiRender() {};
 		virtual void OnEvent(Event& event) {};
 
 		inline const  std::string& Getname() { return m_Debugname; }

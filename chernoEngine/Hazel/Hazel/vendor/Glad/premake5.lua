@@ -1,7 +1,7 @@
 ﻿project "Glad"
 	kind "StaticLib"
 	language "C"
-	staticruntime "off"
+	staticruntime "on"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -21,8 +21,12 @@
 
 	filter "system:windows"
 		systemversion "latest"
-		staticruntime "On"
 
-	filter {"system:windows","configurations:Release"}
-		buildoptions "/MT"
+	filter "configurations:Debug"
+		runtime "Debug" --设置运行时库为 对应 debug 版本 MDd
+		symbols "On"
+		
+	filter "configurations:Release"
+		runtime "Release"
+		optimize "On" --���������Ż�
 

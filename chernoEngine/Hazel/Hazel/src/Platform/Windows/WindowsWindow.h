@@ -5,6 +5,7 @@
 #include "GLFW/glfw3.h" // glad 已经同过定义宏 告知了glfw去除gl引用 ,另外,项目里也已经预定义了gl相关,良心glfw,低素质glad
 
 #include "Hazel/Window.h"
+#include "hazel/Renderer/GraphicsContext.h"
 
 namespace Hazel
 {
@@ -34,6 +35,9 @@ namespace Hazel
 
 	private:
 		GLFWwindow* m_Window;
+		GraphicsContext* m_Context;
+
+
 		struct WindowData
 		{
 			std::string title;
