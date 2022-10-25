@@ -194,7 +194,7 @@ namespace Hazel
 	void WindowsWindow::SetVSync(bool enabled)
 	{
 		if (enabled)
-			glfwSwapInterval(1);//启用 等待帧更新完毕进入下一帧
+			glfwSwapInterval(1);//交换间隔设为一帧 等待帧更新完毕进入下一帧,这将导致帧更新频率大于/小于屏幕刷新频率(60~70)
 		else
 			glfwSwapInterval(0);
 		m_Data.VSync = enabled;

@@ -1,32 +1,39 @@
 #pragma once
 
-
+#include "RenderCommand.h"
 //extern 
-class IndexBuffer;
-
-//extern 
-class Shader;
+#include "OrthographicCamera.h"
+#include "Shader.h"
 
 namespace Hazel
 {
 
-	enum class RendererAPI
-	{
-		None=0,OpenGl,
 
-	};
-
-	class Renderer
+		
+	class Renderer //it shoud be   Render -> RenderCommand -> RenderAPI -> different platform achivement
 	{
 	public:
 
-		static RendererAPI s_rendererAPI;
 
-		inline static RendererAPI GetAPI() { return s_rendererAPI; };
+		static void  BeginScene(OrthographicCamera& orCamera );
+		static void  EndScene();
+		static void  Submit( const Ref<Shader>& shader,const Ref<VertexArray>& vao,const glm::mat4& transformMat = glm::mat4(1.0f));
 
-		virtual void Drawer(const IndexBuffer& ib, const Shader& shader)const =0;//const VertexArray& va
-		virtual void clear() const =0;
+		static void Init();
 
+		inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }; 
+
+
+	private:
+		struct SceneData
+		{
+			
+			glm::mat4 ViewProjectionMartix;  //如果是引用 ...不行... ,引用必须创建时就被初始化
+
+		};
+
+		static SceneData* m_sceneData;
+			
 
 
 

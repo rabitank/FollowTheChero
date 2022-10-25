@@ -1,6 +1,5 @@
 #pragma once
 #include "hzpch.h"
-#include "Renderer.h"
 
 
 namespace Hazel
@@ -66,7 +65,7 @@ namespace Hazel
 	struct LayoutElement
 	{
 
-		LayoutElement() {};
+		LayoutElement()=default;
 		ShaderDataType type;//GL里是
 		std::string name;
 		unsigned char ifNormalized;
@@ -123,7 +122,7 @@ namespace Hazel
 			CalculateOffsetAndStride();//const & 是在修改外部变量(根本改不了,const v& 遍历也得是 const),这里还是得修改内部成员 
 		}; //构造可以有,这只是一种数据结构
 
-		BufferLayout() {};
+		BufferLayout() = default;
 
 		~BufferLayout();
 		inline const std::vector<LayoutElement>& GetLayoutElement()const { return m_elements; }
@@ -158,8 +157,8 @@ namespace Hazel
 	{
 	public:
 		//VertexBuffer() {}; 不能有构造函数,必须得由子类实现实例创建,
-		virtual ~VertexBuffer() {};//同时这些函数必须得是protect或public才能对子类开放,子类自己的构造析构会需要调用他们
-
+		virtual ~VertexBuffer() =default; //同时这些函数必须得是protect或public才能对子类开放,子类自己的构造析构会需要调用他们
+		//virtual ~VertexBuffer() =default; virtual ~VertexBuffer(){};类似,前者显式指明构建默认析构函数(有的情况下编译器不会为你构建默认函数),后面随便写了个空实现 
 		virtual void Bind() const = 0;
 		virtual void UnBind() const = 0;
 
@@ -174,7 +173,7 @@ namespace Hazel
 	class IndexBuffer
 	{
 	public:
-		virtual ~IndexBuffer() {};
+		virtual ~IndexBuffer() =default;
 
 		virtual void Bind()const = 0;
 		virtual void UnBind()const = 0;

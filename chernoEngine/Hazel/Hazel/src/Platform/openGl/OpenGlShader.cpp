@@ -1,157 +1,153 @@
 #include "hzpch.h"
 #include "OpenGlShader.h"
 
-#include "Glad/glad.h"
 
 #include <sstream>
 #include <fstream>
 #include <string> //for pareShader
 
+#include "Glad/glad.h"
+#include <glm/gtc/type_ptr.hpp>
+
+
 namespace Hazel
 {
 
+
 	OpenGlShader::OpenGlShader(const std::string& Filepath)
+		
 	{
-		auto [VertexShadersrc, FragmentShadersrc] = parseShader(Filepath);
 
-		GLint  VertexShader = glCreateShader(GL_VERTEX_SHADER);
+		std::string content = readFile(Filepath);
 
-		const GLchar* VSsource = VertexShadersrc.c_str();//& 取地址这个用法,必须是左值 指必须是被存储的变量,这样才有自己的地址,右边只是返回的一个值而已,不会被维护
-		HZ_CORE_INFO("vertexshader SourceCode:{0}", VertexShadersrc.c_str());
-		glShaderSource(VertexShader, 1, &VSsource, 0);
-		glCompileShader(VertexShader);
+		auto shadersSource = preProcess(content);
 
-
-		{
-			GLint isCompiled;
-
-			glGetShaderiv(VertexShader, GL_COMPILE_STATUS, &isCompiled);
-			if (isCompiled == GL_FALSE)
-			{
-				GLint maxLength = 0;
-				glGetShaderiv(VertexShader, GL_INFO_LOG_LENGTH, &maxLength);
-
-				// The maxLength includes the NULL character
-				std::vector<GLchar> infoLog(maxLength);
-				glGetShaderInfoLog(VertexShader, maxLength, &maxLength, &infoLog[0]);
-
-				HZ_CORE_ERROR("OpenGl Log:", infoLog.data());
-				HZ_CORE_ASSERT(false, "OpenGl Error: VertexShder compilate failed!");
-
-
-				// Either of them. Don't leak shaders.
-				glDeleteShader(VertexShader);
-
-				// Use the infoLog as you see fit.
-
-				// In this simple program, we'll just leave
-				return;
-			}
-		}
-
-
-		GLint  FragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-		const GLchar* FSsource = FragmentShadersrc.c_str();
-		glShaderSource(FragmentShader, 1, &FSsource, 0);
-		glCompileShader(FragmentShader);
-
-		{
-			GLint isCompiled;
-			glGetShaderiv(FragmentShader, GL_COMPILE_STATUS, &isCompiled);
-			if (isCompiled == GL_FALSE)
-			{
-				GLint maxLength = 0;
-				glGetShaderiv(FragmentShader, GL_INFO_LOG_LENGTH, &maxLength);
-
-				// The maxLength includes the NULL character
-				std::vector<GLchar> infoLog(maxLength);
-				glGetShaderInfoLog(FragmentShader, maxLength, &maxLength, &infoLog[0]);
-
-				HZ_CORE_ERROR("OpenGl Log:", infoLog.data());
-				HZ_CORE_ASSERT(false, "OpenGl Error: FragmentShder compilate failed!");
-
-				// We don't need the shader anymore.
-				glDeleteShader(FragmentShader);
-				// Either of them. Don't leak shaders.
-				glDeleteShader(VertexShader);
-
-				// Use the infoLog as you see fit.
-
-				// In this simple program, we'll just leave
-				return;
-			}
-		}
+		shaderCompile(shadersSource);
 
 
 
-		// Vertex and fragment shaders are successfully compiled.
-		// Now time to link them together into a program.
-		// Get a program object.
-		m_rendererID = glCreateProgram();
+		//  shader/shader.glsl / or shader\shader.glsl
+		auto lastSlash = Filepath.find_last_of("/\\"); //find_last_of 允许部分匹配
+		// shader.glsl
+		lastSlash = (lastSlash == std::string::npos) ? 0 : lastSlash+1;
 
-		// Attach our shaders to our program
-		glAttachShader(m_rendererID, VertexShader);
-		glAttachShader(m_rendererID, FragmentShader);
-
-		// Link our program
-		glLinkProgram(m_rendererID);
-
-		// Note the different functions here: glGetProgram* instead of glGetShader*.
-		GLint isLinked = 0;
-		glGetProgramiv(m_rendererID, GL_LINK_STATUS, &isLinked);
-		if (isLinked == GL_FALSE)
-		{
-			GLint maxLength = 0;
-			glGetProgramiv(m_rendererID, GL_INFO_LOG_LENGTH, &maxLength);
-
-			// The maxLength includes the NULL character
-			std::vector<GLchar> infoLog(maxLength);
-			glGetProgramInfoLog(m_rendererID, maxLength, &maxLength, &infoLog[0]);
-
-			// We don't need the program anymore.
-			glDeleteProgram(m_rendererID);
-			// Don't leak shaders either.
-			glDeleteShader(VertexShader);
-			glDeleteShader(FragmentShader);
-
-			// Use the infoLog as you see fit.
-
-			// In this simple program, we'll just leave
-
-			HZ_CORE_ERROR("OpenGl Log:{0}", infoLog.data());
-			HZ_CORE_ASSERT(false, "OpenGl Error: Program link shader failed!");
-
-			return;
-		}
-
-		glValidateProgram(m_rendererID);
-
-		// Always detach shaders after a successful link.
-		glDetachShader(m_rendererID, VertexShader); //类似于 .obj文件
-		glDetachShader(m_rendererID, FragmentShader);
-
-
-
-
-
-
-
-
-
+		auto lastDot = Filepath.rfind('.');
+		auto count = lastDot == std::string::npos ? Filepath.size() : lastDot - lastSlash;
+		m_name = Filepath.substr(lastSlash, count);
 
 
 	}
+	OpenGlShader::OpenGlShader(const std::string& name , const std::string& vertexsrc, const std::string& fragmentsrc)
+	{
+		std::unordered_map<GLenum, std::string> shaderSource;
+		shaderSource[GL_VERTEX_SHADER] = vertexsrc;
+		shaderSource[GL_FRAGMENT_SHADER] = fragmentsrc;
 
-	OpenGlShader::~OpenGlShader()
-	{
-		glDeleteProgram(m_rendererID);
-	}
-	void OpenGlShader::Bind() const
-	{
-		glUseProgram(m_rendererID);
+		shaderCompile(shaderSource);
+
+		m_name = name;
 
 	};
 
+	OpenGlShader::~OpenGlShader()
+	{
+
+		glDeleteProgram(m_rendererID);
+	}
+
+	void OpenGlShader::shaderCompile(const std::unordered_map<GLenum, std::string>& shadersSource)
+	{
+		//std::vector<GLint> shaderVarry; //shaderVarry(size)实际是设置了size个空占位,push_back从空占位后开始
+		//shaderVarry.reserve(shadersSource.size());//设置预设尺寸,push_back仍从0开始,...cherno觉得vector在堆上还是影响性能=_=
+		HZ_CORE_ASSERT(shadersSource.size() < 3,"too many kinds component shader ");
+		std::array<int, 2> shaderVarry;
+		uint32_t index=0;
+
+		uint32_t program = glCreateProgram();
+		for (auto& i : shadersSource)
+		{
+			GLint rendererID = glCreateShader(i.first);
+			const GLchar* shaderSrc = i.second.c_str();//& 取地址这个用法,必须是左值 指必须是被存储的变量,这样才有自己的地址,右边只是返回的一个值而已,不会被维护
+			glShaderSource(rendererID, 1, &shaderSrc, 0);
+			glCompileShader(rendererID);
+
+			HZ_CORE_TRACE("shader type:{0} content:{1} ", i.first, i.second.c_str());
+
+
+			GLint isCompiled;
+
+			glGetShaderiv(rendererID, GL_COMPILE_STATUS, &isCompiled);
+			if (isCompiled == GL_FALSE)
+			{
+				GLint maxLength = 0;
+				glGetShaderiv(rendererID, GL_INFO_LOG_LENGTH, &maxLength);
+
+				// The maxLength includes the NULL character
+				std::vector<GLchar> infoLog(maxLength);
+				glGetShaderInfoLog(rendererID, maxLength, &maxLength, &infoLog[0]);
+
+				HZ_CORE_ERROR("OpenGl Log:{0}", infoLog.data());
+				HZ_CORE_ASSERT(false, "OpenGl Error: compilate failed!", i.second);
+
+				glDeleteShader(rendererID);
+				shaderVarry[index] =(-1); // I 'm smart!!
+				continue;
+
+			}
+
+			glAttachShader(program, rendererID);
+			shaderVarry[index++]=rendererID;
+			
+		
+		}
+
+
+
+		glLinkProgram(program);
+
+		GLint isLinked = 0;
+		glGetProgramiv(program, GL_LINK_STATUS, &isLinked);
+		if (isLinked == GL_FALSE)
+		{
+			GLint maxLength = 0;
+			glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
+
+			std::vector<GLchar> infoLog(maxLength);
+			glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
+
+			// We don't need the program anymore.
+			glDeleteProgram(program);
+			
+			for (auto& shader : shaderVarry)
+			{
+				glDeleteShader(shader);
+			}
+
+			m_rendererID = -1;
+
+			HZ_CORE_ERROR("OpenGl Log:{0}", infoLog.data());
+			HZ_CORE_ASSERT(false, "OpenGl Error: Program link shader failed!");
+			return;
+		}
+
+		glValidateProgram(program);
+
+		for (auto& shader:shaderVarry)
+		{
+			glDetachShader(program, shader);
+		}
+
+		m_rendererID = program; //在一切正确之前就拿 program当挡箭牌	
+
+	};
+
+
+	void OpenGlShader::Bind() const
+	{
+	
+		GLCall(glUseProgram(m_rendererID));
+
+	};
 	void OpenGlShader::UnBind() const
 	{
 
@@ -159,38 +155,109 @@ namespace Hazel
 
 	}
 
-	std::tuple<std::string, std::string> OpenGlShader::parseShader(const std::string& filepath)
+	void OpenGlShader::UploadUniformInt(const std::string& name, int value)
 	{
-		enum class shadertype
-		{
-			NONE = -1, vertex, fragment
-		};
-
-		shadertype type = shadertype::NONE;
-
-		std::ifstream stream(filepath);
-		std::stringstream ss[2];
-		std::string line;
-		while (getline(stream, line))
-		{
-			if (line.find("#shader") != std::string::npos)//不等于无效位置
-			{
-				if (line.find("vertex") != std::string::npos)
-					//todo:set mode to vertex
-					type = shadertype::vertex;
-				else if (line.find("fragment") != std::string::npos)
-					//...
-					type = shadertype::fragment;
-			}
-			else
-			{
-				ss[(int)type] << line << "\n";
-
-			}
-		}
-
-		return { ss[0].str(),ss[1].str() };
+		GLint location = glGetUniformLocation(m_rendererID, name.c_str());
+		if (location == -1) HZ_CORE_WARN("uniform {0} in shader {1},didn't find",name,m_rendererID);
+		GLCall(glUniform1i(location,(GLint)value)); //transPos 是否转置
 
 	}
+	void OpenGlShader::UploadUniformFloat(const std::string& name, float value)
+	{
+		GLint location = glGetUniformLocation(m_rendererID, name.c_str());
+		if (location == -1) HZ_CORE_WARN("uniform {0} in shader {1},didn't find", name, m_rendererID);
+		GLCall(glUniform1f(location, (GLfloat)value)); //transPos 是否转置
+	}
+	void OpenGlShader::UploadUniformFloat2(const std::string& name, const glm::vec2& vec)
+	{
+		GLint location = glGetUniformLocation(m_rendererID, name.c_str());
+		if (location == -1) HZ_CORE_WARN("uniform {0} in shader {1},didn't find", name, m_rendererID);
+		GLCall(glUniform2fv(location,1,glm::value_ptr(vec))); //transPos 是否转置
+	}
+	void OpenGlShader::UploadUniformFloat3(const std::string& name, const glm::vec3& vec)
+	{
+		GLint location = glGetUniformLocation(m_rendererID, name.c_str());
+		if (location == -1) HZ_CORE_WARN("uniform {0} in shader {1},didn't find", name, m_rendererID);
+		GLCall(glUniform3fv(location, 1, glm::value_ptr(vec)));
+
+	}
+	void OpenGlShader::UploadUniformFloat4(const std::string& name, const glm::vec4& vec)
+	{
+		GLint location = glGetUniformLocation(m_rendererID, name.c_str());
+		if (location == -1) HZ_CORE_WARN("uniform {0} in shader {1},didn't find", name, m_rendererID);
+		GLCall(glUniform4f(location, vec.x, vec.y, vec.z, vec.w));//等价(性能也许不同) 4fv(location,1,float*)); 
+
+	}
+	void OpenGlShader::UploadUniformMat3(const std::string& name, const glm::mat3& mat)
+	{
+		GLint location = glGetUniformLocation(m_rendererID, name.c_str());
+		if (location == -1) HZ_CORE_WARN("uniform {0} in shader {1},didn't find", name, m_rendererID);
+		GLCall(glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(mat))); //transPos 是否转置
+	}
+	void OpenGlShader::UploadUniformMat4(const std::string& name, const glm::mat4& mat)
+	{
+		GLint location = glGetUniformLocation(m_rendererID, name.c_str());
+		if (location == -1) HZ_CORE_WARN("uniform {0} in shader {1},didn't find", name, m_rendererID);
+		GLCall( glUniformMatrix4fv(location, 1, GL_FALSE,glm::value_ptr(mat))); //transPos 是否转置
+	}
+
+
+	std::string OpenGlShader::readFile(const std::string& filepath)
+	{
+		std::string result;
+		std::ifstream in(filepath, std::ios::in | std::ios::binary);
+		if (in)
+		{
+			in.seekg(0, std::ios::end);
+			result.resize(in.tellg());
+			in.seekg(0, std::ios::beg);
+			in.read(&result[0], result.size());
+			in.close();
+		}
+		else
+			HZ_CORE_ERROR("file error: no such shader file:{0}", filepath);
+		return result;
+
+	}
+
+	static GLenum shaderTypeFromString(const std::string& type)
+	{
+		if (type == "vertex")
+			return GL_VERTEX_SHADER;
+		if (type == "pixel" || type == "fragment")
+			return GL_FRAGMENT_SHADER;
+
+		return 0;
+	}
+	std::unordered_map<GLenum,std::string> OpenGlShader::preProcess(const std::string& source)
+	{
+		const char* typeToken = "#type";
+
+		size_t typeTokenLength = strlen(typeToken);
+		size_t pos = source.find(typeToken, 0);
+
+		std::unordered_map<GLenum, std::string> shaderSource;
+
+		while (pos != std::string::npos)
+		{
+			size_t eol = source.find_first_of("\r\n", pos);//begin from pos to find
+			HZ_CORE_ASSERT(eol != std::string::npos, "Syntax error");//eol: the end pos of the line
+			size_t begin = pos + typeTokenLength + 1; //the pos after "#type"
+			std::string type = source.substr(begin, eol - begin);
+			HZ_CORE_ASSERT(shaderTypeFromString(type), "Invalid shader type specific");
+
+			size_t nextLinePos = source.find_first_not_of("\r\n", eol);// 第一个不是 \r\n 的位置
+			pos = source.find(typeToken, nextLinePos); //下一个#type的位置
+			shaderSource[shaderTypeFromString(type)] = source.substr(nextLinePos, 
+				(pos == std::string::npos) ? (source.size() - nextLinePos):(pos-nextLinePos)); //感觉cherno写错了,改了下... 没有下一个就直接到底,
+
+		}
+		return shaderSource;
+
+	}
+
+
+
+	
 
 }

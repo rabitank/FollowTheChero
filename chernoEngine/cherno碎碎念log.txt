@@ -8,5 +8,20 @@ P25: 解决 exe 引用 dll引用的lib中的函数的链接错误
 
 dll可以做 热更新 但是cherno想换lib了 .....
 
-p40?? : cherno 觉得换个图形api就要重新编译太麻烦,也许他想要的是像blender那样瞬间切换的渲染组件??
+p30?? : cherno 觉得换个图形api就要重新编译太麻烦,也许他想要的是像blender那样瞬间切换的渲染组件??
 	不同渲染平台api对应不同dll然后切换使用哪个即可,它不需要你在编译前做出选择,只要再写shader时注明使用api,hazel将会自动使用对应的dll来构建它
+
+p?? : 需要 场景层面的统一调度 渲染命令,渲染命令序列 以及 渲染器对应的 接口
+
+P36? :轮询和Onevent 不一样... 轮询按帧读取你的按键是否按下,刷新频率是每帧,Onevent则是响应事件，对于按键长按有延迟且占用的帧数更多
+
+cherno 认为 material 需要有意义,在里面设置个 光线方向的统一变量就莫名其妙了
+可能还得有个basicMaterial?
+:
+Hazel::Materialref* material = new Hazel::Material(Shader);
+Hazel::MaterialInstanceRef* mi = new Hazel::MaterialInstance(Shader);
+mi->set("uniform",data);
+squareMesh->Setmaterial(mi);//以及渲染序列与批渲染
+//构建数据存储区
+
+p46: cherno说 单间一个2Drenderer .....=_=

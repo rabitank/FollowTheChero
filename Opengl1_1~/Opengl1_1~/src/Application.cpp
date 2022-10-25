@@ -98,7 +98,7 @@ int main(void)
 			{
 				currentTest->onUpdate(0.0f);
 				currentTest->onRender();
-				ImGui::Begin("Test"); //开启ImGui的一个线程 , 需要用End()返回
+				ImGui::Begin("Test"); //开启ImGui的一个线程,需要用End()返回
 				
 				if (currentTest != testMenu && ImGui::Button("<-")) //特性,当前一条件已经可以得出结果时,后面一条语句不会被执行(画出Button)
 				{

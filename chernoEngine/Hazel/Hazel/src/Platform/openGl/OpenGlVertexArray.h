@@ -1,5 +1,6 @@
 #pragma once
 #include "Hazel/Renderer/VertexArray.h"
+#include "Glad/glad.h"
 
 namespace Hazel
 {
@@ -11,18 +12,18 @@ namespace Hazel
 		void virtual Bind() override;
 		void virtual UnBind() override;
 
-		void AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vertexbuffer)override;
-		void SetIndexBuffer(const std::shared_ptr<IndexBuffer>& indexbuffer)override;
+		void AddVertexBuffer(const Ref<VertexBuffer>& vertexbuffer)override;
+		void SetIndexBuffer(const Ref<IndexBuffer>& indexbuffer)override;
 
-		inline virtual const std::vector<std::shared_ptr<VertexBuffer>>& GetVertexBuffers() const override { return m_vertexBuffers; };
-		inline virtual const std::shared_ptr<IndexBuffer>& GetIndexBuffer()const override { return m_indexBuffer; };
+		inline virtual const std::vector<Ref<VertexBuffer>>& GetVertexBuffers() const override { return m_vertexBuffers; };
+		inline virtual const Ref<IndexBuffer>& GetIndexBuffer()const override { return m_indexBuffer; };
 
 
 
 	private:
 		uint32_t m_rendererID;
-		std::vector<std::shared_ptr<VertexBuffer>> m_vertexBuffers; //many vertexBuffer use one VertexArray?? a kind of runmode?
-		std::shared_ptr<IndexBuffer	>m_indexBuffer;
+		std::vector<Ref<VertexBuffer>> m_vertexBuffers; //many vertexBuffer use one VertexArray?? a kind of runmode?
+		Ref<IndexBuffer	>m_indexBuffer;
 
 
 	};

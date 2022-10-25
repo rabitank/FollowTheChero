@@ -5,15 +5,20 @@
 #include "Hazel/Events/ApplicationEvent.h"
 #include "Hazel/Log.h"
 
-#include <glad/glad.h>
 //设置宏后,glfw已经不包含gl了,需要glad引用gl头来为其函数提供实现
 
 #include "Hazel/Input.h"
- 
+#include "Hazel/Renderer/Renderer.h"
+
+#include <GLFW/glfw3.h>
+
 namespace Hazel 
 {
 
-#define BIND_EVENT_FN(x)  std::bind(&Application::x,this,std::placeholders::_1)
+#define BIND_EVENT_FN(x)  std::bind(&Application::x,this,std::placeholders::_1) //主要是为了像lambda一样有个待填的参数空位
+
+
+
 
 	Application* Application::m_instance = nullptr; //application 成为单例模式
 
@@ -24,12 +29,18 @@ namespace Hazel
 		m_instance = this;
 		
 		m_window = std::unique_ptr<Window>(Window::Create());//这里因该是windowswindowcpp实现的
-		//make_unique<>() 对于我来说还是一个十分玄幻的东西,<_tp> 错误还是 unique_ptr吧
+		//make_unique<>() 对于我来说还是一个十分玄幻的东西(似乎自动调用构造函数??),<_tp> 错误还是 unique_ptr吧
+		m_ImGuiLayer = new ImGuiLayer; //这里选用原始指针,避免uniqueptr导致被删除
 
 		m_window->SetEventCallback(BIND_EVENT_FN(OnEvent));
 
-		unsigned int id;
-		glGenVertexArrays(1, &id);
+		Renderer::Init(); //初始化 Renderer的各项设置
+
+		PushOverLayer(m_ImGuiLayer);
+
+		
+		//牢记 gl是个状态机!!!!!!!!!,顺序重要
+
 
 	}
 	
@@ -70,7 +81,7 @@ namespace Hazel
 	}
 	void Application::Run()
 	{
-
+		//这就是一帧
 
 // 		WindowsResizeEvent e(1280, 720);
 // 
@@ -86,20 +97,31 @@ namespace Hazel
 // 		}
 		 //先看完再尝试运行....QAQ
 
+
 		while (m_running)
-		{
-			glClearColor(0.01f, 0.2f, 0.7f, 1.0f); //现在由glad提供该函数
-			glClear(GL_COLOR_BUFFER_BIT);
+		{	
+			float time = (float) glfwGetTime(); //glfw 里的
+			Timestep  timestep =  time -m_LastFrameTime;
+			m_LastFrameTime = time;
 
 			for (Layer* layer : m_LayerStack)
-				layer->OnUpdate();
+				layer->OnUpdate(timestep);
 
+			//这个块最后会拆分到 渲染线程 里执行
+			m_ImGuiLayer->Begin(); //构造ImGuiLayer上下文  牢记,unique_ptr是指针!主动 ->
+			for (Layer* layer : m_LayerStack)
+				layer->OnImGuiRender();
+			m_ImGuiLayer->End(); 
+			
+								   
 			//轮询测试
 			/*auto [x, y] = Input::GetMousePos(); */
 			//如果查询按键,我们不应该依赖glfw的宏来输入keycode,这会导致兼容性问题	 
 			/*HZ_CORE_TRACE("{0},{1}", x, y);*/
 
 			m_window->onUpdate();
+
+
 		};
 	}
 

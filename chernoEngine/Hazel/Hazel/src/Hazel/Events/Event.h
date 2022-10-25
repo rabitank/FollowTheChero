@@ -23,11 +23,11 @@ namespace Hazel
 	enum HAZEL_API EventCategory //过滤器,互相将使用位与运算判断
 	{
 		None = 0,
-		EventCategoryApplication	=BIT(0),
-		EventCategoryInput			=BIT(1),
-		EventCategoryKeyboard		=BIT(2),
-		EventCategoryMouse			=BIT(3),
-		EventCategoryMouseButton	=BIT(4)
+		EventCategoryApplication = BIT(0),//1
+		EventCategoryInput = BIT(1),//10
+		EventCategoryKeyboard = BIT(2),
+		EventCategoryMouse = BIT(3),
+		EventCategoryMouseButton = BIT(4)
 
 
 	};
@@ -40,7 +40,7 @@ namespace Hazel
 
 #define EVENT_CLASS_CATEGORY(category) virtual int GetCategoryFlags() const override{return category;}\
 
-	class HAZEL_API Event
+	class Event
 	{
 		friend class EventDispatcher;
 	public:
