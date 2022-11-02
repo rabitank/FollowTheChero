@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Event.h"
 #include "hzpch.h"
 

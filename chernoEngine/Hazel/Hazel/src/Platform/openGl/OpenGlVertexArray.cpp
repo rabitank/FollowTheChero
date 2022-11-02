@@ -8,6 +8,7 @@ namespace Hazel
 	{
 		switch (type)
 		{
+		case ShaderDataType::Float: return GL_FLOAT;
 		case ShaderDataType::Float2: return GL_FLOAT;
 		case ShaderDataType::Float3: return GL_FLOAT;
 		case ShaderDataType::Float4: return GL_FLOAT;
@@ -27,6 +28,7 @@ namespace Hazel
 
 	OpenGlVertexArray::OpenGlVertexArray()
 	{
+		HZ_PROFILE_FUNCTION();
 		glGenVertexArrays(1, &m_rendererID); //不Gen就会隐式地使用默认的vao,总之没事
 	}
 
@@ -35,19 +37,22 @@ namespace Hazel
 		glDeleteVertexArrays(1, &m_rendererID);
 	}
 
-	void OpenGlVertexArray::Bind()
+	void OpenGlVertexArray::Bind()  
 	{
+		HZ_PROFILE_FUNCTION(); //这里的另一个好处是可以看到绑定次数.
 		glBindVertexArray(m_rendererID);
 	}
 
 	void OpenGlVertexArray::UnBind()
 	{
+		HZ_PROFILE_FUNCTION();
 		glBindVertexArray(0);
 
 	}
 
 	void OpenGlVertexArray::AddVertexBuffer(const Ref<VertexBuffer>& vertexbuffer)
 	{
+		HZ_PROFILE_FUNCTION();
 		HZ_CORE_ASSERT(vertexbuffer->GetLayout().GetLayoutElement().size(),"VertexBuffer didn't add any Layout yet")
 
 		glBindVertexArray(m_rendererID);
@@ -67,6 +72,7 @@ namespace Hazel
 
 	void OpenGlVertexArray::SetIndexBuffer(const Ref<IndexBuffer>& indexbuffer)
 	{
+		HZ_PROFILE_FUNCTION();
 		indexbuffer->Bind();
 
 		m_indexBuffer=indexbuffer;

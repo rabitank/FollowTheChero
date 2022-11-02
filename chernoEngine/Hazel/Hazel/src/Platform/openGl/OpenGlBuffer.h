@@ -10,10 +10,12 @@ namespace Hazel
 
 	public:
 		OpenGlVertexBuffer(float* vertics, uint32_t size);
+		OpenGlVertexBuffer(uint32_t size);
 		virtual ~OpenGlVertexBuffer() ;
 
 		virtual void Bind()const  override ;
 		virtual void UnBind()const  override ;
+
 
 		virtual void SetLayout(const BufferLayout& layout) override
 		{
@@ -22,10 +24,14 @@ namespace Hazel
 			//但是! stl弥补了这一点,你可以使用 const_iterator 返回值来完成 begin() const版本实例
 			//ApplyLayout();
 		};
+
+
 		inline virtual const BufferLayout& GetLayout() const override
 		{
 			return m_bufferLayout;
 		};
+
+		virtual void SetData(const void* data, uint32_t size) override;
 
 	private:
 		//void ApplyLayout() const ;//Apply也不能 const,需要layout使用同样的Begin() const实例

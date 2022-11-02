@@ -7,6 +7,8 @@ namespace Hazel
 {
 	Ref<VertexArray> VertexArray::Create()
 	{
+
+
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::API::OpenGl:

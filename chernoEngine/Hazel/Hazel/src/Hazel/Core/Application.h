@@ -3,8 +3,8 @@
 #include "core.h"
 
 #include "Window.h"
-#include "Events/Event.h"
-#include "Events/ApplicationEvent.h"
+#include "Hazel/Events/Event.h"
+#include "Hazel/Events/ApplicationEvent.h"
 #include "LayerStack.h"
 
 #include "Hazel/Core/Timestep.h"
@@ -30,7 +30,7 @@ namespace Hazel {
 		void PushOverLayer(Layer* layer);
 
 		inline Window& GetWindow() { return *m_window; } //unique_ptr 真是搞不明白t _ t
-		inline static Application& Get() { return *m_instance; } 
+		inline static Application& Get() { return *s_instance; } 
 
 	
 		
@@ -40,7 +40,10 @@ namespace Hazel {
 		 
 
 		bool OnWindowClose(WindowsCloseEvent& e);
+		bool OnWindowResize(WindowsResizeEvent& e);
+
 		bool m_running = true;
+		bool m_minimized =false;
 
 
 		std::unique_ptr<Window> m_window;
@@ -48,7 +51,7 @@ namespace Hazel {
 		
 		LayerStack m_LayerStack;
 
-		static Application* m_instance; //最后还是单例了
+		static Application* s_instance; //最后还是单例了
 
 		Timestep m_Timestep;
 

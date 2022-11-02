@@ -5,5 +5,5 @@
 
 int main()
 {
-	LOG("part59:c++更快的多线程加载优化");//没看明白,多核异步处理,pushback时为了防止并发用了lock/互斥锁?
+	LOG("part59:c++更快的多线程加载优化");//没看明白,多核异步处理 async(),多核提交mesh时,为了防止并发访问vector用了lock/互斥锁?
 }

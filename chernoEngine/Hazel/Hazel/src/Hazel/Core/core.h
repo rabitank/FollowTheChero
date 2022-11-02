@@ -35,6 +35,7 @@ bool GlLogCall(const char* function, const char* file, int line);
 #else
 #define HZ_ASSERT(x,...)
 #define HZ_CORE_ASSERT(x,...)
+#define GLCall(x) x
 #endif // HZ_ENABLE_ASSERTS
 
 
@@ -46,9 +47,20 @@ namespace Hazel
 {
 	template <typename T>
 	using Scope = std::unique_ptr<T>;//指明作用域限定
+	template<typename T ,typename... Args> //typename...  形参列表包 命名为 Args
+	constexpr Scope<T> CreateScope(Args&& ... args)//Args引用折叠后 命名为 args(变为右值?)
+	{
+		return std::make_unique<T>(std::forward<Args>(args)...);//转发形参args(...解包)
+	}
 
 	template <typename T>
-	using Ref = std::shared_ptr<T>; //指明资产的ref性质,我们只需对自己的资产强调这一点
+	using Ref = std::shared_ptr<T>; //指明资产的ref性质,并对ref进行包装,方便之后的多线程通信,我们只需对自己的资产强调这一点
 
+	template <typename T,typename ... Args>
+	constexpr Ref<T> CreateRef(Args&& ... args)//constexpr func() 常量表达式函数修饰....保证返回常量(只能有return和其他几种命令),会在编译时计算好
+	{
+		return std::make_shared<T>(std::forward<Args>(args)...); 
+
+	}
 
 }

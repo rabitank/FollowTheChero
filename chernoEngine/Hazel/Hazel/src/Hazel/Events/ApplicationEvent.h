@@ -10,7 +10,7 @@ namespace Hazel
 	public:
 		WindowsResizeEvent(unsigned int width,unsigned int heights)
 			:m_width(width),m_height(heights) {};
-		inline int GetWeight() const { return m_width; }
+		inline int GetWidth() const { return m_width; }
 		inline int GetHeight() const { return m_height; }
 		EVENT_CLASS_TYPE(WindowResize);
 		EVENT_CLASS_CATEGORY(EventCategoryApplication); 

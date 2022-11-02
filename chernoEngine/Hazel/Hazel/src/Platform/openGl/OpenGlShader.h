@@ -19,11 +19,24 @@ namespace Hazel
 		//Bind,Unbind just for debug mode
 		virtual void Bind() const ;
 		virtual void UnBind()const;
+
+
+
+
+		virtual void SetMat4(const std::string& name, const glm::mat4& mat4) override;
+		virtual void SetMat3(const std::string& name, const glm::mat3& mat3)override;
+												
+		virtual void SetFloat4(const std::string& name, const glm::vec4& vec4)override;
+		virtual void SetFloat3(const std::string& name, const glm::vec3& vec3)override;
+		virtual void SetFloat2(const std::string& name, const glm::vec2& vec2)override;
+		virtual void SetFloat(const std::string& name, float value) override;
 		
-		
-		
-		void UploadUniformInt(const std::string& name,  int mat) ; //悲报, 提交uniform被本地化了....以后得动态投射了
-		
+		virtual void SetInt(const std::string& name, int value) override;
+		virtual void SetIntArray(const std::string& name, int* value , uint32_t count) override;
+
+		void UploadUniformInt(const std::string& name,  int mat) ; 
+		void UploadUniformIntArray(const std::string& name, int* value, uint32_t count) ;
+
 		void UploadUniformFloat(const std::string& name,  float value);
 		void UploadUniformFloat2(const std::string& name, const glm::vec2& vec);
 		void UploadUniformFloat3(const std::string& name, const glm::vec3& vec);

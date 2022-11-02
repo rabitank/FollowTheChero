@@ -1,6 +1,6 @@
 #include "hzpch.h"
 #include "WindowsWindow.h"
-#include "Hazel/Window.h"
+#include "Hazel/Core/Window.h"
 #include "Platform/openGl/OpenGLContext.h"
 
 #include "Hazel/Events/ApplicationEvent.h"
@@ -12,7 +12,7 @@
 
 namespace Hazel
 {
-	static bool s_GLFWInitialized = false;
+	static unsigned int s_GLFWWindowCount = 0;
 
 
 	static void GLFWErrorCallback(int error_code, const char* description)
@@ -28,6 +28,8 @@ namespace Hazel
 
 	WindowsWindow::WindowsWindow(const WindowProps& props)
 	{
+		HZ_PROFILE_FUNCTION();
+
 		Init(props);
 
 	}
@@ -37,6 +39,9 @@ namespace Hazel
 	}
 	void WindowsWindow::Init(const WindowProps& props)
 	{
+
+		HZ_PROFILE_FUNCTION();
+
 		m_Data.Width = props.Width;
 		m_Data.Height = props.Height;
 		m_Data.title = props.Title;
@@ -44,19 +49,23 @@ namespace Hazel
 
 		HZ_CORE_INFO("Create Window {0}({1}, {2})", props.Title, props.Width, props.Height);
 		
-		if (!s_GLFWInitialized)
+		if (s_GLFWWindowCount==0)
 		{
 
+			HZ_PROFILE_SCOPE("Windoswindow::Init glfwInit");
 			int success = glfwInit();
 			HZ_CORE_ASSERT(success, "Could not intialize GLFW!");//ASSERT core.h定义的断言
 
 			glfwSetErrorCallback(GLFWErrorCallback);
 
-			s_GLFWInitialized = true;
+		}
+		{
+			HZ_PROFILE_SCOPE("Windowswindow::Init glfwCreateWindow");
+			m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.title.c_str(),nullptr,nullptr); //这里初始化了我们帧缓冲区的size,就是GL实际渲染的区域
+			++s_GLFWWindowCount;
 		}
 
-		m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.title.c_str(),nullptr,nullptr);
-		
+
 		m_Context = new OpenGlContext(m_Window);//? m_Context 可能会是静态的,因为它可能只有一个即可 ,OpenGlContext是 GraphicContext()的派生实现类之一
 		m_Context->Init();
 		// ↓抽象以下代码
@@ -181,15 +190,23 @@ namespace Hazel
 
 	void WindowsWindow::Shutdown()
 	{
+		HZ_PROFILE_FUNCTION();
+
 		glfwDestroyWindow(m_Window);
 	}
 	void WindowsWindow::onUpdate()
 	{
+		HZ_PROFILE_FUNCTION();
+
 		glfwPollEvents();
-		m_Context->SwapBuffers(); //↓ 我们将会抽象它(为了将来的多平台,先从opengl抽象一套)
+		m_Context->SwapBuffers(); //上下文的api   . 刷新buffer(交换下一帧的缓冲区)
 
 	}
 
+	void WindowsWindow::SetViewPort(float width, float height)
+	{
+
+	}
 
 	void WindowsWindow::SetVSync(bool enabled)
 	{

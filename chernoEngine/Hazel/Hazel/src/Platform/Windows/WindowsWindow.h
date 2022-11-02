@@ -4,7 +4,7 @@
 
 #include "GLFW/glfw3.h" // glad 已经同过定义宏 告知了glfw去除gl引用 ,另外,项目里也已经预定义了gl相关,良心glfw,低素质glad
 
-#include "Hazel/Window.h"
+#include "Hazel/Core/Window.h"
 #include "hazel/Renderer/GraphicsContext.h"
 
 namespace Hazel
@@ -22,6 +22,7 @@ namespace Hazel
 
 		inline void SetEventCallback(const EventCallBackFn& Callbackfn)override { m_Data.EventCallback = Callbackfn; };
 		void SetVSync(bool enabled) override;
+		virtual void SetViewPort(float width, float height) override ;
 		bool IsVSync() const override;
 
 		inline virtual void* GetNativeWindow() const override { return m_Window; } ;

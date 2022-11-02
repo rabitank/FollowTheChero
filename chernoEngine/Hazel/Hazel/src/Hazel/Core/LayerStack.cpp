@@ -18,6 +18,7 @@ namespace Hazel
 
 	void LayerStack::PushLayer(Layer* layer)
 	{
+		HZ_PROFILE_FUNCTION();
 		m_layerstack.emplace(m_layerstack.begin()+m_LayerInsertIndex,layer); 
 		m_LayerInsertIndex++;	
 		//m_LayerInsert++,原位置插入新layer  例子: 1 2 3 4 _<-Insert ,over1,over2, 
@@ -27,6 +28,7 @@ namespace Hazel
 
 	void LayerStack::PushOverLayer(Layer* layer)
 	{
+
 		m_layerstack.emplace_back(layer); //覆盖层
 	}
 

@@ -11,7 +11,7 @@
 
 
 
-#include "Hazel/Application.h"
+#include "Hazel/Core/Application.h"
 
 
 namespace Hazel
@@ -31,6 +31,10 @@ namespace Hazel
 
 	void ImGuiLayer::OnAttach() //挂到栈上准备渲染了
 	{
+		HZ_PROFILE_FUNCTION();
+
+
+
 		// Setup Dear ImGui context
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
@@ -92,6 +96,8 @@ namespace Hazel
 
 	void ImGuiLayer::OnDetach()
 	{
+		HZ_PROFILE_FUNCTION();
+
 		ImGui_ImplOpenGL3_Shutdown();
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
@@ -125,6 +131,9 @@ namespace Hazel
 
 	void ImGuiLayer::Begin() //OnUpdat() 被拆分为 Begin,ImGuiRender,End	 在渲染数据设置前 调用Begin() ,渲染数据后 调用 end()
 	{
+		HZ_PROFILE_FUNCTION();
+
+
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
@@ -132,6 +141,8 @@ namespace Hazel
 	}
 	void ImGuiLayer::End()
 	{
+		HZ_PROFILE_FUNCTION();
+
 		ImGuiIO& io = ImGui::GetIO();
 
 
@@ -159,8 +170,11 @@ namespace Hazel
 
 	void ImGuiLayer::OnImGuiRender()
 	{
-		//允许客户端控制 ImGui视口是否被渲染,并允许用户在这里新建ImGui渲染(新的ImGui口)
+		HZ_PROFILE_FUNCTION();
+
+		//允许客户端控制 ImGui视口是否被渲染(还没做),并允许用户在这里新建ImGui渲染(新的ImGui口)
 		static bool show = true;
+
 		ImGui::ShowDemoWindow(&show);
 
 	}
@@ -284,9 +298,9 @@ namespace Hazel
 // 	bool ImGuiLayer::OnWindowsResizeEvent(WindowsResizeEvent& e)
 // 	{
 // 		ImGuiIO& io = ImGui::GetIO();
-// 		io.DisplaySize = ImVec2(e.GetWeight(), e.GetHeight());//和update重复了
+// 		io.DisplaySize = ImVec2(e.GetWidth(), e.GetHeight());//和update重复了
 // 		io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f); //layer渲染大小:沾满displaysize
-// 		glViewport(0, 0, e.GetWeight(), e.GetHeight()); //令gl渲染视口
+// 		glViewport(0, 0, e.GetWidth(), e.GetHeight()); //令gl渲染视口
 // 		return true;
 // 	}
 

@@ -131,6 +131,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\SandBox2D.cpp" />
     <ClCompile Include="src\SandBoxApp.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -139,7 +140,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="C:\Users\sjj29\Desktop\图片寄存器\theChernoLogo.png" />
+    <ClInclude Include="src\SandBox2D.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="C:\Users\sjj29\Desktop\WhiteBlock.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,6 +1,6 @@
 #include "hzpch.h"
 #include "OpenGLContext.h"
-#include "hazel/core.h"
+#include "Hazel/Core/core.h"
 #include <glad/glad.h> //glad 已经支持opengl ,引用的glfw中的opengl(gl可选)会引起冲突 (c 没有 pragma once??)
 #include <GLFW/glfw3.h>	//glad与glfw共用gl标准,函数通用(除了扩展..),glad实际上支持的是4.6(现代高版本的)的gl
 
@@ -24,6 +24,8 @@ namespace Hazel
 
 	void OpenGlContext::Init()
 	{
+		HZ_PROFILE_FUNCTION();
+
 		glfwMakeContextCurrent(m_windowHandle); //看出init需要 GLFWwindow* 参数 
 		int stauts = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress); //初始化 Glad 使用 glfw的入口
 		HZ_CORE_ASSERT(stauts, "Failed to initialize Glad!");// false 触发断言
@@ -36,6 +38,9 @@ namespace Hazel
 
 	void OpenGlContext::SwapBuffers()
 	{
+		HZ_PROFILE_FUNCTION();
+
+
 // 		glBegin(GL_TRIANGLES);
 // 		glEnd(); //这里 cherno 尝试调用 gl.h里的一些旧的直接渲染的函数但是失败了
 

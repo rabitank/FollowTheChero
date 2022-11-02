@@ -3,11 +3,11 @@
 #include "Application.h"
 
 #include "Hazel/Events/ApplicationEvent.h"
-#include "Hazel/Log.h"
+#include "Hazel/Core/Log.h"
 
 //设置宏后,glfw已经不包含gl了,需要glad引用gl头来为其函数提供实现
 
-#include "Hazel/Input.h"
+#include "Hazel/Core/Input.h"
 #include "Hazel/Renderer/Renderer.h"
 
 #include <GLFW/glfw3.h>
@@ -20,13 +20,15 @@ namespace Hazel
 
 
 
-	Application* Application::m_instance = nullptr; //application 成为单例模式
+	Application* Application::s_instance = nullptr; //application 成为单例模式
 
 	Application::Application()
 	{
-		HZ_CORE_ASSERT(!(m_instance) ,"Application has been exists") // 不存在 , 反之停下
+		HZ_PROFILE_FUNCTION();
 
-		m_instance = this;
+		HZ_CORE_ASSERT(!(s_instance) ,"Application has been exists") // 不存在 , 反之停下
+
+		s_instance = this;
 		
 		m_window = std::unique_ptr<Window>(Window::Create());//这里因该是windowswindowcpp实现的
 		//make_unique<>() 对于我来说还是一个十分玄幻的东西(似乎自动调用构造函数??),<_tp> 错误还是 unique_ptr吧
@@ -47,8 +49,12 @@ namespace Hazel
 
 	void Application::OnEvent(Event&e)
 	{
+		HZ_PROFILE_FUNCTION();
+
+
 		EventDispatcher dispatcher(e);
 		dispatcher.DisPatch<WindowsCloseEvent>(BIND_EVENT_FN(OnWindowClose));//bind : the first parameter is waitting
+		dispatcher.DisPatch<WindowsResizeEvent>(BIND_EVENT_FN(OnWindowResize));//bind : the first parameter is waitting
 			//dispatcher, if you see WindowCloseEvent ,then use this callfuction with your event e
 
 		//HZ_CORE_TRACE("{0}",e);
@@ -65,12 +71,18 @@ namespace Hazel
 
 	void Application::PushLayer(Layer* layer)
 	{
+		HZ_PROFILE_FUNCTION();
+
+
 		m_LayerStack.PushLayer(layer);
 		layer->OnAttach();
 	}
 
 	void Application::PushOverLayer(Layer* layer)
 	{
+		HZ_PROFILE_FUNCTION();
+
+
 		m_LayerStack.PushOverLayer(layer);
 		layer->OnAttach();
 	}
@@ -98,21 +110,37 @@ namespace Hazel
 		 //先看完再尝试运行....QAQ
 
 
+		HZ_PROFILE_FUNCTION();
 		while (m_running)
 		{	
+			HZ_PROFILE_SCOPE("RunLoop");
 			float time = (float) glfwGetTime(); //glfw 里的
 			Timestep  timestep =  time -m_LastFrameTime;
 			m_LastFrameTime = time;
-
-			for (Layer* layer : m_LayerStack)
-				layer->OnUpdate(timestep);
-
-			//这个块最后会拆分到 渲染线程 里执行
-			m_ImGuiLayer->Begin(); //构造ImGuiLayer上下文  牢记,unique_ptr是指针!主动 ->
-			for (Layer* layer : m_LayerStack)
-				layer->OnImGuiRender();
-			m_ImGuiLayer->End(); 
 			
+			if (!m_minimized)
+			{
+
+				{
+					HZ_PROFILE_SCOPE("layerstack_layers Onupdate");
+
+					for (Layer* layer : m_LayerStack)
+						layer->OnUpdate(timestep);
+					//这个块最后会拆分到 渲染线程 里执行
+				}
+				//imgui layer 跟viewport是拆分开的 , 主窗口最小化不影响ImGui
+				
+					m_ImGuiLayer->Begin(); //构造ImGuiLayer上下文  牢记,unique_ptr是指针!主动 ->
+				{
+
+					HZ_PROFILE_SCOPE("laystack_ImGuilayers OnImGuiRender");
+
+					for (Layer* layer : m_LayerStack)
+						layer->OnImGuiRender();
+				}
+					m_ImGuiLayer->End();	 
+
+			}
 								   
 			//轮询测试
 			/*auto [x, y] = Input::GetMousePos(); */
@@ -127,8 +155,28 @@ namespace Hazel
 
 	bool Application::OnWindowClose(WindowsCloseEvent& e)
 	{
+		HZ_PROFILE_FUNCTION();
 		m_running = false;
 		return true;
+	}
+
+	bool Application::OnWindowResize(WindowsResizeEvent& e)
+	{
+		HZ_PROFILE_FUNCTION();
+
+
+		if (e.GetWidth() == 0 || e.GetHeight() == 0)
+		{
+			m_minimized = true;
+		}
+		else
+		{
+			m_minimized = false;
+		}
+
+		Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
+
+		return false;
 	}
 }
 		

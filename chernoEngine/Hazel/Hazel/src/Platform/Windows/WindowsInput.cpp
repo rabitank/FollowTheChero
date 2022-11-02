@@ -1,7 +1,7 @@
 
 #include "hzpch.h" //有了预编译头,项目设置后每个cpp都要用的,欸
 #include <GLFW/glfw3.h>
-#include "Hazel/Application.h"
+#include "Hazel/Core/Application.h"
 #include "Platform/Windows/WindowsInput.h"
 
 namespace Hazel

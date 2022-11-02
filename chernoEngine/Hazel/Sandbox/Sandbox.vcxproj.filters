@@ -18,9 +18,17 @@
     <ClCompile Include="src\SandBoxApp.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\SandBox2D.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="C:\Users\sjj29\Desktop\图片寄存器\theChernoLogo.png">
+    <ClInclude Include="src\SandBox2D.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="C:\Users\sjj29\Desktop\WhiteBlock.jpg">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

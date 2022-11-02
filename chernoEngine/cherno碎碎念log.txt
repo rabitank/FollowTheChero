@@ -25,3 +25,11 @@ squareMesh->Setmaterial(mi);//以及渲染序列与批渲染
 //构建数据存储区
 
 p46: cherno说 单间一个2Drenderer .....=_=
+
+p52:cherno觉得Set比upload更高级..可能有多重封装啥的...,upload就是一个api,就简单的提交到Gpu动作的一层封装
+
+p55;通用shader/组件shader.... , 像blender那样就很不粗 . . .深度概念gl自带了....没意思
+
+p59: 2020 cherno : 我们将有一个脚本环境, 一个批渲染..坏消息是,,,公共分支的hazel可能只有renderer2D了
+
+p61: 从设置uniform到编辑顶点buffer进行批渲染

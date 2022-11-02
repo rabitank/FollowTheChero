@@ -1,7 +1,7 @@
 #pragma once
 
 #include "hzpch.h"
-#include "Hazel/core.h"
+#include "Hazel/Core/core.h"
 #include "Hazel/Events/Event.h"
 
 namespace Hazel
@@ -21,7 +21,7 @@ namespace Hazel
 
 	};
 
-	class HAZEL_API Window //抽象类/接口 ,没成员
+	class  Window //抽象类/接口 ,没成员
 	{
 	public:
 		using EventCallBackFn = std::function<void(Event&)>;//函数指针
@@ -32,6 +32,7 @@ namespace Hazel
 		virtual unsigned int  GetHeight() const = 0;
 
 		virtual void SetEventCallback(const EventCallBackFn& callback) = 0; //因该有个回调函数成员
+		virtual void SetViewPort(float width,float height) = 0; //因该有个回调函数成员
 		virtual void SetVSync(bool enabled) = 0;
 		virtual bool IsVSync() const = 0;
 
