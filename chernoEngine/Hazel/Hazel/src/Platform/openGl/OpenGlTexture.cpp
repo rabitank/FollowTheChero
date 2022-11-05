@@ -46,13 +46,6 @@ namespace Hazel
 		HZ_CORE_ASSERT(image, "Texture load error:Faild to load image!");
 
 
-// 		GLCall(glGenTextures(1, &m_rendererID));
-// 		GLCall(glBindTexture(GL_TEXTURE_2D, m_rendererID));//指定存储类型配置工具 对容器进行进行配置
-// 		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));//Parameteri:参数 MIN_FILTER:缩小过滤器 GL_Linear:线性
-// 		//设置2d纹理的参数:缩小方式(过滤器)为 线性
-// 		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));//Parameteri:参数 MAG_FILTER:放大过滤器 GL_Linear:线性
-// 		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));//Parameteri:参数 WRAP_S:水平环绕,CLAMP:嵌入
-// 		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));//Parameteri:参数 WRAP_T:垂直环绕,CLAMP:嵌入
 // 		//将组好的tex2D设置以及其他参数发送给gl,显卡利用这些信息创建空间 
 // 		GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, m_width, m_heigth, 0, GL_RGB, GL_UNSIGNED_BYTE, image));//Parameteri:参数 WRAP_T:垂直环绕,CLAMP:嵌入
  		GLCall( glCreateTextures(GL_TEXTURE_2D,1, &m_rendererID));
@@ -80,7 +73,7 @@ namespace Hazel
 		GLCall(glTextureStorage2D(m_rendererID, 1, internalformat, m_width, m_heigth)); // levels:texture纹理层级数(mipmap级别,对于2D纹理必须为1) internalformat 图像 存储格式 //该API指定纹理存储格式
 //glTextureParameteri or glTexParameteri , it use id but not enum and don't need bind to set texture
 		glTextureParameteri(m_rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);//Parameteri:纹理 MIN_FILTER:缩小过滤器 GL_Linear:线性
-		glTextureParameteri(m_rendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);//Parameteri:纹理 MAG_FILTER:放大过滤器 GL_Linear:线性
+		glTextureParameteri(m_rendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);//Parameteri:纹理 MAG_FILTER:放大过滤器 GL_Linear:线性
 		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));//Parameteri:参数 WRAP_S:水平环绕,CLAMP:嵌入
 		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));//Parameteri:参数 WRAP_T:垂直环绕,CLAMP:嵌入
 

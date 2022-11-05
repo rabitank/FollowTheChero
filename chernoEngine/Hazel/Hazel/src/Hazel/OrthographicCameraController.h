@@ -8,6 +8,16 @@
 namespace Hazel
 
 {
+	struct  OrthographicCameraBounds
+	{
+		float Left, Right;
+		float Bottom, Top;
+
+		float GetWidth() { return Right - Left; }
+		float GetHeight() { return Top - Bottom; }
+	};
+
+
 	class OrthographicCameraController //it just help user control the camera ,and reduce the camera contains
 	{
 	public:
@@ -18,9 +28,12 @@ namespace Hazel
 		OrthographicCamera& GetCamera() { return m_orthographicCamera; };
 		const OrthographicCamera& GetCamera() const  { return m_orthographicCamera; };
 
-		void SetZoomLevel(float level) { m_zoomLevel = level; };
+		void SetZoomLevel(float level) {
+			m_zoomLevel = level; CalculateView();
+		};
 		float GetZoomLevel() {return m_zoomLevel ; };
 
+		inline const OrthographicCameraBounds& GetBound() const { return m_bounds; };
 	private:
 
 		bool onMouseScrolled(MouseScorllEvent& event);
@@ -29,12 +42,16 @@ namespace Hazel
 
 		bool onWindowResized(WindowsResizeEvent& event);
 
-
+		void CalculateView();
+		
 	private:
 		//又说定义顺序跟初始化顺须一样了..
+
 		float m_aspectratio;
 		float m_zoomLevel = 1.0f;
 		bool m_rotation;
+
+		OrthographicCameraBounds m_bounds;
 		OrthographicCamera m_orthographicCamera;
 
 		glm::vec3 m_CameraPosition = {0.f,0.f,0.f};

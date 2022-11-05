@@ -146,6 +146,9 @@ private:
 }
 #ifdef HZ_DEBUG
 #define HZ_PROFILING 1
+#else
+#define HZ_PROFILING 0
+#endif
 
 #if HZ_PROFILING
 #define HZ_PROFILE_SCOPE(name)  ::Hazel::InstrumentationTimer time##__LINE__( name)
@@ -160,4 +163,3 @@ private:
 #define HZ_PROFILE_FUNCTION() HZ_PROFILE_SCOPE(__FUNCSIG__);  //__FUNCTION__能读当前在的文件名(const char*) ,__FUNCSIG__读取函数签名(签名能体现重载和作用域名)
 #endif 
 
-#endif

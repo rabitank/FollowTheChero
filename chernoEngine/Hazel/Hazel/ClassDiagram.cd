@@ -1,0 +1,395 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Hazel::OrthographicCameraController">
+    <Position X="105" Y="7.25" Width="3" />
+    <TypeIdentifier>
+      <HashCode>IAEAAAIAABIAAAAAAkAAIACEAAAAABAEEAAACAEAJAA=</HashCode>
+      <FileName>src\Hazel\OrthographicCameraController.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::Application">
+    <Position X="108.5" Y="2.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAgAAQBCAAABAAkQAAgAAAgACAAAAQABAAACAAgI=</HashCode>
+      <FileName>src\Hazel\Core\Application.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::Input" Collapsed="true">
+    <Position X="98.25" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEBAAAAAQAAAAAAAgQAAABAAAAAAAAABCAAAAAAACA=</HashCode>
+      <FileName>src\Hazel\Core\Input.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::Layer" Collapsed="true">
+    <Position X="100.25" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAQAAAAAAAAAAEAAAAAAAIAAEAAEAAAFAAEAAAA=</HashCode>
+      <FileName>src\Hazel\Core\Layer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::LayerStack" Collapsed="true">
+    <Position X="100.25" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAACAAAAAAAAAAACAEAQAgICAAAAAAAAAMAAAAA=</HashCode>
+      <FileName>src\Hazel\Core\LayerStack.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::Log" Collapsed="true">
+    <Position X="100.5" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAACABAAAAAAAAAAAAAAAAAAAAABAAACAAAAAAA=</HashCode>
+      <FileName>src\Hazel\Core\Log.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::Timestep" Collapsed="true">
+    <Position X="102.75" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAAIBAAAAAQAAAAAEAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>src\Hazel\Core\Timestep.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::Window">
+    <Position X="96" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAABAEAAAAAAABAAAAAAABAAQAAAGAAgAAAAEAAAAA=</HashCode>
+      <FileName>src\Hazel\Core\Window.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::WindowsResizeEvent" Collapsed="true">
+    <Position X="81.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAICAFAAAQAABAAAAAAACAAAAAAEAAAAA=</HashCode>
+      <FileName>src\Hazel\Events\ApplicationEvent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::WindowsCloseEvent" Collapsed="true">
+    <Position X="83.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAIAAEAAAQAAAAAAAAAAAAAAQAAAAAAAA=</HashCode>
+      <FileName>src\Hazel\Events\ApplicationEvent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::AppTickEvent" Collapsed="true">
+    <Position X="85.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAIAAEAAASAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>src\Hazel\Events\ApplicationEvent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::AppUpdateEvent" Collapsed="true">
+    <Position X="88" Y="3.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAAAAAAIAAAAAAQAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>src\Hazel\Events\ApplicationEvent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::AppRenderEvent" Collapsed="true">
+    <Position X="90.25" Y="3.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAIAAEAAAQAAAAAAAAABAAAAAAAAAAAAA=</HashCode>
+      <FileName>src\Hazel\Events\ApplicationEvent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::Event" Collapsed="true">
+    <Position X="93.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAIAIAAIAAAEAAAAAAAAAAAAAAAAAAAAAAAABAA=</HashCode>
+      <FileName>src\Hazel\Events\Event.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::EventDispatcher" Collapsed="true">
+    <Position X="97.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAAIAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>src\Hazel\Events\Event.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::KeyEvent" Collapsed="true">
+    <Position X="94.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>src\Hazel\Events\KeyEvent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::KeyPressedEvent" Collapsed="true">
+    <Position X="92.5" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAQAAAgBAAAAAAABAAAAAAAAAA=</HashCode>
+      <FileName>src\Hazel\Events\KeyEvent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::KeyReleasedEvent" Collapsed="true">
+    <Position X="94.75" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAQAAAAAAAAAIAAAAAAAAAAAAA=</HashCode>
+      <FileName>src\Hazel\Events\KeyEvent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::KeyTypedEvent" Collapsed="true">
+    <Position X="97" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAQAAAAAAAAAAAAAAgAAAAAAAA=</HashCode>
+      <FileName>src\Hazel\Events\KeyEvent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::MouseMoveEvent" Collapsed="true">
+    <Position X="99.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAIAAEAAAQAAAAQABAAAAAYAAAAAAAAAA=</HashCode>
+      <FileName>src\Hazel\Events\MouseEvent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::MouseScorllEvent" Collapsed="true">
+    <Position X="101.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAMAAAIAAEAAAQAAAAAAAAIAAAAAAAAAAAAAA=</HashCode>
+      <FileName>src\Hazel\Events\MouseEvent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::MouseButtonEvent" Collapsed="true">
+    <Position X="104.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAA=</HashCode>
+      <FileName>src\Hazel\Events\MouseEvent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::MouseButtonPressedEvent" Collapsed="true">
+    <Position X="103.75" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAAAAAEAAAQAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>src\Hazel\Events\MouseEvent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::MouseButtonReleasedEvent" Collapsed="true">
+    <Position X="106" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAgAAAAAAEAAAQAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>src\Hazel\Events\MouseEvent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::ImGuiLayer" Collapsed="true">
+    <Position X="100.25" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABIAAAAAAAAAAAAAgAAAAAAAAIAAEAAABAABAAAAAAA=</HashCode>
+      <FileName>src\Hazel\ImGui\ImGuiLayer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::BufferLayout">
+    <Position X="81.25" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgACAAAAAAAAgAAAAQAQAAAAUAAAAAAAAAAAAAo=</HashCode>
+      <FileName>src\Hazel\Renderer\Buffer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::VertexBuffer" Collapsed="true">
+    <Position X="81.5" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAgAAAAAAAAAAAAAAAAAAAAACAAEAIAAAEAAAAAAA=</HashCode>
+      <FileName>src\Hazel\Renderer\Buffer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::IndexBuffer" Collapsed="true">
+    <Position X="87.25" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAgAAAAAAAAAAAAAAAAAABAAAAAEAAAAAEAAAAAAA=</HashCode>
+      <FileName>src\Hazel\Renderer\Buffer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::Camerea">
+    <Position X="91.5" Y="12.75" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAACIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>src\Hazel\Renderer\Camera.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::GraphicsContext" Collapsed="true">
+    <Position X="84.25" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAIAA=</HashCode>
+      <FileName>src\Hazel\Renderer\GraphicsContext.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::OrthographicCamera">
+    <Position X="89" Y="12.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAQACCAQIAgAAAAEAAQIAAACggAAAAAAAEAIAA=</HashCode>
+      <FileName>src\Hazel\Renderer\OrthographicCamera.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::RenderCommand" Collapsed="true">
+    <Position X="87.25" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAABAAAAAAAAAAAAAAEAAAAAAAAAAEAAAACgABAAAA=</HashCode>
+      <FileName>src\Hazel\Renderer\RenderCommand.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::Renderer" Collapsed="true">
+    <Position X="89" Y="11.75" Width="1.5" />
+    <NestedTypes>
+      <Struct Name="Hazel::Renderer::SceneData" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>src\Hazel\Renderer\Renderer.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAggAAAAAAAAAAAAAAAAAAAAAAAAAQBCACAQAAAAA=</HashCode>
+      <FileName>src\Hazel\Renderer\Renderer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::RendererAPI" Collapsed="true">
+    <Position X="87.25" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAABAAAAAAAAAAAEAAEAAAAAAAAAAAAACACCABAAAA=</HashCode>
+      <FileName>src\Hazel\Renderer\RendererAPI.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::Shader" Collapsed="true">
+    <Position X="84.25" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAIgAAAAAAAAgAIAAAAAAAAAAAAAEAABAAEAAAAAAA=</HashCode>
+      <FileName>src\Hazel\Renderer\Shader.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::ShaderLibrary" Collapsed="true">
+    <Position X="87" Y="13" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAkAAAA=</HashCode>
+      <FileName>src\Hazel\Renderer\Shader.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::Texture" Collapsed="true">
+    <Position X="81.5" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAABAAAAAAAAAAAAAABAAAAAAAAAAAAAAEAAAAA=</HashCode>
+      <FileName>src\Hazel\Renderer\Texture.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::Texture2D" Collapsed="true">
+    <Position X="81.5" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>src\Hazel\Renderer\Texture.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::VertexArray" Collapsed="true">
+    <Position X="84.25" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAAAAAAABABAAAAAAAAIAAEAAAAAEAEACAAA=</HashCode>
+      <FileName>src\Hazel\Renderer\VertexArray.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::WindowsInput">
+    <Position X="98.25" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAQAAAAAAAAAAgAAAAQAAAAAABAAAAAAAACA=</HashCode>
+      <FileName>src\Platform\Windows\WindowsInput.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::WindowsWindow">
+    <Position X="96" Y="9.75" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Struct Name="Hazel::WindowsWindow::WindowData">
+        <TypeIdentifier>
+          <NewMemberFileName>src\Platform\Windows\WindowsWindow.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>CQAABAEAAAAEAABAAIABAQBAAAAAECAAgAACAEAAAAA=</HashCode>
+      <FileName>src\Platform\Windows\WindowsWindow.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::OpenGlContext" Collapsed="true">
+    <Position X="84.25" Y="12.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAgACAIAAIAA=</HashCode>
+      <FileName>src\Platform\openGl\OpenGLContext.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::OpenGlVertexBuffer" Collapsed="true">
+    <Position X="81.5" Y="13" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAiAAAAAAgAAAAAABAAAAAAACAAAAIAAAEAAAQAAA=</HashCode>
+      <FileName>src\Platform\openGl\OpenGlBuffer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::OpenGlIndexBuffer" Collapsed="true">
+    <Position X="87.25" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAiAAAQAAAAAAAAAAAAAAAAAAAAQAAAAAEAAQAAAA=</HashCode>
+      <FileName>src\Platform\openGl\OpenGlBuffer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::OpenGlRendererAPI" Collapsed="true">
+    <Position X="87.25" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAABAAAAAAAAAAAAAAEAAAAEAAAAAAAAAACAABAAAA=</HashCode>
+      <FileName>src\Platform\openGl\OpenGlRendererAPI.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::OpenGlShader" Collapsed="true">
+    <Position X="84.25" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EBAIiABAAAAAAgAIAAAAAAAEAAECEBIAAQAEQABeAAA=</HashCode>
+      <FileName>src\Platform\openGl\OpenGlShader.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::OpenGlTexture" Collapsed="true">
+    <Position X="81.5" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAiAgBAAAAAAAABAAAAABAYAABACCAABAAAEAAAAA=</HashCode>
+      <FileName>src\Platform\openGl\OpenGlTexture.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::OpenGlVertexArray" Collapsed="true">
+    <Position X="84.25" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAiAAQAAAAAAABABAAAAAAAAIAAAAAAAAEAAACECA=</HashCode>
+      <FileName>src\Platform\openGl\OpenGlVertexArray.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::Instrumentor">
+    <Position X="98.25" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAABAEAAABgABAAAAAAAAAAAAAAIABAEAgAAAAAAA=</HashCode>
+      <FileName>src\Hazel\Debug\Instrumentor.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::InstrumentationTimer">
+    <Position X="93.25" Y="10.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAAACIAAEAAAAAAAAAAAgAAAAAAAAABAAAAA=</HashCode>
+      <FileName>src\Hazel\Debug\Instrumentor.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hazel::Renderer2D" Collapsed="true">
+    <Position X="90.75" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAABEACAQIAAAA=</HashCode>
+      <FileName>src\Hazel\Renderer\Renderer2D.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="Hazel::WindowProps">
+    <Position X="93.5" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAEABAAAAEAAAAAAAEAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>src\Hazel\Core\Window.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Enum Name="Hazel::ShaderDataType">
+    <Position X="83.75" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAAQAAAAAgAAAAAAAMAgAAAAAAAAAAAAEgACA=</HashCode>
+      <FileName>src\Hazel\Renderer\Buffer.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Microsoft YaHei UI" Size="9" />
+</ClassDiagram>

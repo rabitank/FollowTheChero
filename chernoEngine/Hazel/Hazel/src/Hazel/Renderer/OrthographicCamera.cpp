@@ -7,7 +7,7 @@ namespace Hazel
 {
 
 	OrthographicCamera::OrthographicCamera(float left, float right, float bottom, float top) //这四个,是视场大小,暂且只提供2D平面面积,但我们的投影矩阵包括z向的剪切
-		:m_ProjectionMartix(glm::ortho(left, right, bottom, top, -1.0f, 1.0f)), m_pos(glm::vec3(0.0f,0.0f,0.0f)),m_rotation(0.0f)
+		: m_ProjectionMartix(glm::ortho(left, right, bottom, top, -1.0f, 1.0f)), m_pos(glm::vec3(0.0f, 0.0f, 0.0f)), m_rotation(0.0f)
 	{
 		HZ_PROFILE_FUNCTION();
 

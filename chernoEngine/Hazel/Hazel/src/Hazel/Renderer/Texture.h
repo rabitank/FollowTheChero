@@ -1,7 +1,5 @@
 #pragma once
-#include <string>
 #include <Hazel/Core/core.h>
-
 
 namespace Hazel
 {
@@ -28,7 +26,6 @@ namespace Hazel
 		static Ref<Texture2D> Create(const std::string& filePath);//不再使用裸指针,而是使用shared->强引用
 		static Ref<Texture2D> Create(uint32_t width, uint32_t height );//不再使用裸指针,而是使用shared->强引用
 
-		
 
 	};
 

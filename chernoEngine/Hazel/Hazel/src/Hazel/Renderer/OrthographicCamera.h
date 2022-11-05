@@ -5,6 +5,8 @@
 
 namespace Hazel
 {
+
+
 	class OrthographicCamera //正交相机
 	{
 	public:
@@ -21,10 +23,13 @@ namespace Hazel
 		inline const glm::mat4& GetProjectionMat() const { return m_ProjectionMartix; };
 		inline const glm::mat4& GetViewMat() const { return m_ViewMartix; };
 		inline const glm::mat4& GetViewProjectionMat() const { return m_ViewProjectionMartix; };
+
+
 		
 	private:
 		void RecalculateViewMatrix(); //for updata ViewM
 	private:
+
 
 		glm::mat4 m_ProjectionMartix;
 		glm::mat4 m_ViewMartix;
