@@ -175,7 +175,6 @@ namespace Hazel
 		//允许客户端控制 ImGui视口是否被渲染(还没做),并允许用户在这里新建ImGui渲染(新的ImGui口)
 		static bool show = true;
 
-		ImGui::ShowDemoWindow(&show);
 
 	}
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "Hazel/Core/core.h"
+#include "Hazel/Core/Base.h"
 //  Entry point 最后的编译是在 SandBoxApp.cpp 中, int main 函数的实现 在 hazel.h 最后,因此可以不声明hazel/...h 而使用引擎
 
 

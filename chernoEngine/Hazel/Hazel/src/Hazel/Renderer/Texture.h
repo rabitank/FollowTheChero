@@ -1,5 +1,5 @@
 #pragma once
-#include <Hazel/Core/core.h>
+#include <Hazel/Core/Base.h>
 
 namespace Hazel
 {
@@ -10,6 +10,8 @@ namespace Hazel
 
 		virtual uint32_t GetWidth() const= 0;
 		virtual uint32_t GetHeight() const= 0;
+
+		virtual uint32_t GetRendererID() const=0;
 
 		virtual void SetData(void* data, uint32_t size) = 0;
 
@@ -25,6 +27,8 @@ namespace Hazel
 	public:
 		static Ref<Texture2D> Create(const std::string& filePath);//不再使用裸指针,而是使用shared->强引用
 		static Ref<Texture2D> Create(uint32_t width, uint32_t height );//不再使用裸指针,而是使用shared->强引用
+
+
 
 
 	};

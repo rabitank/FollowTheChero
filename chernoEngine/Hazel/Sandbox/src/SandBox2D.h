@@ -3,7 +3,6 @@
 #include "ImGui/imgui.h"
 
 
-#include "ParticleSystem.h"
 
 class SandBox2D:public Hazel::Layer
 {
@@ -30,15 +29,13 @@ private:
 	Hazel::Ref<Hazel::VertexArray> m_squareVA; //for test
 
 	Hazel::Ref<Hazel::Texture2D> m_boardTexture,m_quancifangTexture;
-	Hazel::Ref<Hazel::Texture2D> m_spriteSheet;
-	Hazel::Ref<Hazel::SubTexture2D> m_spriteHair,m_spriteTree;
+
 
 	Hazel::OrthographicCameraController m_cameraController; //cherno把position提出来了?? 
 	glm::vec4 m_flatColor = { 0.2,0.3f,0.8f,0.4f};
 
-	ParticleSystem m_particleSystem;
-	ParticleProps m_particle;
-	std::vector<ProfileResult> m_result;
+	Hazel::ParticleSystem m_particleSystem;
+	Hazel::ParticleProps m_particle;
 
 	std::unordered_map<char, Hazel::Ref<Hazel::SubTexture2D>> m_TextureMap ; //for char to texture
 	uint32_t m_mapWidth, m_mapHeight;

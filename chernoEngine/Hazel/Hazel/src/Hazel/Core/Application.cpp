@@ -22,7 +22,7 @@ namespace Hazel
 
 	Application* Application::s_instance = nullptr; //application 成为单例模式
 
-	Application::Application()
+	Application::Application(const std::string& windowName )
 	{
 		HZ_PROFILE_FUNCTION();
 
@@ -30,7 +30,7 @@ namespace Hazel
 
 		s_instance = this;
 		
-		m_window = std::unique_ptr<Window>(Window::Create());//这里因该是windowswindowcpp实现的
+		m_window = std::unique_ptr<Window>(Window::Create(windowName));//这里因该是windowswindowcpp实现的... windowName自动构造成了windowprops了
 		//make_unique<>() 对于我来说还是一个十分玄幻的东西(似乎自动调用构造函数??),<_tp> 错误还是 unique_ptr吧
 		m_ImGuiLayer = new ImGuiLayer; //这里选用原始指针,避免uniqueptr导致被删除
 
@@ -85,6 +85,11 @@ namespace Hazel
 
 		m_LayerStack.PushOverLayer(layer);
 		layer->OnAttach();
+	}
+
+	void Application::Close()
+	{
+		m_running = false;
 	}
 
 	Application::~Application()

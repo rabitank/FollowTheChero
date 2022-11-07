@@ -17,6 +17,9 @@ namespace Hazel
 		virtual bool operator==(const Texture& other)const override { return m_rendererID == ((OpenGlTexture2D&)other).m_rendererID; };
 		//类(class)私有成员可以被类成员函数访问,不区分成员在哪个实例(instance)里。
 
+		virtual inline uint32_t GetRendererID()const override{ return m_rendererID; };
+
+
 		OpenGlTexture2D(const std::string& path) ;
 		OpenGlTexture2D(uint32_t width,uint32_t height) ;
 		virtual ~OpenGlTexture2D() ;

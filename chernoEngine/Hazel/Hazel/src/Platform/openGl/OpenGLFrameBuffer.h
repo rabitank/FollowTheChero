@@ -1,0 +1,31 @@
+#pragma once
+#include "Hazel/Renderer/FrameBuffer.h"
+
+namespace Hazel
+{
+	/// <summary>
+	///帧缓存的概念就是,把输出结果都组合一下渲染成一张图,有窗口那么大,实际显示的就是这张图,你可以手动设置它直接让显示器显示你想显示的,或者用这个承接渲染器渲染的东西(Bind,UnBind)
+	/// </summary>
+	class OpenGlFrameBuffer:public FrameBuffer
+	{
+	public:
+		OpenGlFrameBuffer(const FrameBufferSpecification& spec);
+		virtual ~OpenGlFrameBuffer() {};
+
+		void Invalidate(); //无效化...变成空白帧
+		virtual void Bind() const override;	
+		virtual void UnBind() const override;
+		virtual const FrameBufferSpecification& GetSpecification() const override { return m_specification; }; //最好还是const....安全第一...
+		virtual  uint32_t GetColorAttachMentRendererID() const { return m_colorAttachMent; }; //最好还是const....安全第一...
+
+
+	private:
+		FrameBufferSpecification m_specification;
+
+		uint32_t m_rendererID;
+		uint32_t m_colorAttachMent;
+		uint32_t m_depthAttachMent;
+	};
+
+}
+

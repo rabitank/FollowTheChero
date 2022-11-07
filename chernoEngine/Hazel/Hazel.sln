@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImGui", "Hazel\vendor\imgui
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Hazel", "Hazel\Hazel.vcxproj", "{99294D0D-053E-75BE-CEBF-181E3A9371EF}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Hazel-Editor", "Hazel-Editor\Hazel-Editor.vcxproj", "{2D075B63-196A-EA07-C2EF-22BEAE31B68A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -50,6 +52,12 @@ Global
 		{99294D0D-053E-75BE-CEBF-181E3A9371EF}.Dist|x64.Build.0 = Dist|x64
 		{99294D0D-053E-75BE-CEBF-181E3A9371EF}.Release|x64.ActiveCfg = Release|x64
 		{99294D0D-053E-75BE-CEBF-181E3A9371EF}.Release|x64.Build.0 = Release|x64
+		{2D075B63-196A-EA07-C2EF-22BEAE31B68A}.Debug|x64.ActiveCfg = Debug|x64
+		{2D075B63-196A-EA07-C2EF-22BEAE31B68A}.Debug|x64.Build.0 = Debug|x64
+		{2D075B63-196A-EA07-C2EF-22BEAE31B68A}.Dist|x64.ActiveCfg = Dist|x64
+		{2D075B63-196A-EA07-C2EF-22BEAE31B68A}.Dist|x64.Build.0 = Dist|x64
+		{2D075B63-196A-EA07-C2EF-22BEAE31B68A}.Release|x64.ActiveCfg = Release|x64
+		{2D075B63-196A-EA07-C2EF-22BEAE31B68A}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

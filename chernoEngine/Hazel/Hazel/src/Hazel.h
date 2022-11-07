@@ -15,6 +15,8 @@
 
 #include "Hazel/ImGui/ImGuiLayer.h"
 
+#include "Hazel/Core/ParticleSystem.h"
+
 //-------------Renderer ------------------------
 #include "Hazel/Renderer/renderer.h"
 #include "Hazel/Renderer/Renderer2D.h"
@@ -22,12 +24,14 @@
 
 #include "Hazel/Renderer/VertexArray.h"
 #include "Hazel/Renderer/Buffer.h"
+#include "Hazel/Renderer/FrameBuffer.h"
 #include "Hazel/Renderer/Shader.h"
 #include "Hazel/Renderer/Texture.h"
 
 #include "Hazel/Renderer/SubTexture2D.h"
 
 #include "Hazel/Renderer/OrthographicCamera.h "
+
 //----------------------------------------------
 
 
