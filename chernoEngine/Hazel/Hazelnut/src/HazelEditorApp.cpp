@@ -17,17 +17,17 @@
 
 namespace Hazel
 {
-	class HazelEditor :public Application //Hazel 的编辑器界面!!!!!
+	class Hazelnut :public Application //Hazel 的编辑器界面!!!!!
 	{
 	public:
-		HazelEditor(const std::string&  windowName=  "Hazel Editor")
+		Hazelnut(const std::string&  windowName=  "Hazel Editor")
 			:Application(windowName)
 		{
 
 			PushLayer(new EditorLayer());// ExampleLayer* -->Layer* 
 
 		}
-		~HazelEditor()
+		~Hazelnut()
 		{
 
 		}
@@ -39,7 +39,7 @@ namespace Hazel
 
 	Application* CreateApplication()
 	{
-		return new HazelEditor();
+		return new Hazelnut();
 
 	}
 }

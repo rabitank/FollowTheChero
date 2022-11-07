@@ -131,6 +131,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Particel.h" />
     <ClInclude Include="src\SandBox2D.h" />
   </ItemGroup>
   <ItemGroup>

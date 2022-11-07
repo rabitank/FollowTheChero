@@ -15,6 +15,13 @@ namespace Hazel
 	}
 
 
+	OpenGlFrameBuffer::~OpenGlFrameBuffer()
+	{
+		glDeleteFramebuffers(1, &m_rendererID);
+		glDeleteTextures(1, &m_colorAttachMent);
+		glDeleteTextures(1, &m_depthAttachMent);
+	}
+
 ////////////一个支持OpenGL渲染的窗口(即帧缓存) 可能包含以下的组合：
 // 
 // 			· 至多4个颜色缓存
@@ -29,6 +36,14 @@ namespace Hazel
 //////////////////
 	void OpenGlFrameBuffer::Invalidate()
 	{
+
+		if (m_rendererID) //第一次创建fb时删除所有fb/显示图像
+		{
+			glDeleteFramebuffers(1, &m_rendererID);
+			glDeleteTextures(1, &m_colorAttachMent);
+			glDeleteTextures(1, &m_depthAttachMent);
+		}
+
 		glCreateFramebuffers(1, &m_rendererID);
 		glBindFramebuffer(GL_FRAMEBUFFER,m_rendererID);
 
@@ -62,12 +77,20 @@ namespace Hazel
 	void OpenGlFrameBuffer::Bind() const
 	{	
 		glBindFramebuffer(GL_FRAMEBUFFER, m_rendererID);
+		glViewport(0, 0, m_specification.width, m_specification.height); //设置视口
 	}
 
 	void OpenGlFrameBuffer::UnBind() const
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0	);
 
+	}
+
+	void OpenGlFrameBuffer::ReSize(uint32_t width, uint32_t height)
+	{
+		m_specification.width = width;
+		m_specification.height = height;
+		Invalidate();
 	}
 
 }

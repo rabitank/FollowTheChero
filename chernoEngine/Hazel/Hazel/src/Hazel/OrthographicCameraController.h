@@ -34,7 +34,10 @@ namespace Hazel
 		float GetZoomLevel() {return m_zoomLevel ; };
 
 		inline const OrthographicCameraBounds& GetBound() const { return m_bounds; };
+
+		void OnResiz(float width,float height);
 	private:
+
 
 		bool onMouseScrolled(MouseScorllEvent& event);
 		bool onMouseReleased(MouseButtonPressedEvent& event);

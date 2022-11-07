@@ -71,7 +71,7 @@ namespace Hazel
 
 
 		Hazel::FrameBufferSpecification spec{ 1080,720 };
-		m_FrameBuffer = Hazel::FrameBuffer::Create(spec);
+		m_frameBuffer = Hazel::FrameBuffer::Create(spec);
 	}
 
 	void EditorLayer::OnDetach()
@@ -104,7 +104,7 @@ namespace Hazel
 		///////////////////////////////////
 
 		static bool dockSpace = true;
-
+	
 		static bool opt_fullscreen = true;
 		static bool opt_padding = false;
 		static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
@@ -176,34 +176,45 @@ namespace Hazel
 			ImGui::EndMenuBar();
 		}
 
-		if (0)
 		{
-			ImGui::Begin("Status view port");
+			ImGui::Begin("Setting");
 
 			ImGui::Text("Renderer2D test - stats:");
 			ImGui::Text("DrawCall:%d", stats.DrawCalls);
 			ImGui::Text("quadCount: %d", stats.quadCount);
 			ImGui::Text("Vertex:%d", stats.GetTotalVertexCount());
 			ImGui::Text("Indeics:%d", stats.GetTotalIndexCount());
-			ImGui::ColorEdit4("Grid Color", glm::value_ptr(m_flatColor));
-			ImGui::Image((ImTextureID)m_FrameBuffer->GetColorAttachMentRendererID(), { 1080.f,720.f }, { 0,1 }, { 1,0 }); //.... 所以都是用gl的id吗...  
+
+			ImGui::End();
 		}
-		else
+
 		{
-			ImGui::Begin("Status view port");
 
-			ImGui::Text("Renderer2D test - stats:");
-			ImGui::Text("DrawCall:%d", stats.DrawCalls);
-			ImGui::Text("quadCount: %d", stats.quadCount);
-			ImGui::Text("Vertex:%d", stats.GetTotalVertexCount());
-			ImGui::Text("Indeics:%d", stats.GetTotalIndexCount());
-			ImGui::ColorEdit4("Grid Color", glm::value_ptr(m_flatColor));
-			ImGui::Image((ImTextureID)m_quancifangTexture->GetRendererID(), { 1080.f,720.f }, { 0,1 }, { 1,0 }); //ImGui是从左上角开始绘制的....设置下uv
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0,0}); //make port no board
+
+			ImGui::Begin("ViewPort");
+
+			ImVec2 viewPortPanelSize = ImGui::GetContentRegionAvail();//ViewPort这panel的内容渲染大小...我们需要framebuffer跟随它改变以减少不必要的buffer写入
+			if (m_ViewPortSize != *(glm::vec2*)&viewPortPanelSize)
+			{
+				m_ViewPortSize = { viewPortPanelSize.x,viewPortPanelSize.y };
+				m_frameBuffer->ReSize((uint32_t)viewPortPanelSize.x, (uint32_t)viewPortPanelSize.y);
+
+
+				m_cameraController.OnResiz(m_ViewPortSize.x, m_ViewPortSize.y); //相机跟着视口,glviewPort一起变化就不会引起形变了..
+			}
+
+			ImGui::Image((ImTextureID)m_frameBuffer->GetColorAttachMentRendererID(), { m_ViewPortSize.x,m_ViewPortSize.y}, { 0,1 }, { 1,0 }); //.... 所以都是用gl的id吗...  
+			ImGui::End();
+
+			ImGui::PopStyleVar();
 		}
+
+		//dockSpace's end
 		ImGui::End();
 
 
-		ImGui::End();
+
 	}
 
 	void EditorLayer::OnUpdate(Hazel::Timestep deltaime)
@@ -223,7 +234,7 @@ namespace Hazel
 
 
 			HZ_PROFILE_SCOPE("Renderer Prepare ");
-			m_FrameBuffer->Bind(); //every frame;
+			m_frameBuffer->Bind(); //every frame;
 
 			RenderCommand::SetClearColor({ 0.2f, 0.2f, 0.2f, 1.0f });
 			RenderCommand::Clear(); //↓	//why i can't see the layer before ? you clear it
@@ -238,11 +249,11 @@ namespace Hazel
 			HZ_PROFILE_SCOPE("Render Draw");
 
 			Renderer2D::BeginScene(m_cameraController.GetCamera());//开始调度,设置场景参数 //提交场景的相机 ,注意 是"提交" , vp
+
+
 			Renderer2D::DrawQuad({ 1.f,0.2f }, { 0.3f,1.5f }, { 1.f,0.2f,0.4f,1.f });
 			Renderer2D::DrawQuad({ -1.f,-1.f,-0.1f }, { 1.f,1.f }, { 0.3f,0.5f,0.9f,1.0f });
 			Renderer2D::DrawQuad({ -5.f,-5.f,-0.2f }, { 10.f,10.f }, m_boardTexture, 10.f);
-			//Hazel::Renderer2D::DrawQuad({ -1.f,1.f,0.1f }, { 1.f,1.f },m_quancifangTexture);
-			//Hazel::Renderer2D::DrawRotatedQuad({ 0.5f,0.2f }, { 2.f,2.f }, glm::degrees(rotation),m_quancifangTexture);
 
 			for (float x = -5.0f; x < 5.f; x += 0.5f)
 			{
@@ -253,8 +264,9 @@ namespace Hazel
 			}
 			Hazel::Renderer2D::EndScene();
 
-			m_FrameBuffer->UnBind();
 		}
+
+		m_frameBuffer->UnBind();
 
 		if (Hazel::Input::IsMouseButtonPressed(HZ_MOUSE_BUTTON_LEFT))
 		{

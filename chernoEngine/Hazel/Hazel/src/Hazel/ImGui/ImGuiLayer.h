@@ -18,6 +18,8 @@ namespace Hazel
 		void virtual OnAttach() override;
 		void virtual OnDetach() override;
 		virtual void OnImGuiRender() override;
+		virtual void OnEvent(Event& event)override;
+
 
 		virtual void Begin();//打开关闭新的Imguilayer
 		virtual void End();

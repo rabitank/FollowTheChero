@@ -10,7 +10,7 @@ namespace Hazel
 	{
 	public:
 		OpenGlFrameBuffer(const FrameBufferSpecification& spec);
-		virtual ~OpenGlFrameBuffer() {};
+		virtual ~OpenGlFrameBuffer(); //析构需要在其基类中存在....不然被视为基类时不会调用该类的析构函数/或者没有析构函数
 
 		void Invalidate(); //无效化...变成空白帧
 		virtual void Bind() const override;	
@@ -18,13 +18,14 @@ namespace Hazel
 		virtual const FrameBufferSpecification& GetSpecification() const override { return m_specification; }; //最好还是const....安全第一...
 		virtual  uint32_t GetColorAttachMentRendererID() const { return m_colorAttachMent; }; //最好还是const....安全第一...
 
+		virtual void ReSize(uint32_t width, uint32_t height) override;
 
 	private:
 		FrameBufferSpecification m_specification;
 
-		uint32_t m_rendererID;
-		uint32_t m_colorAttachMent;
-		uint32_t m_depthAttachMent;
+		uint32_t m_rendererID =0;
+		uint32_t m_colorAttachMent= 0;
+		uint32_t m_depthAttachMent =0;
 	};
 
 }

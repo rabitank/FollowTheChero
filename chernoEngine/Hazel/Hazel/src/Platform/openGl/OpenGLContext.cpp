@@ -17,10 +17,6 @@ namespace Hazel
 		HZ_CORE_ASSERT(m_windowHandle,"wimdowHandle is null")
 	}
 
-	OpenGlContext::~OpenGlContext()
-	{
-
-	}
 
 	void OpenGlContext::Init()
 	{

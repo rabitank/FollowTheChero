@@ -77,12 +77,18 @@ namespace Hazel
 
 	}
 
+	//好处只改变宽高比 而不会改变尺寸
+	void OrthographicCameraController::OnResiz(float width, float height) 
+	{
+		m_aspectratio = width / height;
+		CalculateView();
+	}
+
 	bool OrthographicCameraController::onWindowResized(WindowsResizeEvent& event)
 	{
 		HZ_PROFILE_FUNCTION();
 
-		m_aspectratio = (float) event.GetWidth() / (float)event.GetHeight();
-		CalculateView();
+		OnResiz((float)event.GetWidth(), (float)event.GetHeight());
 		return false;
 	}
 
@@ -98,6 +104,7 @@ namespace Hazel
 		return false;
 
 	}
+
 
 
 }

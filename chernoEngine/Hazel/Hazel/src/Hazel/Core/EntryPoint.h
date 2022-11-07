@@ -25,7 +25,7 @@ int main(int argc,char** argv)
 	app->Run();
 	HZ_PROFILE_END_SESSION();
 
-	HZ_PROFILE_BEGIN_SESSION("Run","HazelProfile-ShutDown.json");
+	HZ_PROFILE_BEGIN_SESSION("ShutDown","HazelProfile-ShutDown.json");
 	delete app;
 	HZ_PROFILE_END_SESSION();
 }

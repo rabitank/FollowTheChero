@@ -25,11 +25,15 @@ namespace Hazel
 	{
 	public:
 
+		virtual ~FrameBuffer() = default; //需要有一个virtual析构 才会查看子类的析构并执行
+
 		 //virtual FrameBufferSpecification& GetSpecification()const = 0;
 		virtual const FrameBufferSpecification& GetSpecification() const = 0; //最好还是const....安全第一...
 		virtual  uint32_t GetColorAttachMentRendererID() const = 0;
 		virtual void Bind() const = 0;
 		virtual void UnBind() const = 0;
+
+		virtual void ReSize(uint32_t width,uint32_t height) = 0;
 
 
 		static Ref<FrameBuffer> Create(const FrameBufferSpecification& spec);
