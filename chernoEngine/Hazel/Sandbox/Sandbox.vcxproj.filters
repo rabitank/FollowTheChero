@@ -21,33 +21,10 @@
     <ClCompile Include="src\SandBox2D.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\ParticleSystem.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Particel.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Random.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\SandBox2D.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="src\ParticleSystem.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Particel.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Random.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="C:\Users\sjj29\Desktop\WhiteBlock.jpg">
-      <Filter>资源文件</Filter>
-    </Image>
   </ItemGroup>
 </Project>

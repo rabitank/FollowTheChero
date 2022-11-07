@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Hazel/Core/core.h"
+#include "Hazel/Core/Base.h"
 
 #include "hzpch.h"
 

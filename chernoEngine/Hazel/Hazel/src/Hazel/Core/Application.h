@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core.h"
+#include "Base.h"
 
 #include "Window.h"
 #include "Hazel/Events/Event.h"
@@ -16,11 +16,11 @@
 namespace Hazel {
 
 
-	class Application
+	class Application   //application自带推一个imguilayer啊啊啊哭晕,用来构建imgui上下文的
 	{
 
 	public:
-		Application();
+		Application(const std::string& windowName ="Hazel App");
 		virtual ~Application();
 		void Run();
 		void OnEvent(Event&); //as the callback func :how we deal with the event?
@@ -32,7 +32,7 @@ namespace Hazel {
 		inline Window& GetWindow() { return *m_window; } //unique_ptr 真是搞不明白t _ t
 		inline static Application& Get() { return *s_instance; } 
 
-	
+		void Close();
 		
 	private:
 
@@ -60,5 +60,5 @@ namespace Hazel {
 
 	};
 	//To be definde in CLIENT 一个接口,在客户端实现
-	Hazel::Application* CreateApplication();
+	Application* CreateApplication();
 }

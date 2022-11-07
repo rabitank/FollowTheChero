@@ -1,6 +1,6 @@
 #include "hzpch.h"
 #include "OpenGLContext.h"
-#include "Hazel/Core/core.h"
+#include "Hazel/Core/Base.h"
 #include <glad/glad.h> //glad 已经支持opengl ,引用的glfw中的opengl(gl可选)会引起冲突 (c 没有 pragma once??)
 #include <GLFW/glfw3.h>	//glad与glfw共用gl标准,函数通用(除了扩展..),glad实际上支持的是4.6(现代高版本的)的gl
 

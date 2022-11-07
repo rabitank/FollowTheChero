@@ -33,3 +33,7 @@ p55;通用shader/组件shader.... , 像blender那样就很不粗 . . .深度概�
 p59: 2020 cherno : 我们将有一个脚本环境, 一个批渲染..坏消息是,,,公共分支的hazel可能只有renderer2D了
 
 p61: 从设置uniform到编辑顶点buffer进行批渲染
+
+P70:应该到了 GUI部分了!
+
+P72: 新项目! HazelEditor !Hazel的游戏编辑子工具

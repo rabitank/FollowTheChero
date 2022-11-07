@@ -17,8 +17,8 @@ namespace Hazel
 		virtual ~WindowsWindow();
 
 		void onUpdate() override; //application调用 ,每帧执行 ,GLFW询问事件
-		virtual unsigned int  GetWidth() const override { return m_Data.Width; }
-		inline unsigned int GetHeight() const override { return m_Data.Height; }
+		virtual inline uint32_t  GetWidth() const override { return m_Data.Width; }
+		virtual inline uint32_t GetHeight() const override { return m_Data.Height; }
 
 		inline void SetEventCallback(const EventCallBackFn& Callbackfn)override { m_Data.EventCallback = Callbackfn; };
 		void SetVSync(bool enabled) override;

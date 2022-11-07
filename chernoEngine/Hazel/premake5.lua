@@ -111,31 +111,85 @@ project "Sandbox"
       {
            "%{prj.name}/src/**.cpp",
            "%{prj.name}/src/**.h"
-          }
-          includedirs
-          {
-               
-               "Hazel/src",
-               "Hazel/vendor/spdlog/include",
-               "Hazel/vendor",
-               "%{IncludeDir.glm}"
-               
-          }
+      }
+      includedirs
+      {
+           
+           "Hazel/src",
+           "Hazel/vendor/spdlog/include",
+           "Hazel/vendor",
+           "%{IncludeDir.glm}"
+           
+      }
+      
+      links
+      {
+           "Hazel"
+      }
+      
+      filter "system:windows"
+      systemversion "latest"
+      
+      defines
+      {
+           "HZ_PLATFORM_WINDOWS"
+      }
           
-          links
-          {
-               "Hazel"
-          }
           
-          filter "system:windows"
-          systemversion "latest"
-          
-          defines
-          {
-               "HZ_PLATFORM_WINDOWS"
-          }
-          
-          
+   filter "configurations:Debug"
+   defines "HZ_DEBUG"
+   runtime "Debug"
+   symbols "On" --debug symbols on
+   
+   filter "configurations:Release"  
+   defines "HZ_RELEASE"
+   runtime "Release"
+   optimize "On" --开启优化
+   
+   filter "configurations:Dist"
+   defines "HZ_DIST"
+   runtime "Release"
+   optimize "On" --��
+   
+
+   project "Hazel-Editor"
+      location "Hazel-Editor" --���·��
+      kind "ConsoleApp"  -- =dll
+      language "C++"
+      cppdialect "C++17"
+      staticruntime "on" --运行时库设为 静态链接
+      
+      targetdir ("bin/"..outputdir.."/%{prj.name}")
+      objdir ("bin-int/"..outputdir.."/%{prj.name}")
+      
+      files
+      {
+           "%{prj.name}/src/**.cpp",
+           "%{prj.name}/src/**.h"
+      }
+      includedirs
+      {
+           
+           "Hazel/src",
+           "Hazel/vendor/spdlog/include",
+           "Hazel/vendor",
+           "%{IncludeDir.glm}"
+           
+      }
+      
+      links
+      {
+           "Hazel"
+      }
+      
+      filter "system:windows"
+      systemversion "latest"
+      
+      defines
+      {
+           "HZ_PLATFORM_WINDOWS"
+      }
+
    filter "configurations:Debug"
    defines "HZ_DEBUG"
    runtime "Debug"
@@ -155,5 +209,3 @@ project "Sandbox"
    include "Hazel/vendor/imgui" 
    include "Hazel/vendor/GLFW" 
    include "Hazel/vendor/Glad" --incldue(copy) the premake.lua in Glad to here  = add project GLAW
-   
-   
