@@ -152,8 +152,13 @@ project "Sandbox"
    optimize "On" --��
    
 
+<<<<<<< HEAD
    project "Hazelnut"
       location "Hazelnut" --���·��
+=======
+   project "Hazel-Editor"
+      location "Hazel-Editor" --���·��
+>>>>>>> 09c9513fa9700bc556c182756b0d40ca526de9c6
       kind "ConsoleApp"  -- =dll
       language "C++"
       cppdialect "C++17"

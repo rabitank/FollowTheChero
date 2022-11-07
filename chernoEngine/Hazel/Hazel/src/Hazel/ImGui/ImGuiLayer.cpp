@@ -175,6 +175,7 @@ namespace Hazel
 		//允许客户端控制 ImGui视口是否被渲染(还没做),并允许用户在这里新建ImGui渲染(新的ImGui口)
 		static bool show = true;
 
+<<<<<<< HEAD
 
 	}
 
@@ -183,6 +184,8 @@ namespace Hazel
 		ImGuiIO& io = ImGui::GetIO();
 		event.Handled |= event.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;//入果事件是Mouse 且 ImGui想要接受事件 那么返回真,停止事件传播
 		event.Handled |= event.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;//入果事件是键盘类的 且 ImGui想要监听键盘 ....
+=======
+>>>>>>> 09c9513fa9700bc556c182756b0d40ca526de9c6
 
 	}
 

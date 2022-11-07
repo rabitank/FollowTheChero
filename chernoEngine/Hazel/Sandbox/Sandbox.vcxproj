@@ -131,7 +131,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+<<<<<<< HEAD
     <ClInclude Include="src\Particel.h" />
+=======
+>>>>>>> 09c9513fa9700bc556c182756b0d40ca526de9c6
     <ClInclude Include="src\SandBox2D.h" />
   </ItemGroup>
   <ItemGroup>
