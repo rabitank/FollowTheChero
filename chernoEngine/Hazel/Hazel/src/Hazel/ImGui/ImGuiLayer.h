@@ -25,6 +25,8 @@ namespace Hazel
 		virtual void End();
 
 
+		void SetBlockEvent(bool set) { m_blockImGuiEvent = set; }
+
 	/*	void OnEvent(Event& e) override;*/
 
 //	private://这里和cherno不一样,我想在之后能改ui层的响应
@@ -40,6 +42,7 @@ namespace Hazel
 
 	private:
 		float m_time  = 0.0f;
+		bool m_blockImGuiEvent = true; //是否锁住ImGui事件?...估计以后都在ImGui里操作了..
 	};
 };
 

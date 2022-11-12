@@ -154,7 +154,7 @@ namespace Hazel
 		ImGui::Render();
 
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
+		
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) //如果开启了视口
 		{
 			GLFWwindow* backup_current_constext = glfwGetCurrentContext();
@@ -172,20 +172,28 @@ namespace Hazel
 	{
 		HZ_PROFILE_FUNCTION();
 
-		//允许客户端控制 ImGui视口是否被渲染(还没做),并允许用户在这里新建ImGui渲染(新的ImGui口)
 		static bool show = true;
 
-<<<<<<< HEAD
+
 
 	}
 
 	void ImGuiLayer::OnEvent(Event& event)
 	{
-		ImGuiIO& io = ImGui::GetIO();
-		event.Handled |= event.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;//入果事件是Mouse 且 ImGui想要接受事件 那么返回真,停止事件传播
-		event.Handled |= event.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;//入果事件是键盘类的 且 ImGui想要监听键盘 ....
-=======
->>>>>>> 09c9513fa9700bc556c182756b0d40ca526de9c6
+		if (m_blockImGuiEvent)
+		{
+
+			ImGuiIO& io = ImGui::GetIO();
+
+			event.Handled |= event.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;//入果事件是Mouse 且 ImGui想要接受事件 那么返回真,停止事件传播
+			event.Handled |= event.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;//入果事件是键盘类的 且 ImGui想要监听键盘 ....
+
+			//WantCaptureMouse  的 机制是 如果鼠标悬停或点击了ImGui元素的就会为真(即foucus)/或许是他注释里建议你这么做? 喜喜
+
+		}
+
+		
+
 
 	}
 

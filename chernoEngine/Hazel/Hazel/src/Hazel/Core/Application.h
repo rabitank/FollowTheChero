@@ -32,6 +32,8 @@ namespace Hazel {
 		inline Window& GetWindow() { return *m_window; } //unique_ptr 真是搞不明白t _ t
 		inline static Application& Get() { return *s_instance; } 
 
+		inline ImGuiLayer* GetImGuiLayer()const { return m_ImGuiLayer; }
+
 		void Close();
 		
 	private:

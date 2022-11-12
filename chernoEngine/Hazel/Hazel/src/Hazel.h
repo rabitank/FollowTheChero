@@ -35,3 +35,10 @@
 //----------------------------------------------
 
 
+//-----------------Scene------------------------
+#include "Hazel/Scene/Scene.h"
+#include "Hazel/Scene/Component.h"
+#include "Hazel/Scene/Entity.h"
+
+
+

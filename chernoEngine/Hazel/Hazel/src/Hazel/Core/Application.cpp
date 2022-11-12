@@ -55,7 +55,7 @@ namespace Hazel
 		EventDispatcher dispatcher(e);
 		dispatcher.DisPatch<WindowsCloseEvent>(BIND_EVENT_FN(OnWindowClose));//bind : the first parameter is waitting
 		dispatcher.DisPatch<WindowsResizeEvent>(BIND_EVENT_FN(OnWindowResize));//bind : the first parameter is waitting
-			//dispatcher, if you see WindowCloseEvent ,then use this callfuction with your event e
+		//dispatcher, if you see WindowCloseEvent ,then use this callfuction with your event e
 
 		//HZ_CORE_TRACE("{0}",e);
 

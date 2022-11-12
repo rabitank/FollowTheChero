@@ -16,6 +16,7 @@ workspace "Hazel"
  IncludeDir["ImGui"] = "Hazel/vendor/imgui" -- yes, imgui.h is out 
  IncludeDir["glm"] = "Hazel/vendor/glm" 
  IncludeDir["stb_image"] = "Hazel/vendor/stb_image" 
+ IncludeDir["entt"] = "Hazel/vendor/entt/include" 
  
  project "Hazel"
  location "Hazel" --���·��
@@ -32,10 +33,10 @@ workspace "Hazel"
  {
       "%{prj.name}/src/**.cpp",
       "%{prj.name}/src/**.h",
-        "%{prj.name}/vendor/glm/glm/**.hpp",
-        "%{prj.name}/vendor/glm/glm/**.inl",
-        "%{prj.name}/vendor/stb_image/**.cpp",
-        "%{prj.name}/vendor/stb_image/**.h"
+      "%{prj.name}/vendor/glm/glm/**.hpp",
+      "%{prj.name}/vendor/glm/glm/**.inl",
+      "%{prj.name}/vendor/stb_image/**.cpp",
+      "%{prj.name}/vendor/stb_image/**.h"
  }
 
  defines
@@ -55,7 +56,8 @@ workspace "Hazel"
           "%{IncludeDir.Glad}",
           "%{IncludeDir.ImGui}",
           "%{IncludeDir.glm}",
-          "%{IncludeDir.stb_image}"
+          "%{IncludeDir.stb_image}",
+          "%{IncludeDir.entt}"
      }
      
      links
@@ -118,7 +120,8 @@ project "Sandbox"
            "Hazel/src",
            "Hazel/vendor/spdlog/include",
            "Hazel/vendor",
-           "%{IncludeDir.glm}"
+           "%{IncludeDir.glm}",
+           "%{IncludeDir.entt}"
            
       }
       
@@ -132,7 +135,7 @@ project "Sandbox"
       
       defines
       {
-           "HZ_PLATFORM_WINDOWS"
+           --"HZ_PLATFORM_WINDOWS"
       }
           
           
@@ -152,13 +155,9 @@ project "Sandbox"
    optimize "On" --��
    
 
-<<<<<<< HEAD
+
    project "Hazelnut"
       location "Hazelnut" --���·��
-=======
-   project "Hazel-Editor"
-      location "Hazel-Editor" --���·��
->>>>>>> 09c9513fa9700bc556c182756b0d40ca526de9c6
       kind "ConsoleApp"  -- =dll
       language "C++"
       cppdialect "C++17"
@@ -178,7 +177,8 @@ project "Sandbox"
            "Hazel/src",
            "Hazel/vendor/spdlog/include",
            "Hazel/vendor",
-           "%{IncludeDir.glm}"
+           "%{IncludeDir.glm}",
+           "%{IncludeDir.entt}"
            
       }
       
@@ -192,7 +192,7 @@ project "Sandbox"
       
       defines
       {
-           "HZ_PLATFORM_WINDOWS"
+           --"HZ_PLATFORM_WINDOWS"
       }
 
    filter "configurations:Debug"

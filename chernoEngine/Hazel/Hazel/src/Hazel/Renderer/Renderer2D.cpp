@@ -151,6 +151,23 @@ namespace Hazel
 
 	}
 
+
+
+
+	void Renderer2D::BeginScene(const Camera& Camera,glm::mat4 viewMat)
+	{
+		HZ_PROFILE_FUNCTION();
+
+		s_Data.TextureShader->Bind();
+		s_Data.TextureShader->SetMat4("u_ViewProjection", Camera.GetProjection()*glm::inverse(viewMat));//我们
+
+		s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
+		s_Data.quadIndexCount = 0;
+
+		s_Data.TextureSlotIndex = 1; //begin
+
+	}
+
 	void Renderer2D::BeginScene(const OrthographicCamera& Camera)
 	{
 		HZ_PROFILE_FUNCTION();
@@ -164,6 +181,9 @@ namespace Hazel
 		s_Data.TextureSlotIndex = 1; //begin
 	
 	}
+
+
+
 
 
 	void Renderer2D::EndScene()
@@ -247,13 +267,7 @@ namespace Hazel
 		s_Data.quadIndexCount += 6;
 
 		s_Data.Stats.quadCount++;
-		/*s_Data.WhitBlock->Bind();
-		s_Data.TextureShader->Bind();
-		s_Data.TextureShader->SetFloat("u_TilingFactor", 1.0f);
-		s_Data.TextureShader->SetMat4("u_Transform", glm::mat4(1.0f));//我们需要为我们引擎的shader指定统一
-		s_Data.QuadVA->Bind();
-		RenderCommand::DrawIndexed(s_Data.QuadVA);
-		*/
+
 
 	}
 
@@ -327,23 +341,6 @@ namespace Hazel
 
 		s_Data.Stats.quadCount++;
 
-#if 0
-		glm::mat4 transformMat =
-			glm::translate(glm::mat4(1.f), position)
-			*
-			glm::scale(glm::mat4(1.0f), { size.x, size.y,1.0f });
-
-
-
-		texture->Bind();
-
-		s_Data.TextureShader->Bind();
-
-		s_Data.TextureShader->SetFloat4("u_color", tintColor);//我们需要为我们引擎的shader指定统一
-		s_Data.TextureShader->SetFloat("u_TilingFactor", tilingFactor); //cherno是一个float ... 算了就这样	 
-		s_Data.TextureShader->SetMat4("u_Transform", transformMat);
-		
-#endif
 
 	}
 
@@ -414,6 +411,7 @@ namespace Hazel
 
 	}
 
+
 	void Renderer2D::DrawLine()
 	{
 		HZ_PROFILE_FUNCTION();
@@ -429,32 +427,74 @@ namespace Hazel
 
 	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color)
 	{
-		HZ_PROFILE_FUNCTION();
+// 		HZ_PROFILE_FUNCTION();
+// 
+// 		if (s_Data.quadIndexCount >= s_Data.MaxIndeics)
+// 			Renderer2D::FlushAndReset();
+// 
+// 		constexpr size_t quadVertexCount = 4;
+// 		constexpr glm::vec2 textureCoord[4] = {
+// 				{0.f,0.f},
+// 				{1.f,0.f},
+// 				{1.f,1.f},
+// 				{0.f,1.f}
+// 		};
 
-		if (s_Data.quadIndexCount >= s_Data.MaxIndeics)
-			Renderer2D::FlushAndReset();
 
-		constexpr size_t quadVertexCount = 4;
-		constexpr glm::vec2 textureCoord[4] = {
-				{0.f,0.f},
-				{1.f,0.f},
-				{1.f,1.f},
-				{0.f,1.f}
-		};
 		glm::mat4 transform = glm::translate(glm::mat4(1.f), position)
 			*
 			glm::rotate(glm::mat4(1.f), rotation, glm::vec3(0.f, 0.f, 1.f)) //使用默认就是弧度 //换算成 弧度
 			*
 			glm::scale(glm::mat4(1.0f), glm::vec3(size, 0.f));
 
-		float textureIndex = 0.0f;
-		float tilingFactor = 1.0f;
 
+		DrawQuad(transform, color);
+
+// 		float textureIndex = 0.0f;
+// 		float tilingFactor = 1.0f;
+// 
+// 
+// 		for (uint32_t i = 0; i < quadVertexCount; i++)
+// 		{
+// 			s_Data.QuadVertexBufferPtr->Color = color;
+// 			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.quadVertexPosition[i];
+// 			s_Data.QuadVertexBufferPtr->TexCoord = textureCoord[i];//左下角定义	
+// 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+// 			s_Data.QuadVertexBufferPtr->TilingFactor = tilingFactor;
+// 
+// 			s_Data.QuadVertexBufferPtr++;
+// 		}
+// 
+// 
+// 		s_Data.quadIndexCount += 6;
+// 		s_Data.Stats.quadCount++;
+
+	}
+
+
+	void Renderer2D::DrawQuad(const glm::mat4& transformat, const glm::vec4& color)
+	{
+
+		HZ_PROFILE_FUNCTION();
+
+		float textureIndex = 0.0f;
+		float tilingFactor = 1.f;
+
+		if (s_Data.quadIndexCount >= s_Data.MaxIndeics)
+			Renderer2D::FlushAndReset();
+
+
+		constexpr size_t quadVertexCount = 4;
+		constexpr glm::vec2 textureCoord[4] = {
+			{0.f,0.f},
+			{1.f,0.f},
+			{1.f,1.f},
+			{0.f,1.f} };
 
 		for (uint32_t i = 0; i < quadVertexCount; i++)
 		{
 			s_Data.QuadVertexBufferPtr->Color = color;
-			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.quadVertexPosition[i];
+			s_Data.QuadVertexBufferPtr->Position = transformat * s_Data.quadVertexPosition[i];
 			s_Data.QuadVertexBufferPtr->TexCoord = textureCoord[i];//左下角定义	
 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 			s_Data.QuadVertexBufferPtr->TilingFactor = tilingFactor;
@@ -462,35 +502,11 @@ namespace Hazel
 			s_Data.QuadVertexBufferPtr++;
 		}
 
-
 		s_Data.quadIndexCount += 6;
 		s_Data.Stats.quadCount++;
-
-
-// 
-// 		glm::mat4 transformMat =
-// 			glm::translate(glm::mat4(1.f), position)
-// 			* glm::rotate(glm::mat4(1.f), rotation, glm::vec3(0.f, 0.f, 1.f))
-// 			* glm::scale(glm::mat4(1.0f), { size.x, size.y,1.0f });
-// 		s_Data.WhitBlock->Bind();
-// 
-// 		s_Data.TextureShader->Bind();
-// 		
-// 		s_Data.TextureShader->SetFloat4("u_color", color);//我们需要为我们引擎的shader指定统一
-// 		s_Data.TextureShader->SetFloat("u_TilingFactor", 1.f); //cherno是一个float ... 算了就这样	 
-// 		s_Data.TextureShader->SetMat4("u_Transform", transformMat);
-
-
-
 	}
 
-	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
-	{
-
-		DrawRotatedQuad({ position.x, position.y,0 }, size, rotation, texture, tilingFactor, tintColor);
-	}
-
-	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
+	void Renderer2D::DrawQuad(const glm::mat4& transformat, const Ref<Texture2D>& texture, float tilingFactor /*= 1.f*/, const glm::vec4& tintColor /*= glm::vec4(1.0f)*/)
 	{
 		HZ_PROFILE_FUNCTION();
 
@@ -525,16 +541,12 @@ namespace Hazel
 				{1.f,1.f},
 				{0.f,1.f}
 		};
-		glm::mat4 transform = glm::translate(glm::mat4(1.f), position)
-			*
-			glm::rotate(glm::mat4(1.f), rotation, glm::vec3(0.f, 0.f, 1.f)) //使用默认就是弧度 //换算成 弧度
-			*
-			glm::scale(glm::mat4(1.0f), glm::vec3(size, 0.f));
+
 
 		for (uint32_t i = 0; i < quadVertexCount; i++)
 		{
 			s_Data.QuadVertexBufferPtr->Color = color;
-			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.quadVertexPosition[i];
+			s_Data.QuadVertexBufferPtr->Position = transformat * s_Data.quadVertexPosition[i];
 			s_Data.QuadVertexBufferPtr->TexCoord = textureCoord[i];//左下角定义	
 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 			s_Data.QuadVertexBufferPtr->TilingFactor = tilingFactor;
@@ -545,24 +557,74 @@ namespace Hazel
 
 		s_Data.quadIndexCount += 6;
 		s_Data.Stats.quadCount++;
+	}
 
-// 		glm::mat4 transformMat =
-// 			glm::translate(glm::mat4(1.f), position)
-// 			*glm::rotate(glm::mat4(1.f),rotation,glm::vec3(0.f,0.f,1.f))
-// 			*glm::scale(glm::mat4(1.0f), { size.x, size.y,1.0f });
+
+	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
+	{
+
+		DrawRotatedQuad({ position.x, position.y,0 }, size, rotation, texture, tilingFactor, tintColor);
+	}
+
+	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
+	{
+// 		HZ_PROFILE_FUNCTION();
+// 
+// 		if (s_Data.quadIndexCount >= s_Data.MaxIndeics)
+// 			Renderer2D::FlushAndReset();
+// 
+// 		float textureIndex = 0.f;
+// 		for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++) //if the texture  exist  in slots
+// 		{
+// 
+// 			if (*texture.get() == *s_Data.TextureSlots[i].get()) //get : get raw ptr?
+// 			{
+// 				textureIndex = (float)i;
+// 				break;
+// 			}
 // 
 // 
+// 		}
+// 		if (textureIndex == 0.f)
+// 		{
+// 			textureIndex = (float)s_Data.TextureSlotIndex; // or a new slot
+// 			s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
+// 			s_Data.TextureSlotIndex++;
+// 		}
 // 
-// 		texture->Bind();
 // 
-// 		s_Data.TextureShader->Bind();
+// 		constexpr glm::vec4 color = { 1.f,1.f,1.f,1.f };
+// 		constexpr size_t quadVertexCount = 4;
+// 		constexpr glm::vec2 textureCoord[4] = {
+// 				{0.f,0.f},
+// 				{1.f,0.f},
+// 				{1.f,1.f},
+// 				{0.f,1.f}
+// 		};
+		glm::mat4 transform = glm::translate(glm::mat4(1.f), position)
+			*
+			glm::rotate(glm::mat4(1.f), rotation, glm::vec3(0.f, 0.f, 1.f)) //使用默认就是弧度 //换算成 弧度
+			*
+			glm::scale(glm::mat4(1.0f), glm::vec3(size, 0.f));
+
+		DrawQuad(transform, texture, tilingFactor, tintColor);
+
+// 		for (uint32_t i = 0; i < quadVertexCount; i++)
+// 		{
+// 			s_Data.QuadVertexBufferPtr->Color = color;
+// 			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.quadVertexPosition[i];
+// 			s_Data.QuadVertexBufferPtr->TexCoord = textureCoord[i];//左下角定义	
+// 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+// 			s_Data.QuadVertexBufferPtr->TilingFactor = tilingFactor;
 // 
-// 		s_Data.TextureShader->SetFloat4("u_color", tintColor);//我们需要为我们引擎的shader指定统一
-// 		s_Data.TextureShader->SetFloat("u_TilingFactor", tilingFactor); //cherno是一个float ... 算了就这样	 
-// 		s_Data.TextureShader->SetMat4("u_Transform", transformMat);
+// 			s_Data.QuadVertexBufferPtr++;
+// 		}
 // 
-// 		s_Data.QuadVA->Bind();
-// 		RenderCommand::DrawIndexed(s_Data.QuadVA);
+// 
+// 		s_Data.quadIndexCount += 6;
+// 		s_Data.Stats.quadCount++;
+
+
 
 	}
 

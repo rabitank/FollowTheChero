@@ -11,7 +11,7 @@
 
 namespace Hazel
 {
-
+#if 0
 	static const uint32_t s_mapWidth = 31;
 	static const char* s_mapTiles =
 		"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
@@ -33,6 +33,13 @@ namespace Hazel
 		"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
 		;
 
+
+	m_TextureMap['W'] = SubTexture2D::CreateFromCroods(m_spriteSheet, { 11,11 }, { 128,128 });
+	m_TextureMap['S'] = SubTexture2D::CreateFromCroods(m_spriteSheet, { 6,11 }, { 128,128 });
+	m_TextureMap['D'] = SubTexture2D::CreateFromCroods(m_spriteSheet, { 1,11 }, { 128,128 });
+	m_TextureMap['T'] = SubTexture2D::CreateFromCroods(m_spriteSheet, { 2,1 }, { 128,128 }, { 1,2 });
+	m_TextureMap['R'] = SubTexture2D::CreateFromCroods(m_spriteSheet, { 5,9 }, { 128,128 });
+#endif
 	EditorLayer::EditorLayer()
 		:Layer("SandBox2D"), m_cameraController(1280.f / 720.f, true)
 	{}
@@ -60,18 +67,28 @@ namespace Hazel
 		m_cameraController.SetZoomLevel(5.f);
 
 		//Init the maptexture
-		m_mapHeight = (uint32_t)strlen(s_mapTiles) / s_mapWidth;
-		m_mapWidth = s_mapWidth;
-
-		m_TextureMap['W'] = Hazel::SubTexture2D::CreateFromCroods(m_spriteSheet, { 11,11 }, { 128,128 });
-		m_TextureMap['S'] = Hazel::SubTexture2D::CreateFromCroods(m_spriteSheet, { 6,11 }, { 128,128 });
-		m_TextureMap['D'] = Hazel::SubTexture2D::CreateFromCroods(m_spriteSheet, { 1,11 }, { 128,128 });
-		m_TextureMap['T'] = Hazel::SubTexture2D::CreateFromCroods(m_spriteSheet, { 2,1 }, { 128,128 }, { 1,2 });
-		m_TextureMap['R'] = Hazel::SubTexture2D::CreateFromCroods(m_spriteSheet, { 5,9 }, { 128,128 });
+		//m_mapHeight = (uint32_t)strlen(s_mapTiles) / s_mapWidth;
+		//m_mapWidth = s_mapWidth;
 
 
-		Hazel::FrameBufferSpecification spec{ 1080,720 };
+
+		FrameBufferSpecification spec{ 1080,720 };
 		m_frameBuffer = Hazel::FrameBuffer::Create(spec);
+
+		
+		//Create a simple entitiy
+		m_activeScene = CreateRef<Scene>();
+		Entity squareEntity = m_activeScene->CreateEntity("Square");
+		bool hasTrans = squareEntity.HasComponent<TransformComponent>();
+		squareEntity.AddComponent< SpriteRendererComponent>(glm::vec4(0.6f, 0.2f, 0.3f, 1.f));
+		m_quadEntity = squareEntity;
+
+		//Create two simple camera
+		m_cameraEntity = m_activeScene->CreateEntity("Camrea");
+		m_cameraEntity.AddComponent<CameraComponent>(glm::ortho(-16.f,16.f,-9.f,9.f)).Primary=true;
+		m_secondCamera = m_activeScene->CreateEntity("SecondCamrea");
+		m_secondCamera.AddComponent<CameraComponent>(glm::ortho(-1.f,1.f,-1.f,1.f)).Primary=true; //in fact , the latter entity will be poped earlier
+
 	}
 
 	void EditorLayer::OnDetach()
@@ -176,6 +193,7 @@ namespace Hazel
 			ImGui::EndMenuBar();
 		}
 
+		//Setting
 		{
 			ImGui::Begin("Setting");
 
@@ -185,17 +203,48 @@ namespace Hazel
 			ImGui::Text("Vertex:%d", stats.GetTotalVertexCount());
 			ImGui::Text("Indeics:%d", stats.GetTotalIndexCount());
 
+
+			//TODO: abstract
+			if (m_quadEntity)
+			{
+				ImGui::Separator();
+				ImGui::Text("%s", m_quadEntity.GetComponent<TagComponent>().Tag.c_str()); //记得.., 要的是 c风格字符
+				ImGui::ColorEdit4("quad color",glm::value_ptr(m_quadEntity.GetComponent<SpriteRendererComponent>().Color));
+				ImGui::Separator();
+				
+				
+			}
+			
+			glm::mat4& cameraTransMat = m_activeScene->GetMainCamera()->GetComponent<TransformComponent>().Transform;
+			ImGui::Text("%s", m_cameraEntity.GetComponent<TagComponent>().Tag.c_str()); //记得.., 要的是 c风格字符
+			ImGui::DragFloat3("camera Position x", glm::value_ptr(cameraTransMat[3]));
+
+			if(ImGui::Checkbox("Camer A:",&m_primaryCamera))//对勾小盒子..返回是否点击..引用绑定m_primaryCamera
+			{
+				m_secondCamera.GetComponent<CameraComponent>().Primary = !m_primaryCamera;
+				m_cameraEntity.GetComponent<CameraComponent>().Primary = m_primaryCamera;
+				ImGui::Separator();
+			}
+
 			ImGui::End();
 		}
 
+
+		//ViewPort
 		{
 
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0,0}); //make port no board
 
 			ImGui::Begin("ViewPort");
 
+			// IsWindow...() 查询的是所在上下文的窗口的状态
+
+			m_viewPortIsFocus=ImGui::IsWindowFocused();
+			m_viewPortIsHover = ImGui::IsWindowHovered();
+			Application::Get().GetImGuiLayer()->SetBlockEvent(!m_viewPortIsFocus || !m_viewPortIsHover);
+
 			ImVec2 viewPortPanelSize = ImGui::GetContentRegionAvail();//ViewPort这panel的内容渲染大小...我们需要framebuffer跟随它改变以减少不必要的buffer写入
-			if (m_ViewPortSize != *(glm::vec2*)&viewPortPanelSize)
+			if (m_ViewPortSize != *(glm::vec2*)&viewPortPanelSize && viewPortPanelSize.x>0&&viewPortPanelSize.y>0)
 			{
 				m_ViewPortSize = { viewPortPanelSize.x,viewPortPanelSize.y };
 				m_frameBuffer->ReSize((uint32_t)viewPortPanelSize.x, (uint32_t)viewPortPanelSize.y);
@@ -225,72 +274,28 @@ namespace Hazel
 
 		{
 			HZ_PROFILE_SCOPE("CameraController::OnUpdate");
-			m_cameraController.OnUpdate(deltaime);
+			if (m_viewPortIsFocus)//没聚焦就关掉位置刷新
+			{
+				m_cameraController.OnUpdate(deltaime); //也减少了资源耗费对吧
+			}
 		}
 
-		Hazel::Renderer2D::ResetStats();
-
 		{
-
-
 			HZ_PROFILE_SCOPE("Renderer Prepare ");
+			Renderer2D::ResetStats();
 			m_frameBuffer->Bind(); //every frame;
 
-			RenderCommand::SetClearColor({ 0.2f, 0.2f, 0.2f, 1.0f });
-			RenderCommand::Clear(); //↓	//why i can't see the layer before ? you clear it
+			//Clear 必须
+			RenderCommand::SetClearColor({ 0.1f,0.1,0.1f,1.f });
+			RenderCommand::Clear();
 		}
 
-		static float rotation = 0.f;
 
 		{
-
-			//rotation += deltaime;
-
 			HZ_PROFILE_SCOPE("Render Draw");
-
-			Renderer2D::BeginScene(m_cameraController.GetCamera());//开始调度,设置场景参数 //提交场景的相机 ,注意 是"提交" , vp
-
-
-			Renderer2D::DrawQuad({ 1.f,0.2f }, { 0.3f,1.5f }, { 1.f,0.2f,0.4f,1.f });
-			Renderer2D::DrawQuad({ -1.f,-1.f,-0.1f }, { 1.f,1.f }, { 0.3f,0.5f,0.9f,1.0f });
-			Renderer2D::DrawQuad({ -5.f,-5.f,-0.2f }, { 10.f,10.f }, m_boardTexture, 10.f);
-
-			for (float x = -5.0f; x < 5.f; x += 0.5f)
-			{
-				for (float y = -5.0f; y < 5.f; y += 0.5f)
-				{
-					Hazel::Renderer2D::DrawQuad({ x ,y ,-0.1f }, { 0.5f,0.5f }, { 0.2f,(x + 5.f) / 10.f,(y + 5.f) / 10.f,0.5f });
-				}
-			}
-			Hazel::Renderer2D::EndScene();
-
+			m_activeScene->OnUpdate(deltaime);
 		}
-
 		m_frameBuffer->UnBind();
-
-		if (Hazel::Input::IsMouseButtonPressed(HZ_MOUSE_BUTTON_LEFT))
-		{
-			auto [x, y] = Hazel::Input::GetMousePos();
-			auto width = Hazel::Application::Get().GetWindow().GetWidth();
-			auto height = Hazel::Application::Get().GetWindow().GetHeight();
-
-			auto bounds = m_cameraController.GetBound();
-			auto pos = m_cameraController.GetCamera().GetPosition();
-			x = (x / width) * bounds.GetWidth() - bounds.GetWidth() * 0.5f;
-			y = -(y / height) * bounds.GetHeight() + bounds.GetHeight() * 0.5f;//y轴向下;
-			m_particle.Position = { x + pos.x,y + pos.y };
-			for (int i = 0; i < 5; i++) //emit 5 time?
-			{
-				m_particleSystem.Emit(m_particle);
-			}
-
-		}
-
-
-
-		m_particleSystem.OnUpdate(deltaime);
-		m_particleSystem.OnRender(m_cameraController.GetCamera());
-
 
 
 #if 0
@@ -328,7 +333,10 @@ namespace Hazel
 
 	void EditorLayer::OnEvent(Hazel::Event& e)
 	{
-		m_cameraController.OnEvent(e);
+		if (m_viewPortIsFocus)
+		{
+			m_cameraController.OnEvent(e); //没聚焦就不要管滚轮对吧
+		}
 
 	}
 
