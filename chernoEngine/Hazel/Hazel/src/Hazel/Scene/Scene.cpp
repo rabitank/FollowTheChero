@@ -1,8 +1,8 @@
 #include "hzpch.h"
 #include "Scene.h"
-#include "Component.h"
-#include "Entity.h"
 
+#include "Entity.h"
+#include "Component.h"
 #include "Hazel/Renderer/Renderer2D.h"
 #include "glm/glm.hpp"
 
@@ -19,26 +19,49 @@ namespace Hazel
 
 	Scene::~Scene()
 	{
-		delete m_mainCamera;
+		//delete m_mainCamera;
 	}
+
+
+
 
 	void Scene::OnUpdate(Timestep ts)
 	{
+		//Update Script ... you should bind an specific NativeScriptcomponent before it enter Scene's Update
+		{
+			m_registry.view<NativeScripComponent>().each([=](auto entity ,NativeScripComponent& nsc)  // auto entity ,&nsc : view 
+			{
+				if(!nsc.Instance)
+				{ 
+					nsc.Instance = nsc.InstantiateScript();
+					nsc.Instance->m_entity = { entity,this };
+					nsc.Instance->OnCreate();	
+				}
+
+				
+				nsc.Instance->OnUpdate(ts);	
+			
+			}); // nsc: native script component
+
+
+		}
+
+
 		//render
 		Camera* main_Camera = nullptr;
-		glm::mat4* main_Camrea_transformMat = nullptr;
+		TransformComponent* main_Camrea_transform = nullptr;
 		{
 
 			auto view = m_registry.view<CameraComponent,TransformComponent>();
 			for (auto entity : view)
 			{
-				auto&[camera,trans] = view.get<CameraComponent, TransformComponent>(entity);
-				if (camera.Primary)
+				auto[camera,trans] = view.get<CameraComponent, TransformComponent>(entity); //ok.. view.get返回引用元组,我们直接auto[] 就行.这种引用并不是因为auto 而是[]的结构化绑定
+				if (camera.Primary)	
 				{
 
 					m_mainCamera = new Entity{entity,this};
-					main_Camera = &camera.camera;
-					main_Camrea_transformMat = &trans.Transform;
+					main_Camera = & camera.Camera;
+					main_Camrea_transform = &trans;
 					break;
 				}
 				
@@ -48,7 +71,7 @@ namespace Hazel
 		if (main_Camera)
 		{
 
-			Renderer2D::BeginScene(main_Camera->GetProjection(),*main_Camrea_transformMat);
+			Renderer2D::BeginScene(main_Camera->GetProjection(),*main_Camrea_transform);
 
 			auto group = m_registry.group<TransformComponent, SpriteRendererComponent>();
 
@@ -60,8 +83,6 @@ namespace Hazel
 
 			Renderer2D::EndScene();
 		}
-
-
 
 
 	}
@@ -76,6 +97,69 @@ namespace Hazel
 		e.AddComponent<TagComponent>(tag);
 		return e;
 	}
+
+	void Scene::OnViewportResize(const uint32_t& width, const uint32_t& height)
+	{
+		m_viewportWidth = width;
+		m_viewportHeight = height;
+
+		//fix our camera aspectratio
+		auto view = m_registry.view<CameraComponent>();
+		for (auto entity : view)
+		{
+			auto& camera = view.get<CameraComponent>(entity);//但是对于单个组件的get方法..返回仍需要& 承接...自己去看变量类型啊!
+			if (!camera.FixedAspectRatio) //camera size change with viewPort -> change ProjectionMatrix
+			{
+				camera.Camera.SetViewPortSize(width,height);
+			}
+
+		}
+
+	}
+
+	void Scene::DestroyEntity(Entity entity)
+	{
+		m_registry.destroy(entity);
+
+	}
+
+
+	template <typename T>
+	void Scene::OnComponentAdded(Entity entity, T& component)
+	{
+		static_assert(false); //静态断言 -> 无对应特化模板 ->中断
+	}
+	//模板特化
+	template <>
+	void Scene::OnComponentAdded<TransformComponent>(Entity entity, TransformComponent& component)
+	{
+
+	}
+
+	template <>
+	void Hazel::Scene::OnComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component)
+	{
+		
+	}
+
+	template <>
+	void Hazel::Scene::OnComponentAdded<CameraComponent>(Entity entity, CameraComponent& component)
+	{
+		component.Camera.SetViewPortSize(m_viewportWidth, m_viewportHeight);
+	}
+	template <>
+	void Hazel::Scene::OnComponentAdded<TagComponent>(Entity entity, TagComponent& component)
+	{
+		
+	}
+
+	template <>
+	void Hazel::Scene::OnComponentAdded<NativeScripComponent>(Entity entity, NativeScripComponent& component)
+	{
+
+	}
+
+
 
 }
 

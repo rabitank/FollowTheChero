@@ -73,7 +73,7 @@ namespace Hazel
 		GLCall(glTextureStorage2D(m_rendererID, 1, internalformat, m_width, m_heigth)); // levels:texture纹理层级数(mipmap级别,对于2D纹理必须为1) internalformat 图像 存储格式 //该API指定纹理存储格式
 //glTextureParameteri or glTexParameteri , it use id but not enum and don't need bind to set texture
 		glTextureParameteri(m_rendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);//Parameteri:纹理 MIN_FILTER:缩小过滤器 GL_Linear:线性
-		glTextureParameteri(m_rendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);//Parameteri:纹理 MAG_FILTER:放大过滤器 GL_Linear:线性
+		glTextureParameteri(m_rendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);//Parameteri:纹理 MAG_FILTER:放大过滤器 GL_Linear:线性
 		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));//Parameteri:参数 WRAP_S:水平环绕,CLAMP:嵌入
 		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));//Parameteri:参数 WRAP_T:垂直环绕,CLAMP:嵌入
 

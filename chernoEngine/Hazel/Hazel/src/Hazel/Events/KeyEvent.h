@@ -1,6 +1,6 @@
 
 #include "Event.h"
-
+#include "Hazel/Core/KeyCodes.h"
 #include "hzpch.h"
 namespace Hazel
 {
@@ -9,7 +9,7 @@ namespace Hazel
 	{
 	public:
 		
-		inline int GetKeyCode() const{return m_keycode;}
+		inline Key GetKeyCode() const{return (Key)m_keycode;}
 		
 		EVENT_CLASS_CATEGORY(EventCategoryInput | EventCategoryKeyboard ) // | 或运算赋
 	protected://允许子类访问

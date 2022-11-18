@@ -1,7 +1,7 @@
 #pragma once
 #include "Hazel.h"
 #include "ImGui/imgui.h"
-
+#include "Panels/SceneHierarchyPanel.h"
 
 
 namespace Hazel
@@ -21,8 +21,15 @@ namespace Hazel
 		void OnUpdate(Timestep deltaime) override;
 		void OnEvent(Event& e) override;//调度的解决判断在application 的Onevent ,不用管
 
-	private:
+		static ImVec2 GetViewPortSize() { return s_viewPortPanelSize; }
 
+	private:
+		bool OnKeyPressed(KeyPressedEvent& e);
+		void SaveSceneAs();
+		void OpenScene();
+		void NewScene();
+
+	private:
 		struct  ProfileResult
 		{
 			const char* Name;
@@ -55,12 +62,17 @@ namespace Hazel
 		Entity m_secondCamera;
 		bool m_primaryCamera =false;
 
+		//UI
+		SceneHierarchyPanel m_sceneHierarchyPanel; 	
 
+		static ImVec2 s_viewPortPanelSize ;
 
 		std::unordered_map<char, Hazel::Ref<SubTexture2D>> m_TextureMap; //for char to texture
 		uint32_t m_mapWidth, m_mapHeight;
 
 		bool m_viewPortIsFocus =false, m_viewPortIsHover =false;
+
+
 
 	};
 

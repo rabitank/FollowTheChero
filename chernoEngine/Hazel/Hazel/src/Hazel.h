@@ -31,6 +31,7 @@
 #include "Hazel/Renderer/SubTexture2D.h"
 
 #include "Hazel/Renderer/OrthographicCamera.h "
+#include "Hazel/Renderer/Camera.h "
 
 //----------------------------------------------
 
@@ -39,6 +40,6 @@
 #include "Hazel/Scene/Scene.h"
 #include "Hazel/Scene/Component.h"
 #include "Hazel/Scene/Entity.h"
-
+#include "Hazel/Scene/ScriptableEntity.h"
 
 

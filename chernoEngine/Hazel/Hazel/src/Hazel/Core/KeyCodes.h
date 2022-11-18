@@ -138,7 +138,7 @@ namespace Hazel
 
 
 
-	}Key;
+	}Key; //Keycode or name: Key
 
 	inline std::ostream& operator<<(std::ostream& os, Keycode keycode)
 	{

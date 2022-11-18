@@ -17,6 +17,7 @@ workspace "Hazel"
  IncludeDir["glm"] = "Hazel/vendor/glm" 
  IncludeDir["stb_image"] = "Hazel/vendor/stb_image" 
  IncludeDir["entt"] = "Hazel/vendor/entt/include" 
+ IncludeDir["yaml_cpp"] = "Hazel/vendor/yaml-cpp/include" 
  
  project "Hazel"
  location "Hazel" --���·��
@@ -57,7 +58,8 @@ workspace "Hazel"
           "%{IncludeDir.ImGui}",
           "%{IncludeDir.glm}",
           "%{IncludeDir.stb_image}",
-          "%{IncludeDir.entt}"
+          "%{IncludeDir.entt}",
+          "%{IncludeDir.yaml_cpp}"
      }
      
      links
@@ -65,7 +67,8 @@ workspace "Hazel"
           "GLFW", --reference
           "Glad",
           "ImGui",
-          "opengl32.lib"
+          "opengl32.lib",
+          "yaml-cpp"
           
      }
      
@@ -74,8 +77,8 @@ workspace "Hazel"
      
      defines
      {
-          "HZ_BUILD_DLL",
-          "HZ_PLATFORM_WINDOWS",
+          --"HZ_BUILD_DLL",
+          --"HZ_PLATFORM_WINDOWS",
           "_WINDLL",
           "GLFW_INCLUDE_NONE"-- delete gl in glfw
           
@@ -213,4 +216,5 @@ project "Sandbox"
    group "Dependencies"
    include "Hazel/vendor/imgui" 
    include "Hazel/vendor/GLFW" 
+   include "Hazel/vendor/yaml-cpp" 
    include "Hazel/vendor/Glad" --incldue(copy) the premake.lua in Glad to here  = add project GLAW

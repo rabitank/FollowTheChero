@@ -3,8 +3,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-
 #include <chrono>
+#include "Hazel/Scene/SceneSerializer.h"
+#include "Hazel/Utils/PlantformUtils.h"
 
 
 
@@ -44,6 +45,8 @@ namespace Hazel
 		:Layer("SandBox2D"), m_cameraController(1280.f / 720.f, true)
 	{}
 
+	ImVec2 EditorLayer::s_viewPortPanelSize = { 1080,760 };
+
 	void EditorLayer::OnAttach()
 	{
 		HZ_PROFILE_FUNCTION();
@@ -78,16 +81,69 @@ namespace Hazel
 		
 		//Create a simple entitiy
 		m_activeScene = CreateRef<Scene>();
-		Entity squareEntity = m_activeScene->CreateEntity("Square");
-		bool hasTrans = squareEntity.HasComponent<TransformComponent>();
+
+#if 0
+		Entity squareEntity = m_activeScene->CreateEntity("SquareA");
 		squareEntity.AddComponent< SpriteRendererComponent>(glm::vec4(0.6f, 0.2f, 0.3f, 1.f));
-		m_quadEntity = squareEntity;
+
+		Entity square2Entity = m_activeScene->CreateEntity("SquareB");
+		square2Entity.AddComponent<SpriteRendererComponent>(glm::vec4(0.2f, 0.7f, 0.4f, 1.f));
+		square2Entity.GetComponent<TransformComponent>().Translation= glm::vec3(1.f,1.f,0.2f);
 
 		//Create two simple camera
-		m_cameraEntity = m_activeScene->CreateEntity("Camrea");
-		m_cameraEntity.AddComponent<CameraComponent>(glm::ortho(-16.f,16.f,-9.f,9.f)).Primary=true;
-		m_secondCamera = m_activeScene->CreateEntity("SecondCamrea");
-		m_secondCamera.AddComponent<CameraComponent>(glm::ortho(-1.f,1.f,-1.f,1.f)).Primary=true; //in fact , the latter entity will be poped earlier
+		m_cameraEntity = m_activeScene->CreateEntity("CamreaA");
+		m_cameraEntity.AddComponent<CameraComponent>().Primary=true;
+		m_secondCamera = m_activeScene->CreateEntity("CamreaB");
+		m_secondCamera.AddComponent<CameraComponent>().Primary=true; //in fact , the latter entity will be poped earlier
+
+
+
+		//it shoule be someKind Entity
+		class CameraController:public ScriptableEntity
+		{
+		public:
+			CameraController() {};
+
+			virtual void OnCreate() override
+			{
+				//GetComponent<TransformComponent>();
+				std::cout << "CameraController : OnCreate! "<< std::endl;
+				
+				auto& transform = GetComponent<TransformComponent>().Translation;
+				
+				transform[0] = rand() % 10 - 5.f;
+			}
+
+			virtual void OnUpdate(Timestep ts ) override
+			{
+
+				auto& transform = GetComponent<TransformComponent>().Translation;
+				if (Input::IsKeyPressed(HZ_KEY_A))
+					transform[0] -= m_cameraSpeed * ts;
+				if (Input::IsKeyPressed(HZ_KEY_D))
+					transform[0] += m_cameraSpeed * ts;
+				if (Input::IsKeyPressed(HZ_KEY_W))
+					transform[1] += m_cameraSpeed * ts;
+				if (Input::IsKeyPressed(HZ_KEY_S))
+					transform[1] -= m_cameraSpeed * ts;
+
+			}
+
+			virtual void OnDestroy() override
+			{
+
+				std::cout << "CameraController :OnDestroy! "<< std::endl;
+			}
+		private:
+			float m_cameraSpeed = 1.f;
+
+		};
+
+		m_secondCamera.AddComponent<NativeScripComponent>().Bind<CameraController>();
+		m_cameraEntity.AddComponent<NativeScripComponent>().Bind<CameraController>();
+
+#endif
+		m_sceneHierarchyPanel.SetContext(m_activeScene);
 
 	}
 
@@ -120,56 +176,55 @@ namespace Hazel
 		//ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
 		///////////////////////////////////
 
-		static bool dockSpace = true;
-	
-		static bool opt_fullscreen = true;
-		static bool opt_padding = false;
+		// Note: Switch this to true to enable dockspace
+		static bool dockspaceOpen = true;
+		static bool opt_fullscreen_persistant = true;
+		bool opt_fullscreen = opt_fullscreen_persistant;
 		static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
-
 
 		// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
 		// because it would be confusing to have two docking targets within each others.
 		ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
 		if (opt_fullscreen)
 		{
-			const ImGuiViewport* viewport = ImGui::GetMainViewport();
-			ImGui::SetNextWindowPos(viewport->WorkPos);
-			ImGui::SetNextWindowSize(viewport->WorkSize);
+			ImGuiViewport* viewport = ImGui::GetMainViewport();
+			ImGui::SetNextWindowPos(viewport->Pos);
+			ImGui::SetNextWindowSize(viewport->Size);
 			ImGui::SetNextWindowViewport(viewport->ID);
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 			window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 			window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 		}
-		else
-		{
-			dockspace_flags &= ~ImGuiDockNodeFlags_PassthruCentralNode;
-		}
 
-
+		// When using ImGuiDockNodeFlags_PassthruCentralNode, DockSpace() will render our background and handle the pass-thru hole, so we ask Begin() to not render a background.
 		if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
 			window_flags |= ImGuiWindowFlags_NoBackground;
 
-		if (!opt_padding)
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-		ImGui::Begin("DockSpace Demo", &dockSpace, window_flags);
-		if (!opt_padding)
-			ImGui::PopStyleVar();
+		// Important: note that we proceed even if Begin() returns false (aka window is collapsed).
+		// This is because we want to keep our DockSpace() active. If a DockSpace() is inactive, 
+		// all active windows docked into it will lose their parent and become undocked.
+		// We cannot preserve the docking relationship between an active window and an inactive docking, otherwise 
+		// any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+		ImGui::Begin("DockSpace Demo", &dockspaceOpen, window_flags);
+		ImGui::PopStyleVar();
 
 		if (opt_fullscreen)
 			ImGui::PopStyleVar(2);
 
-		// Submit the DockSpace
+		// DockSpace
 		ImGuiIO& io = ImGui::GetIO();
+		ImGuiStyle& style = ImGui::GetStyle();
+		float minWinSizeX = style.WindowMinSize.x;
+		style.WindowMinSize.x = 370.0f;
 		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
 		{
 			ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
 			ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
 		}
-		else
-		{
-			ShowDockingDisabledMessage();
-		}
+
+		style.WindowMinSize.x = minWinSizeX;
 
 
 		//a menu for option about dockSpace ,unnecessary
@@ -184,7 +239,22 @@ namespace Hazel
 				//ImGui::Separator();
 
 				if (ImGui::MenuItem("Exit"))
-					Hazel::Application::Get().Close();
+					Application::Get().Close();
+
+				if (ImGui::MenuItem("New","Ctrl+N"))
+				{
+					NewScene();
+				}
+
+				if (ImGui::MenuItem("SaveAs...","Ctrl+Shift+S"))
+				{
+					SaveSceneAs();
+				}
+				if (ImGui::MenuItem("Open...","Ctrl+O"))
+				{
+
+					OpenScene();
+				}
 				ImGui::Separator();
 
 				ImGui::EndMenu();
@@ -195,7 +265,7 @@ namespace Hazel
 
 		//Setting
 		{
-			ImGui::Begin("Setting");
+			ImGui::Begin("Render Stats");
 
 			ImGui::Text("Renderer2D test - stats:");
 			ImGui::Text("DrawCall:%d", stats.DrawCalls);
@@ -203,60 +273,50 @@ namespace Hazel
 			ImGui::Text("Vertex:%d", stats.GetTotalVertexCount());
 			ImGui::Text("Indeics:%d", stats.GetTotalIndexCount());
 
-
-			//TODO: abstract
-			if (m_quadEntity)
-			{
-				ImGui::Separator();
-				ImGui::Text("%s", m_quadEntity.GetComponent<TagComponent>().Tag.c_str()); //记得.., 要的是 c风格字符
-				ImGui::ColorEdit4("quad color",glm::value_ptr(m_quadEntity.GetComponent<SpriteRendererComponent>().Color));
-				ImGui::Separator();
-				
-				
-			}
-			
-			glm::mat4& cameraTransMat = m_activeScene->GetMainCamera()->GetComponent<TransformComponent>().Transform;
-			ImGui::Text("%s", m_cameraEntity.GetComponent<TagComponent>().Tag.c_str()); //记得.., 要的是 c风格字符
-			ImGui::DragFloat3("camera Position x", glm::value_ptr(cameraTransMat[3]));
-
-			if(ImGui::Checkbox("Camer A:",&m_primaryCamera))//对勾小盒子..返回是否点击..引用绑定m_primaryCamera
-			{
-				m_secondCamera.GetComponent<CameraComponent>().Primary = !m_primaryCamera;
-				m_cameraEntity.GetComponent<CameraComponent>().Primary = m_primaryCamera;
-				ImGui::Separator();
-			}
-
 			ImGui::End();
 		}
 
 
 		//ViewPort
 		{
+			HZ_PROFILE_SCOPE("ViewPortRender:");
 
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0,0}); //make port no board
-
+			//make port no board
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0,0});
 			ImGui::Begin("ViewPort");
 
-			// IsWindow...() 查询的是所在上下文的窗口的状态
 
+
+			// IsWindow...() 查询的是所在上下文的窗口的状态
 			m_viewPortIsFocus=ImGui::IsWindowFocused();
 			m_viewPortIsHover = ImGui::IsWindowHovered();
 			Application::Get().GetImGuiLayer()->SetBlockEvent(!m_viewPortIsFocus || !m_viewPortIsHover);
 
-			ImVec2 viewPortPanelSize = ImGui::GetContentRegionAvail();//ViewPort这panel的内容渲染大小...我们需要framebuffer跟随它改变以减少不必要的buffer写入
-			if (m_ViewPortSize != *(glm::vec2*)&viewPortPanelSize && viewPortPanelSize.x>0&&viewPortPanelSize.y>0)
+			
+			// view Port Resize: 
+			s_viewPortPanelSize = ImGui::GetContentRegionAvail();
+			//ViewPort这panel的内容渲染大小...我们需要framebuffer跟随它改变以减少不必要的buffer写入
+			
+			if (m_ViewPortSize != *(glm::vec2*)& s_viewPortPanelSize && s_viewPortPanelSize.x> 0&&s_viewPortPanelSize.y>0)
 			{
-				m_ViewPortSize = { viewPortPanelSize.x,viewPortPanelSize.y };
-				m_frameBuffer->ReSize((uint32_t)viewPortPanelSize.x, (uint32_t)viewPortPanelSize.y);
 
+				HZ_PROFILE_SCOPE("ViewPortResize:");
+				m_ViewPortSize = { s_viewPortPanelSize.x,s_viewPortPanelSize.y };
+				m_frameBuffer->ReSize((uint32_t)s_viewPortPanelSize.x, (uint32_t)s_viewPortPanelSize.y);
+				m_activeScene->OnViewportResize(m_ViewPortSize.x,m_ViewPortSize.y);
 
-				m_cameraController.OnResiz(m_ViewPortSize.x, m_ViewPortSize.y); //相机跟着视口,glviewPort一起变化就不会引起形变了..
 			}
 
+			//show what rendered
 			ImGui::Image((ImTextureID)m_frameBuffer->GetColorAttachMentRendererID(), { m_ViewPortSize.x,m_ViewPortSize.y}, { 0,1 }, { 1,0 }); //.... 所以都是用gl的id吗...  
 			ImGui::End();
 
 			ImGui::PopStyleVar();
+		}
+
+		{
+			m_sceneHierarchyPanel.OnImGuiRender();
+		
 		}
 
 		//dockSpace's end
@@ -280,10 +340,10 @@ namespace Hazel
 			}
 		}
 
+		m_frameBuffer->Bind(); //every frame;
 		{
 			HZ_PROFILE_SCOPE("Renderer Prepare ");
 			Renderer2D::ResetStats();
-			m_frameBuffer->Bind(); //every frame;
 
 			//Clear 必须
 			RenderCommand::SetClearColor({ 0.1f,0.1,0.1f,1.f });
@@ -298,46 +358,81 @@ namespace Hazel
 		m_frameBuffer->UnBind();
 
 
-#if 0
-		for (int y = 0; y < (int)m_mapHeight; y++)
-		{
-			for (int x = 0; x < (int)m_mapWidth; x++)
-			{
-				char tileType = s_mapTiles[y * m_mapWidth + x];
-				Hazel::Ref<Hazel::SubTexture2D> tileTexture;
-				if (m_TextureMap.find(tileType) == m_TextureMap.end())
-				{
-					tileTexture = m_spriteHair;
-					HZ_ERROR("didn,t find tile type:{0}", tileType);
-				}
-				else
-				{
-
-					tileTexture = m_TextureMap[tileType]; //小心....unordedmap就算没有也会给你返回个空的..这回导致一些难以识别的崩溃 //所以加个判别
-				}
-				Hazel::Renderer2D::DrawQuad({ x - m_mapWidth / 2.f,(-y + m_mapHeight - 1) - m_mapHeight / 2.f,0.2f }, { 1.f,1.f }, tileTexture);
-			}
-
-		}
-
-		Hazel::Renderer2D::BeginScene(m_cameraController.GetCamera());
-		Hazel::Renderer2D::DrawQuad({ 0.f,0.0f,0.1f }, { 1.f,1.f }, m_spriteHair);
-		Hazel::Renderer2D::DrawQuad({ 1.f,0.0f,0.1f }, { 1.f,2.f }, m_spriteTree);
-
-		Hazel::Renderer2D::EndScene();
-
-#endif
-
-
 	}
 
 	void EditorLayer::OnEvent(Hazel::Event& e)
 	{
-		if (m_viewPortIsFocus)
-		{
-			m_cameraController.OnEvent(e); //没聚焦就不要管滚轮对吧
-		}
+		
+
+		EventDispatcher dispatcher(e);
+		dispatcher.DisPatch<KeyPressedEvent>(BIND_EVENT_CALLFN(EditorLayer::OnKeyPressed));
 
 	}
 
+	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
+	{
+
+		if (e.GetRepeatcount() > 0) //if you want pressed an hotKeies ,you might have pressed it for a while;
+			return false;
+		
+		bool CtrlPressed = Input::IsKeyPressed((int)Key::Left_control) || Input::IsKeyPressed((int)Key::Right_control);
+		bool ShiftPressed = Input::IsKeyPressed((int)Key::Left_shift) || Input::IsKeyPressed((int)Key::Right_shift);
+		switch (e.GetKeyCode())
+		{
+		case Key::N:
+			{
+				if (CtrlPressed)
+					NewScene();
+				break;
+			}
+		case Key::S:
+			{
+				if (CtrlPressed && ShiftPressed)
+					SaveSceneAs();
+				break;
+			}
+		case Key::O:
+		{
+			if (CtrlPressed)
+				OpenScene();
+			break;
+		}
+
+		}
+
+		return false;
+	}
+
+	void EditorLayer::SaveSceneAs()
+	{
+		std::string path = PlantformUtils::SaveFile("场景文件(*.hazel)\0*.hazel\0"); //Showtext\0filter\0
+		if (!path.empty())
+		{
+			SceneSerializer sceneSerializer(m_activeScene);
+			sceneSerializer.Serialize(path);
+		}
+	}
+
+	void EditorLayer::OpenScene()
+	{
+		std::string path = PlantformUtils::OpenFile("场景文件(*.hazel)\0*.hazel\0");
+		if (!path.empty())
+		{
+			m_activeScene = CreateRef<Scene>();
+			m_activeScene->OnViewportResize((uint32_t)m_ViewPortSize.x, (uint32_t)m_ViewPortSize.y);
+			m_sceneHierarchyPanel.SetContext(m_activeScene);
+			SceneSerializer sceneSerializer(m_activeScene);
+			sceneSerializer.DeSerialize(path);
+		}
+	}
+
+	void EditorLayer::NewScene()
+	{
+		m_activeScene = CreateRef<Scene>();
+		m_activeScene->OnViewportResize((uint32_t)m_ViewPortSize.x, (uint32_t)m_ViewPortSize.y);
+		m_sceneHierarchyPanel.SetContext(m_activeScene);
+	}
+
 }
+
+

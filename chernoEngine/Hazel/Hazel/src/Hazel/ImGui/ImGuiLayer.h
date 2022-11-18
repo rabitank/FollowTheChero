@@ -26,6 +26,7 @@ namespace Hazel
 
 
 		void SetBlockEvent(bool set) { m_blockImGuiEvent = set; }
+		void SetDarkThemeColors();
 
 	/*	void OnEvent(Event& e) override;*/
 
@@ -39,7 +40,7 @@ namespace Hazel
 // 		bool virtual OnWindowsResizeEvent(WindowsResizeEvent& e);
 // 		bool virtual OnKeyTypedEvent(KeyTypedEvent& e);//键入字符单独拎出来了
 
-
+	private:
 	private:
 		float m_time  = 0.0f;
 		bool m_blockImGuiEvent = true; //是否锁住ImGui事件?...估计以后都在ImGui里操作了..

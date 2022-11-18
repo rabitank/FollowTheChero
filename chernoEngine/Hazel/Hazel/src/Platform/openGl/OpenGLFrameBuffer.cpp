@@ -46,6 +46,7 @@ namespace Hazel
 			glDeleteFramebuffers(1, &m_rendererID);
 			glDeleteTextures(1, &m_colorAttachMent);
 			glDeleteTextures(1, &m_depthAttachMent);
+
 		}
 
 
@@ -69,8 +70,8 @@ namespace Hazel
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, m_specification.width, m_specification.height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);//GL_DEPTH24_STENCIL8 深度模板格式:融合深度和纹理，可以让你设置深度缓冲区的同时设置模板缓冲区。
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_depthAttachMent,0);
+		
 
 		HZ_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER)== GL_FRAMEBUFFER_COMPLETE,"OpenGL Error:FrameBuffer Invalidate failed!"); //检查frameBuffer是否完成配置
 

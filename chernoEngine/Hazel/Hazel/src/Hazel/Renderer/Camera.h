@@ -7,17 +7,22 @@ namespace Hazel
 	class Camera
 	{
 	public:
-		Camera() {};
+		Camera() =default	;
 		Camera(const glm::mat4& projectionMat) 
 			:m_projection(projectionMat)
 		{ };
+		virtual ~Camera() {};
+
 		glm::mat4 GetProjection() const { return m_projection; }
 
-	private:
+	protected:
 
-		glm::mat4 m_projection;
+		glm::mat4 m_projection = glm::mat4(1.f);
 
 	};
+
+
+
 
 
 	class  PerspectiveCamera
