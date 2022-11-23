@@ -75,7 +75,9 @@ bool GlLogCall(const char* function, const char* file, int line);
 
 #define BIT(x) (1<<x) //1位移x位
 
-#define  BIND_EVENT_CALLFN(x) std::bind(&x,this,std::placeholders::_1) //不是很懂& 和 this 干嘛?: 函数引用?,使用this,是成员函数的隐藏参数吧
+//不是很懂& 和 this 干嘛?: 函数引用?,使用this,是成员函数的隐藏参数吧
+//记得 带上命名空间/类名
+#define  BIND_EVENT_CALLFN(x) std::bind(&x,this,std::placeholders::_1) 
 
 namespace Hazel
 {

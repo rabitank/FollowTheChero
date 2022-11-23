@@ -23,9 +23,25 @@ namespace Hazel
 	}
 
 
+	void Scene::OnUpdateEditor(Timestep ts, EditorCamera& camera)
+	{
 
 
-	void Scene::OnUpdate(Timestep ts)
+		Renderer2D::BeginScene(camera);
+
+		auto group = m_registry.group<TransformComponent, SpriteRendererComponent>();
+
+		for (auto entity : group)
+		{
+			auto& [transC, spriteC] = m_registry.get<TransformComponent, SpriteRendererComponent>(entity);
+			Renderer2D::DrawQuad((const glm::mat4&)transC, (const glm::vec4&)spriteC, (int)entity);
+		}
+
+		Renderer2D::EndScene();
+
+	}
+
+	void Scene::OnUpdateRuntime(Timestep ts)
 	{
 		//Update Script ... you should bind an specific NativeScriptcomponent before it enter Scene's Update
 		{
@@ -59,7 +75,6 @@ namespace Hazel
 				if (camera.Primary)	
 				{
 
-					m_mainCamera = new Entity{entity,this};
 					main_Camera = & camera.Camera;
 					main_Camrea_transform = &trans;
 					break;
@@ -78,7 +93,9 @@ namespace Hazel
 			for (auto entity : group)
 			{
 				auto& [transC, spriteC] = m_registry.get<TransformComponent, SpriteRendererComponent>(entity);
-				Renderer2D::DrawQuad((const glm::mat4&)transC, (const glm::vec4&)spriteC);
+				HZ_CORE_TRACE("Renderer2D::DrawQuad ,entityID: {0}", (int)entity);
+				Renderer2D::DrawQuad((const glm::mat4&)transC, (const glm::vec4&)spriteC, (int)entity);
+
 			}
 
 			Renderer2D::EndScene();
@@ -135,6 +152,26 @@ namespace Hazel
 	{
 
 	}
+
+	Entity Scene::GetPrimaryCamera()
+	{
+		auto view = m_registry.view<CameraComponent>();
+		if(view.empty())
+		{
+			return {entt::null,this};
+		}
+		for (auto entity : view)
+		{
+			auto& camera= view.get<CameraComponent>(entity); //ok.. view.get返回引用元组,我们直接auto[] 就行.这种引用并不是因为auto 而是[]的结构化绑定
+			if (camera.Primary)
+			{
+				return {entity,this};
+			}
+
+		}
+		return { entt::null,this };
+	}
+
 
 	template <>
 	void Hazel::Scene::OnComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component)

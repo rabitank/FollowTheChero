@@ -13,7 +13,7 @@ namespace Hazel
 		{ };
 		virtual ~Camera() {};
 
-		glm::mat4 GetProjection() const { return m_projection; }
+		const glm::mat4& GetProjection() const { return m_projection; }
 
 	protected:
 

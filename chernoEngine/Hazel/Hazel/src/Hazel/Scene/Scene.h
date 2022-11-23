@@ -2,7 +2,7 @@
 #include "entt.hpp"
 
 #include "Hazel/Core/Timestep.h"
-
+#include "Hazel/Renderer/EditorCamera.h"
 
 namespace Hazel //100% 包装 不会让用户接触到除了hazel之外的api
 {
@@ -20,11 +20,12 @@ namespace Hazel //100% 包装 不会让用户接触到除了hazel之外的api
 		* @return Entity.
 		*/
 		Entity CreateEntity(const std::string& tag = std::string("Entity"));
-		inline Entity* GetMainCamera(){ return m_mainCamera; };
+		Entity GetPrimaryCamera();
 		
 		void OnViewportResize(const uint32_t & width, const uint32_t& height) ;
 
-		void OnUpdate(Timestep ts);
+		void OnUpdateRuntime(Timestep ts);
+		void OnUpdateEditor(Timestep ts,EditorCamera& camera);
 
 		void DestroyEntity(Entity entity);
 

@@ -174,17 +174,17 @@ namespace Hazel
 		ImGui::PushFont(boldFont);
 		if (ImGui::Button("Z", buttonSize))
 			vec3.z = resetValue;
-ImGui::PopFont();
-ImGui::PopStyleColor(3);
+		ImGui::PopFont();
+		ImGui::PopStyleColor(3);
 
-ImGui::SameLine();
-ImGui::DragFloat("##Z", &vec3.z, speed, 0.f, 0.f, "%.2f");
-ImGui::PopItemWidth();
+		ImGui::SameLine();
+		ImGui::DragFloat("##Z", &vec3.z, speed, 0.f, 0.f, "%.2f");
+		ImGui::PopItemWidth();
 
-ImGui::PopID(); //pop now IDscope
-ImGui::PopStyleVar();
+		ImGui::PopID(); //pop now IDscope
+		ImGui::PopStyleVar();
 
-ImGui::Columns(1);
+		ImGui::Columns(1);
 
 	}
 

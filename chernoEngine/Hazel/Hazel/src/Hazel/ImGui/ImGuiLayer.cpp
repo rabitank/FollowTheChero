@@ -9,7 +9,7 @@
 #include "backends/imgui_impl_opengl3.h"
 #include "backends/imgui_impl_glfw.h"
 
-
+#include "ImGuizmo.h" 
 
 #include "Hazel/Core/Application.h"
 
@@ -71,29 +71,7 @@ namespace Hazel
 		GLFWwindow* window = static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow());
 
 		
-		//temporary
-		//累死我了! 草你! cherno 
-// 		io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB; //键位映射:暂时收录这么多的键位
-// 		io.KeyMap[ImGuiKey_LeftArrow] = GLFW_KEY_LEFT;	
-// 		io.KeyMap[ImGuiKey_RightArrow] = GLFW_KEY_RIGHT;
-// 		io.KeyMap[ImGuiKey_UpArrow] = GLFW_KEY_UP;
-// 		io.KeyMap[ImGuiKey_DownArrow] = GLFW_KEY_DOWN;
-// 		io.KeyMap[ImGuiKey_PageUp] = GLFW_KEY_PAGE_UP;
-// 		io.KeyMap[ImGuiKey_PageDown] = GLFW_KEY_PAGE_DOWN;
-// 		io.KeyMap[ImGuiKey_Home] = GLFW_KEY_HOME;
-// 		io.KeyMap[ImGuiKey_End] = GLFW_KEY_END;
-// 		io.KeyMap[ImGuiKey_Insert] = GLFW_KEY_INSERT;
-// 		io.KeyMap[ImGuiKey_Delete] = GLFW_KEY_DELETE;
-// 		io.KeyMap[ImGuiKey_Backspace] = GLFW_KEY_BACKSPACE;
-// 		io.KeyMap[ImGuiKey_Space] = GLFW_KEY_SPACE;
-// 		io.KeyMap[ImGuiKey_Enter] = GLFW_KEY_ENTER;
-// 		io.KeyMap[ImGuiKey_Escape] = GLFW_KEY_ESCAPE;
-// 		io.KeyMap[ImGuiKey_C] = GLFW_KEY_C;
-// 		io.KeyMap[ImGuiKey_V] = GLFW_KEY_V;
-// 		io.KeyMap[ImGuiKey_X] = GLFW_KEY_X;
-// 		io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
-// 		io.KeyMap[ImGuiKey_A] = GLFW_KEY_A;
-// 		io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
+
 
 
 		ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -110,30 +88,7 @@ namespace Hazel
 
 	}
 
-// 	void ImGuiLayer::OnUpdate()
-// 	{
-// 		
-// 
-// 		ImGuiIO& io = ImGui::GetIO();
-// 		
-// 		Application& app = Application::Get(); //get singal instance
-// 		Window& app_window = app.GetWindow();
-// 		io.DisplaySize = ImVec2(app_window.GetWidth(), app_window.GetHeight());
-// 
-// 		float time = (float)glfwGetTime(); //获得时间
-// 		io.DeltaTime= m_time > 0.0 ? (time - m_time):(1.0f / 60.0f); //获得	帧间时间
-// 
-// 		ImGui_ImplOpenGL3_NewFrame();
-// 		ImGui::NewFrame(); //先设尺寸,后画帧??
-// 
-// 		static bool show =true;
-// 		ImGui::ShowDemoWindow(&show);
-// 
-// 		ImGui::Render();
-// 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());	
-// 
-// 		//接下来 imguiLayer的onevent();
-// 	}
+
 
 	void ImGuiLayer::Begin() //OnUpdat() 被拆分为 Begin,ImGuiRender,End	 在渲染数据设置前 调用Begin() ,渲染数据后 调用 end()
 	{
@@ -143,6 +98,7 @@ namespace Hazel
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
+		ImGuizmo::BeginFrame();
 
 	}
 	void ImGuiLayer::End()

@@ -7,8 +7,10 @@
 #include "Hazel/Scene/SceneSerializer.h"
 #include "Hazel/Utils/PlantformUtils.h"
 
+#include "ImGuizmo.h"
+#include "Hazel/Math/Math.h"
 
-
+#include "Hazel/Renderer/EditorCamera.h"
 
 namespace Hazel
 {
@@ -42,15 +44,35 @@ namespace Hazel
 	m_TextureMap['R'] = SubTexture2D::CreateFromCroods(m_spriteSheet, { 5,9 }, { 128,128 });
 #endif
 	EditorLayer::EditorLayer()
-		:Layer("SandBox2D"), m_cameraController(1280.f / 720.f, true)
+		:Layer("SandBox2D")//, m_cameraController(1280.f / 720.f, true)
 	{}
 
-	ImVec2 EditorLayer::s_viewPortPanelSize = { 1080,760 };
+
+
 
 	void EditorLayer::OnAttach()
 	{
 		HZ_PROFILE_FUNCTION();
+		FrameBufferSpecification spec{ 1080,720 };
+		spec.Attachments = { { FrameBufferTextureFormat::RGBA},{ FrameBufferTextureFormat::RED_INTEGER},{FrameBufferTextureFormat::DEPTH } };
+		m_frameBuffer = Hazel::FrameBuffer::Create(spec);
 
+		//FrameBufferSpecification IDspec{ 1080,720 };
+		//IDspec.Attachments = { {FrameBufferTextureFormat::DEPTH_STENCIL} };
+		//m_frameBuffer = Hazel::FrameBuffer::Create(IDspec);
+
+
+
+		//Create a simple entitiy
+		m_activeScene = CreateRef<Scene>();
+		m_sceneHierarchyPanel.SetContext(m_activeScene);
+
+		m_editorCamera = EditorCamera(30.f, 1.778f, 0.1f, 1000.f);
+
+#if 0
+		//Init the maptexture
+		//m_mapHeight = (uint32_t)strlen(s_mapTiles) / s_mapWidth;
+		//m_mapWidth = s_mapWidth;
 		m_boardTexture = Hazel::Texture2D::Create("Assets/Texture/99.png");
 		m_quancifangTexture = Hazel::Texture2D::Create("Assets/Texture/quancifang.png");
 		m_spriteSheet = Hazel::Texture2D::Create("Assets/Texture/game/RPGpack_sheet_2X.png");
@@ -69,18 +91,7 @@ namespace Hazel
 
 		m_cameraController.SetZoomLevel(5.f);
 
-		//Init the maptexture
-		//m_mapHeight = (uint32_t)strlen(s_mapTiles) / s_mapWidth;
-		//m_mapWidth = s_mapWidth;
-
-
-
-		FrameBufferSpecification spec{ 1080,720 };
-		m_frameBuffer = Hazel::FrameBuffer::Create(spec);
-
-		
-		//Create a simple entitiy
-		m_activeScene = CreateRef<Scene>();
+#endif
 
 #if 0
 		Entity squareEntity = m_activeScene->CreateEntity("SquareA");
@@ -143,8 +154,6 @@ namespace Hazel
 		m_cameraEntity.AddComponent<NativeScripComponent>().Bind<CameraController>();
 
 #endif
-		m_sceneHierarchyPanel.SetContext(m_activeScene);
-
 	}
 
 	void EditorLayer::OnDetach()
@@ -241,16 +250,16 @@ namespace Hazel
 				if (ImGui::MenuItem("Exit"))
 					Application::Get().Close();
 
-				if (ImGui::MenuItem("New","Ctrl+N"))
+				if (ImGui::MenuItem("New", "Ctrl+N"))
 				{
 					NewScene();
 				}
 
-				if (ImGui::MenuItem("SaveAs...","Ctrl+Shift+S"))
+				if (ImGui::MenuItem("SaveAs...", "Ctrl+Shift+S"))
 				{
 					SaveSceneAs();
 				}
-				if (ImGui::MenuItem("Open...","Ctrl+O"))
+				if (ImGui::MenuItem("Open...", "Ctrl+O"))
 				{
 
 					OpenScene();
@@ -273,71 +282,174 @@ namespace Hazel
 			ImGui::Text("Vertex:%d", stats.GetTotalVertexCount());
 			ImGui::Text("Indeics:%d", stats.GetTotalIndexCount());
 
+			bool& iflock = m_editorCamera.IfLockRotation();
+			ImGui::Checkbox("Lock EditorCamer Rotation", &iflock);
+
 			ImGui::End();
 		}
 
+		//sceneHierarchyPanel
+		{
+			m_sceneHierarchyPanel.OnImGuiRender();
+
+		}
 
 		//ViewPort
 		{
 			HZ_PROFILE_SCOPE("ViewPortRender:");
-
 			//make port no board
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0,0});
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0,0 });
 			ImGui::Begin("ViewPort");
+
+			auto viewPortOffset = ImGui::GetCursorPos(); //Include Tab bar
+
 
 
 
 			// IsWindow...() 查询的是所在上下文的窗口的状态
-			m_viewPortIsFocus=ImGui::IsWindowFocused();
+			m_viewPortIsFocus = ImGui::IsWindowFocused();
 			m_viewPortIsHover = ImGui::IsWindowHovered();
-			Application::Get().GetImGuiLayer()->SetBlockEvent(!m_viewPortIsFocus || !m_viewPortIsHover);
+			//Application::Get().GetImGuiLayer()->SetBlockEvent(!m_viewPortIsFocus || !m_viewPortIsHover);
+			Application::Get().GetImGuiLayer()->SetBlockEvent( !m_viewPortIsHover);
 
-			
+
+
+
 			// view Port Resize: 
-			s_viewPortPanelSize = ImGui::GetContentRegionAvail();
+			ImVec2 viewPortPanelSize = ImGui::GetContentRegionAvail();
 			//ViewPort这panel的内容渲染大小...我们需要framebuffer跟随它改变以减少不必要的buffer写入
-			
-			if (m_ViewPortSize != *(glm::vec2*)& s_viewPortPanelSize && s_viewPortPanelSize.x> 0&&s_viewPortPanelSize.y>0)
-			{
 
-				HZ_PROFILE_SCOPE("ViewPortResize:");
-				m_ViewPortSize = { s_viewPortPanelSize.x,s_viewPortPanelSize.y };
-				m_frameBuffer->ReSize((uint32_t)s_viewPortPanelSize.x, (uint32_t)s_viewPortPanelSize.y);
-				m_activeScene->OnViewportResize(m_ViewPortSize.x,m_ViewPortSize.y);
+			//viewPortResize framebuffer 移动到 update
+			m_ViewPortSize = { viewPortPanelSize.x,viewPortPanelSize.y };
+
+
+			//show what rendered
+			uint64_t textureID = m_frameBuffer->GetColorAttachMentRendererID();
+			ImGui::Image(reinterpret_cast<void*>(textureID), { m_ViewPortSize.x,m_ViewPortSize.y }, { 0,1 }, { 1,0 }); //.... 所以都是用gl的id吗...  
+
+
+			auto windowSize = ImGui::GetWindowSize();
+			ImVec2 minBound = ImGui::GetWindowPos();
+			ImVec2 maxBound{ minBound.x + windowSize.x,minBound.y + windowSize.y }; //the viewPortImage rightButtom
+			minBound.x += viewPortOffset.x;
+			minBound.y += viewPortOffset.y; //the viewPortImage leftUp pos (except tab Bar)
+
+
+			m_viewPortBounds[0] = { minBound.x,minBound.y };
+			m_viewPortBounds[1] = { maxBound.x,maxBound.y };
+
+			//Gizmos  //it should just be used in EditorTime 
+			Entity selectedentity = m_sceneHierarchyPanel.GetSelectedEntity();
+			if (selectedentity)
+			{
+				ImGuizmo::SetDrawlist();
+				float windowWidth = ImGui::GetWindowWidth();
+				float windowHeight = ImGui::GetWindowHeight();
+
+				ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);//设置矩形坐标 左上右下(画布覆盖整个ViewPort?)
+
+				//Camera
+
+
+				const glm::mat4& cameraProjectMat = m_editorCamera.GetProjection();
+				glm::mat4 cameraViewMat = m_editorCamera.GetViewMatrix();
+
+				//Entity
+				auto& transcomp = selectedentity.GetComponent<TransformComponent>();
+				glm::mat4 transform = transcomp.GetTransform();
+
+
+				//snap / capture .. rotation/tanslate with grids
+				bool snap = Input::IsKeyPressed((int)Keycode::Left_control);
+				glm::vec4 snapvalue = { 0.5f,15.f,0.5f,0.5f };
+
+
+				ImGuizmo::Manipulate(glm::value_ptr(cameraViewMat), glm::value_ptr(cameraProjectMat),
+					(ImGuizmo::OPERATION)m_gizmoMod, ImGuizmo::MODE::WORLD, glm::value_ptr(transform), nullptr, snap ? &snapvalue[(int)m_gizmoMod] : nullptr);
+
+
+				if (ImGuizmo::IsUsing())
+				{
+					glm::vec3 translation, rotation, scale;
+					Hazel::Math::DecomposeTransform(transform, translation, rotation, scale);
+					glm::vec3 deletaRotation = rotation - transcomp.Rotation; //for no lock
+
+					transcomp.Translation = translation;
+					transcomp.Rotation += deletaRotation;
+					transcomp.Scale = scale;
+				};
+#if 0
+				//RunTimeGzmos
+				//auto cameraEntity = m_activeScene->GetPrimaryCamera();
+				if (cameraEntity && m_gizmoMod != -1)
+				{
+					const auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
+					const glm::mat4& cameraProjectMat = camera.GetProjection();
+					glm::mat4 cameraViewMat = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
+
+					//Entity
+					auto& transcomp = selectedentity.GetComponent<TransformComponent>();
+					glm::mat4 transform = transcomp.GetTransform();
+
+
+					//snap / capture .. rotation/tanslate with grids
+					bool snap = Input::IsKeyPressed((int)Keycode::Left_control);
+					glm::vec4 snapvalue = { 0.5f,15.f,0.5f,0.5f };
+
+
+					ImGuizmo::Manipulate(glm::value_ptr(cameraViewMat), glm::value_ptr(cameraProjectMat),
+						(ImGuizmo::OPERATION)m_gizmoMod, ImGuizmo::MODE::WORLD, glm::value_ptr(transform), nullptr, snap ? &snapvalue[(int)m_gizmoMod] : nullptr);
+
+
+					if (ImGuizmo::IsUsing())
+					{
+						glm::vec3 translation, rotation, scale;
+						Hazel::Math::DecomposeTransform(transform, translation, rotation, scale);
+						glm::vec3 deletaRotation = rotation - transcomp.Rotation; //for no lock
+
+						transcomp.Translation = translation;
+						transcomp.Rotation += deletaRotation;
+						transcomp.Scale = scale;
+					}
+#endif
+
+
 
 			}
 
-			//show what rendered
-			ImGui::Image((ImTextureID)m_frameBuffer->GetColorAttachMentRendererID(), { m_ViewPortSize.x,m_ViewPortSize.y}, { 0,1 }, { 1,0 }); //.... 所以都是用gl的id吗...  
-			ImGui::End();
-
-			ImGui::PopStyleVar();
 		}
-
-		{
-			m_sceneHierarchyPanel.OnImGuiRender();
-		
-		}
-
+		ImGui::End();
+		ImGui::PopStyleVar();
 		//dockSpace's end
 		ImGui::End();
-
-
-
 	}
+
+
+
 
 	void EditorLayer::OnUpdate(Hazel::Timestep deltaime)
 	{
 
-
 		HZ_PROFILE_FUNCTION();
+
+
+
+		if (auto spec = m_frameBuffer->GetSpecification(); m_ViewPortSize.x > 0.f && m_ViewPortSize.y > 0.f &&
+			(spec.width != m_ViewPortSize.x || spec.height != m_ViewPortSize.y))
+		{
+			m_editorCamera.SetViewPortSize(m_ViewPortSize.x, m_ViewPortSize.y);
+			m_frameBuffer->ReSize((uint32_t)m_ViewPortSize.x, (uint32_t)m_ViewPortSize.y);
+			m_activeScene->OnViewportResize((uint32_t)m_ViewPortSize.x, (uint32_t)m_ViewPortSize.y);
+
+		}
 
 		{
 			HZ_PROFILE_SCOPE("CameraController::OnUpdate");
 			if (m_viewPortIsFocus)//没聚焦就关掉位置刷新
 			{
-				m_cameraController.OnUpdate(deltaime); //也减少了资源耗费对吧
-			}
+				//m_cameraController.OnUpdate(deltaime); //也减少了资源耗费对吧
+				m_editorCamera.OnUpdate(deltaime);
+			}	
 		}
 
 		m_frameBuffer->Bind(); //every frame;
@@ -353,8 +465,30 @@ namespace Hazel
 
 		{
 			HZ_PROFILE_SCOPE("Render Draw");
-			m_activeScene->OnUpdate(deltaime);
+			//CHANGED:
+			m_activeScene->OnUpdateEditor(deltaime,m_editorCamera);
+			//m_activeScene->OnUpdateRuntime(deltaime);
 		}
+
+		//calculate the relative Position
+		auto [mx, my] = ImGui::GetMousePos();
+		mx -= m_viewPortBounds[0].x; 
+		my -= m_viewPortBounds[0].y;
+		glm::vec2 viewPortSize = m_viewPortBounds[1] - m_viewPortBounds[0];
+		//updown y to alien with openglCoord
+		my = viewPortSize.y - my;
+
+		int mouseX = (int)mx;
+		int mouseY = (int)my;
+
+		if (mouseX > 0 && mouseY > 0 && mouseX < viewPortSize.x && mouseY < viewPortSize.y)
+		{
+			int entityID = m_frameBuffer->ReadPixel(1, mouseX, mouseY);
+			HZ_CORE_TRACE("Pixel Data{0}", entityID);
+
+		}
+
+
 		m_frameBuffer->UnBind();
 
 
@@ -362,8 +496,7 @@ namespace Hazel
 
 	void EditorLayer::OnEvent(Hazel::Event& e)
 	{
-		
-
+		m_editorCamera.OnEvent(e);
 		EventDispatcher dispatcher(e);
 		dispatcher.DisPatch<KeyPressedEvent>(BIND_EVENT_CALLFN(EditorLayer::OnKeyPressed));
 
@@ -389,6 +522,7 @@ namespace Hazel
 			{
 				if (CtrlPressed && ShiftPressed)
 					SaveSceneAs();
+				m_gizmoMod = m_gizmoMod == ImGuizmo::OPERATION::SCALE? -1 : ImGuizmo::OPERATION::SCALE;
 				break;
 			}
 		case Key::O:
@@ -397,6 +531,23 @@ namespace Hazel
 				OpenScene();
 			break;
 		}
+		case Key::G:
+		{
+			m_gizmoMod = m_gizmoMod == ImGuizmo::OPERATION::TRANSLATE ? -1 : ImGuizmo::OPERATION::TRANSLATE;
+			break;
+		}
+	
+		case Key::R:
+		{
+			m_gizmoMod = m_gizmoMod == ImGuizmo::OPERATION::ROTATE? -1 : ImGuizmo::OPERATION::ROTATE;
+			break;
+		}
+		case Key::Tab:
+		{
+			m_gizmoMod = m_gizmoMod == ImGuizmo::OPERATION::BOUNDS? -1 : ImGuizmo::OPERATION::BOUNDS;
+			break;
+		}
+
 
 		}
 

@@ -18,6 +18,7 @@ workspace "Hazel"
  IncludeDir["stb_image"] = "Hazel/vendor/stb_image" 
  IncludeDir["entt"] = "Hazel/vendor/entt/include" 
  IncludeDir["yaml_cpp"] = "Hazel/vendor/yaml-cpp/include" 
+ IncludeDir["ImGuizmo"] = "Hazel/vendor/ImGuizmo" 
  
  project "Hazel"
  location "Hazel" --���·��
@@ -37,7 +38,10 @@ workspace "Hazel"
       "%{prj.name}/vendor/glm/glm/**.hpp",
       "%{prj.name}/vendor/glm/glm/**.inl",
       "%{prj.name}/vendor/stb_image/**.cpp",
-      "%{prj.name}/vendor/stb_image/**.h"
+      "%{prj.name}/vendor/stb_image/**.h",
+
+      "%{prj.name}/vendor/ImGuizmo/ImGuizmo.h",
+      "%{prj.name}/vendor/ImGuizmo/ImGuizmo.cpp" 
  }
 
  defines
@@ -59,7 +63,8 @@ workspace "Hazel"
           "%{IncludeDir.glm}",
           "%{IncludeDir.stb_image}",
           "%{IncludeDir.entt}",
-          "%{IncludeDir.yaml_cpp}"
+          "%{IncludeDir.yaml_cpp}",
+          "%{IncludeDir.ImGuizmo}"
      }
      
      links
@@ -69,8 +74,10 @@ workspace "Hazel"
           "ImGui",
           "opengl32.lib",
           "yaml-cpp"
-          
      }
+
+     filter "files:Hazel/vendor/ImGuizmo/**.cpp"
+     flags { "NoPCH" } --for cpp in ImGUizmo don't use pchheader(预编译头)
      
      filter "system:windows"
      systemversion "latest"
@@ -181,7 +188,8 @@ project "Sandbox"
            "Hazel/vendor/spdlog/include",
            "Hazel/vendor",
            "%{IncludeDir.glm}",
-           "%{IncludeDir.entt}"
+           "%{IncludeDir.entt}",
+           "%{IncludeDir.ImGuizmo}"
            
       }
       

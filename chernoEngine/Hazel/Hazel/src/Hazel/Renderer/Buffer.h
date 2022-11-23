@@ -1,5 +1,4 @@
 #pragma once
-#include "hzpch.h"
 
 
 namespace Hazel

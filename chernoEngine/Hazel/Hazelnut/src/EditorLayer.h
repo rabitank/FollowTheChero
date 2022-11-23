@@ -21,7 +21,6 @@ namespace Hazel
 		void OnUpdate(Timestep deltaime) override;
 		void OnEvent(Event& e) override;//调度的解决判断在application 的Onevent ,不用管
 
-		static ImVec2 GetViewPortSize() { return s_viewPortPanelSize; }
 
 	private:
 		bool OnKeyPressed(KeyPressedEvent& e);
@@ -36,25 +35,29 @@ namespace Hazel
 			float Time;
 		};
 
+#if 0
+
 		//old ref
 		Ref<VertexArray> m_squareVA; //for 
 		Ref<Texture2D> m_boardTexture, m_quancifangTexture;
 		Ref<Texture2D> m_spriteSheet;
 		Ref<SubTexture2D> m_spriteHair, m_spriteTree;
-		Ref<FrameBuffer> m_frameBuffer;	
 
-		Ref<Scene> m_activeScene;
 
 		OrthographicCameraController m_cameraController; //cherno把position提出来了?? 
-		
-		glm::vec4 m_flatColor = { 0.2,0.3f,0.8f,0.4f };
-		glm::vec2 m_ViewPortSize;
-
 
 		//Paricle 
 		ParticleSystem m_particleSystem;
 		ParticleProps m_particle;
+#endif
 
+		Ref<Scene> m_activeScene;
+		Ref<FrameBuffer> m_frameBuffer;
+		//Ref<FrameBuffer> m_entityIDBuffer;
+
+		glm::vec4 m_flatColor = { 0.2,0.3f,0.8f,0.4f };
+		glm::vec2 m_ViewPortSize;
+		glm::vec2 m_viewPortBounds[2];
 
 		//Entity: quad and Camera
 		Entity m_quadEntity;
@@ -65,12 +68,16 @@ namespace Hazel
 		//UI
 		SceneHierarchyPanel m_sceneHierarchyPanel; 	
 
-		static ImVec2 s_viewPortPanelSize ;
 
 		std::unordered_map<char, Hazel::Ref<SubTexture2D>> m_TextureMap; //for char to texture
 		uint32_t m_mapWidth, m_mapHeight;
+		bool m_viewPortIsFocus =true, m_viewPortIsHover =false;
 
-		bool m_viewPortIsFocus =false, m_viewPortIsHover =false;
+		//UI:gizmo
+		int m_gizmoMod = -1;
+
+		//editorCamera
+		EditorCamera m_editorCamera;
 
 
 

@@ -8,10 +8,111 @@ namespace Hazel
 
 	static uint32_t s_maxFrameBufferSize = 8192;
 
+	namespace Utils //Utils:实用工具
+	{
+
+
+		//GL_TEXTURE_2D_MULTISAMPLE same to make miniMap?
+		static GLenum TextureTarget(bool multisampled)
+		{
+			return multisampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
+		}
+
+		static void CreateTexture(bool mulitySamples, uint32_t* ids, uint32_t count)
+		{
+
+			glCreateTextures(TextureTarget(mulitySamples), count,(GLuint*)ids);
+
+		}
+
+		static bool IsDepthFormat(FrameBufferTextureFormat format)
+		{
+			switch (format)
+			{
+			case FrameBufferTextureFormat::DEPTH24STENCIL8:
+				return true;
+			}
+			return false;
+		}
+
+		static void BindTexture(bool multisampled, uint32_t id)
+		{
+			glBindTexture(TextureTarget(multisampled),id);
+		};
+
+		//internalFormat:interalStorageFormat 
+		//format:访问format
+		static void AttachColorTexture(uint32_t id, int samples, GLenum internalFormat,GLenum format, uint32_t width, uint32_t height, int index)
+		{
+			bool multisamples = samples > 1;
+			if (multisamples)
+			{
+				glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, internalFormat, width, height, GL_FALSE);
+			}
+			else
+			{
+				glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, nullptr);//always GL_RGBA
+
+				//MaybeTemporary 
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			}
+			//HZ_CORE_TRACE("GL_COLOR_ATTACHMENT0+index{0}", index);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+index, TextureTarget(multisamples), id, 0);
+
+		}
+		static void AttachDepthTexture(uint32_t id, int samples, GLenum format,GLenum attachmentType, uint32_t width, uint32_t height)
+		{
+			bool multisamples = samples > 1;
+			if (multisamples)
+			{
+				glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, format, width, height, GL_FALSE);
+			}
+			else
+			{
+				glTexStorage2D(GL_TEXTURE_2D, 1, format, width, height);//always GL_RGBA
+
+				//MaybeTemporary 
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			}
+
+			glFramebufferTexture2D(GL_FRAMEBUFFER,attachmentType, TextureTarget(multisamples), id, 0);
+
+		}
+
+
+
+
+
+	}
+
+
+	
+	
+
+	//textureType None also will be Created;
 	OpenGlFrameBuffer::OpenGlFrameBuffer(const FrameBufferSpecification& spec)
 		:m_specification(spec)
 	{
-		
+		for (auto& attch : m_specification.Attachments)
+		{
+			if (!Utils::IsDepthFormat(attch.Format))
+			{
+				m_colorAttachmentspecifications.emplace_back(attch);
+			}
+			else
+			{
+				m_depthAttchmentSpecification = attch;
+			}
+			
+		}
 		
 		//Currently just for debug!
 		Invalidate();
@@ -20,12 +121,23 @@ namespace Hazel
 	OpenGlFrameBuffer::~OpenGlFrameBuffer()
 	{
 		glDeleteFramebuffers(1, &m_rendererID);
-		glDeleteTextures(1, &m_colorAttachMent);
-		glDeleteTextures(1, &m_depthAttachMent);
+		glDeleteTextures((uint32_t)m_colorAttachmentIDs.size(),m_colorAttachmentIDs.data());
+		glDeleteTextures(1,&m_depthAttachmentID);
 	}
 
+	//you should Bind FrameBufferBefore
+	int OpenGlFrameBuffer::ReadPixel(uint32_t attachmentIndex, int x, int y)
+	{
+		HZ_CORE_ASSERT(attachmentIndex < m_colorAttachmentIDs.size(), "attachmentIndex is out of Index");
+		glReadBuffer(GL_COLOR_ATTACHMENT0 +attachmentIndex);
+		int pixelData;
+		glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, &pixelData);//width,height means select a bounds ->and we just read one Pixel
+		return pixelData;
+	}
 
-////////////一个支持OpenGL渲染的窗口(即帧缓存) 可能包含以下的组合：
+////////////
+// 
+//			一个支持OpenGL渲染的窗口(即帧缓存) 可能包含以下的组合：
 // 
 // 			· 至多4个颜色缓存
 // 
@@ -36,19 +148,90 @@ namespace Hazel
 // 			· 一个积累缓存
 // 
 // 			· 一个多重采样缓存
-//////////////////
+// 
+////////////
 	void OpenGlFrameBuffer::Invalidate()
 	{
 
 
-		if (m_rendererID) //第一次创建fb时删除所有fb/显示图像
+		if (m_rendererID) //第n(n!=1)次创建fb时旧的所有fb/显示图像
 		{
 			glDeleteFramebuffers(1, &m_rendererID);
-			glDeleteTextures(1, &m_colorAttachMent);
-			glDeleteTextures(1, &m_depthAttachMent);
+			glDeleteTextures((uint32_t)m_colorAttachmentIDs.size(), m_colorAttachmentIDs.data());
+			glDeleteTextures(1, &m_depthAttachmentID);
 
+			m_colorAttachmentIDs.clear();
+			m_depthAttachmentID = 0;
 		}
 
+		glCreateFramebuffers(1, &m_rendererID);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_rendererID);
+
+
+		bool multisample = m_specification.Samples > 1;
+
+		if (m_colorAttachmentspecifications.size())
+		{
+			m_colorAttachmentIDs.resize(m_colorAttachmentspecifications.size());
+
+			Utils::CreateTexture(multisample, m_colorAttachmentIDs.data(),(uint32_t) m_colorAttachmentIDs.size()); 
+
+
+			for (int i =0;i<m_colorAttachmentIDs.size();i++)
+			{
+				Utils::BindTexture(multisample, m_colorAttachmentIDs[i]);
+				switch (m_colorAttachmentspecifications[i].Format)
+				{
+				case FrameBufferTextureFormat::RGB:
+					Utils::AttachColorTexture(m_colorAttachmentIDs[i], m_specification.Samples, GL_RGB8, GL_RGBA ,m_specification.width, m_specification.height,i);
+					break;
+				case FrameBufferTextureFormat::RGBA:
+					Utils::AttachColorTexture(m_colorAttachmentIDs[i], m_specification.Samples, GL_RGBA8, GL_RGBA, m_specification.width, m_specification.height, i);
+					break;
+				case FrameBufferTextureFormat::RGBA16F:
+					Utils::AttachColorTexture(m_colorAttachmentIDs[i], m_specification.Samples, GL_RGBA16F, GL_RGBA ,m_specification.width, m_specification.height, i);
+					break;
+				case FrameBufferTextureFormat::RED_INTEGER:
+					Utils::AttachColorTexture(m_colorAttachmentIDs[i], m_specification.Samples, GL_R32I, GL_RED_INTEGER,m_specification.width, m_specification.height, i);
+					break;
+
+				}
+
+			}
+		}
+
+		if (m_depthAttchmentSpecification.Format != FrameBufferTextureFormat::None)
+		{
+			Utils::CreateTexture(multisample,&m_depthAttachmentID, 1); 
+			Utils::BindTexture(multisample, m_depthAttachmentID);
+
+			switch (m_depthAttchmentSpecification.Format)
+			{
+			case FrameBufferTextureFormat::DEPTH:
+				Utils::AttachDepthTexture(m_depthAttachmentID, m_specification.Samples,GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT, m_specification.width, m_specification.height);
+				break;
+			}
+		}
+
+
+		if (m_colorAttachmentIDs.size() > 1)
+		{ 
+			HZ_CORE_ASSERT(m_colorAttachmentIDs.size() < 4, "Max 4 ColorAttachments for oneFrameBuffer");
+			GLenum buffers[4] = { GL_COLOR_ATTACHMENT0,GL_COLOR_ATTACHMENT1,GL_COLOR_ATTACHMENT2,GL_COLOR_ATTACHMENT3 };
+			glDrawBuffers((uint32_t)m_colorAttachmentIDs.size(), buffers);
+		}
+		else if(m_colorAttachmentIDs.empty())
+		{
+			//Only Depth-pass
+			glDrawBuffer(GL_NONE); //
+		}
+
+
+		HZ_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "OpenGL Error:FrameBuffer Invalidate failed!"); //检查frameBuffer是否完成配置
+		glBindBuffer(GL_FRAMEBUFFER, 0);//safe!..还不确定是否使用这个帧
+
+
+#if 0
 
 		glCreateFramebuffers(1, &m_rendererID);
 		glBindFramebuffer(GL_FRAMEBUFFER,m_rendererID);
@@ -71,12 +254,9 @@ namespace Hazel
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_depthAttachMent,0);
-		
-
 		HZ_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER)== GL_FRAMEBUFFER_COMPLETE,"OpenGL Error:FrameBuffer Invalidate failed!"); //检查frameBuffer是否完成配置
-
-
 		glBindBuffer(GL_FRAMEBUFFER, 0);//safe!..还不确定是否使用这个帧缓存
+#endif
 
 	}
 

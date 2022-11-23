@@ -50,7 +50,7 @@ namespace Hazel
 		switch (m_projectionType)
 		{
 		case Hazel::SceneCamera::ProjectionType::Perspective:
-			m_projection = glm::perspective(m_perspectiveFov,m_aspect,m_orthoZFar,m_orthoZNear); //hen ... like a prespectiveCamera
+			m_projection = glm::perspective(m_perspectiveFov,m_aspect,m_perspectiveZNear,m_perspectiveZFar); //hen ... like a prespectiveCamera
 
 			break;
 		case Hazel::SceneCamera::ProjectionType::Orthographic:

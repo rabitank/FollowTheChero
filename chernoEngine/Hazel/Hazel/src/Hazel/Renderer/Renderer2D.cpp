@@ -19,6 +19,7 @@ namespace Hazel
 		//TODO:color ,texid
 		float TexIndex ;
 		float TilingFactor;
+		int EntityID;
 	};
 
 	
@@ -33,7 +34,7 @@ namespace Hazel
 
 		Ref<VertexArray> QuadVA;
 		Ref<VertexBuffer> QuadVB;
-		Ref<Texture2D> WhitBlock ;
+		Ref<Texture2D> WhitBlock  ;
 		Ref<Shader> TextureShader ;
 
 		uint32_t quadIndexCount = 0; //统计多少正方形被画了
@@ -80,7 +81,8 @@ namespace Hazel
 			{Hazel::ShaderDataType::Float4 ,"a_Color"},
 			{Hazel::ShaderDataType::Float2 ,"a_UVCoord"},
 			{Hazel::ShaderDataType::Float ,"a_TexIndex"},
-			{Hazel::ShaderDataType::Float ,"a_TilingFactor"}
+			{Hazel::ShaderDataType::Float ,"a_TilingFactor"},
+			{Hazel::ShaderDataType::Int ,"a_EntityID"}
 			});
 
 		s_Data.QuadVA->AddVertexBuffer(s_Data.QuadVB);
@@ -116,7 +118,8 @@ namespace Hazel
 		uint32_t OnePixel = 0xffffffff; //因为是采样...采样不在乎你原图的..
 		s_Data.WhitBlock->SetData(&OnePixel, 4);
 
-		s_Data.TextureShader = Shader::Create("Assets/shader/texture.glsl");//TODO : texure2d renderer
+		//s_Data.TextureShader = Shader::Create("Assets/shader/texture.glsl");//TODO : texure2d renderer
+		s_Data.TextureShader = Shader::Create("Assets/shader/Pathes.glsl");//TODO : texure2d renderer
 		s_Data.TextureShader->Bind();
 
 
@@ -125,7 +128,7 @@ namespace Hazel
 		for ( int i = 0; i < s_Data.MaxTextureSlots; i++)
 			samples[i] = i;
 
-		s_Data.TextureShader->SetIntArray("u_Texture", samples,s_Data.MaxTextureSlots);
+		s_Data.TextureShader->SetIntArray("u_Textures",samples,s_Data.MaxTextureSlots);
 
 		s_Data.TextureSlots[0] = s_Data.WhitBlock;
 
@@ -182,6 +185,20 @@ namespace Hazel
 	
 	}
 
+	void Renderer2D::BeginScene(const EditorCamera& Camera)
+	{
+		HZ_PROFILE_FUNCTION();
+
+		s_Data.TextureShader->Bind();
+		s_Data.TextureShader->SetMat4("u_ViewProjection", Camera.GetViewProjectionMatrix());//我们
+
+		s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
+		s_Data.quadIndexCount = 0;
+
+		s_Data.TextureSlotIndex = 1; //begin
+
+	}
+
 
 
 
@@ -231,43 +248,47 @@ namespace Hazel
 	{
 		HZ_PROFILE_FUNCTION();
 
-		float textureIndex = 0.0f;
-		float tilingFactor = 1.f;
 
-		if (s_Data.quadIndexCount >= s_Data.MaxIndeics)
-			Renderer2D::FlushAndReset();
+// 		float textureIndex = 0.0f;
+// 		float tilingFactor = 1.f;
+// 
+// 		if (s_Data.quadIndexCount >= s_Data.MaxIndeics)
+// 			Renderer2D::FlushAndReset();
+// 
+// 
+// 		constexpr size_t quadVertexCount = 4;
+// 		constexpr glm::vec2 textureCoord[4] = {
+// 			{0.f,0.f},
+// 			{1.f,0.f},
+// 			{1.f,1.f},
+// 			{0.f,1.f} };
+// 		glm::vec2 Setposition[4] =
+// 		{
+// 			{0.f,0.f},
+// 			{size.x,0.f},
+// 			{size.x,size.y},
+// 			{0.f,size.y}
+// 		};
+// 
+// 		for (uint32_t i = 0; i < quadVertexCount; i++)
+// 		{
+// 			s_Data.QuadVertexBufferPtr->Color = color;
+// 			s_Data.QuadVertexBufferPtr->Position = { position.x + Setposition[i].x,position.y + Setposition[i].y,position.z };
+// 			s_Data.QuadVertexBufferPtr->TexCoord = textureCoord[i];//左下角定义	
+// 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+// 			s_Data.QuadVertexBufferPtr->TilingFactor = tilingFactor;
+// 
+// 			s_Data.QuadVertexBufferPtr++;
+// 		}
+// 
+// 
+// 		s_Data.quadIndexCount += 6;
+// 
+// 		s_Data.Stats.quadCount++;
 
+		glm::mat4 tansformMat = glm::translate(glm::mat4(1.f), position) * glm::scale(glm::mat4(1.f), glm::vec3(size, 0.f));
 
-		constexpr size_t quadVertexCount = 4;
-		constexpr glm::vec2 textureCoord[4] = {
-			{0.f,0.f},
-			{1.f,0.f},
-			{1.f,1.f},
-			{0.f,1.f} };
-		glm::vec2 Setposition[4] =
-		{
-			{0.f,0.f},
-			{size.x,0.f},
-			{size.x,size.y},
-			{0.f,size.y}
-		};
-
-		for (uint32_t i = 0; i < quadVertexCount; i++)
-		{
-			s_Data.QuadVertexBufferPtr->Color = color;
-			s_Data.QuadVertexBufferPtr->Position = { position.x + Setposition[i].x,position.y + Setposition[i].y,position.z };
-			s_Data.QuadVertexBufferPtr->TexCoord = textureCoord[i];//左下角定义	
-			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
-			s_Data.QuadVertexBufferPtr->TilingFactor = tilingFactor;
-
-			s_Data.QuadVertexBufferPtr++;
-		}
-
-
-		s_Data.quadIndexCount += 6;
-
-		s_Data.Stats.quadCount++;
-
+		DrawQuad(tansformMat, color);
 
 	}
 
@@ -283,63 +304,65 @@ namespace Hazel
 		HZ_PROFILE_FUNCTION();
 
 		// 2560 1664
+		glm::mat4 tansformMat = glm::translate(glm::mat4(1.f), position) * glm::scale(glm::mat4(1.f), glm::vec3(size, 0.f));
+		DrawQuad(tansformMat,texture,tilingFactor,tintColor);
 
 
-		constexpr size_t quadVertexCount = 4;
-		constexpr glm::vec4 color = { 1.f,1.f,1.f,1.f };
-		constexpr glm::vec2 textureCoord[4] = {
-				{0.f,0.f},
-				{1.f,0.f},
-				{1.f,1.f},
-				{0.f,1.f}
-		};
-
-
-		glm::vec2 Setposition[4] =
-		{
-			{0.f,0.f},
-			{size.x,0.f},
-			{size.x,size.y},
-			{0.f,size.y}
-		};
-		
-		float textureIndex = 0.f;
-
-		if (s_Data.quadIndexCount >= s_Data.MaxIndeics)
-			Renderer2D::FlushAndReset();
-
-		for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++) //if the texture  exist  in slots
-		{
-			
-			if (*texture.get() == *s_Data.TextureSlots[i].get()) //get : get raw ptr?
-			{
-				textureIndex = (float) i;
-				break;
-			}
-			
-		}
-
-		if (textureIndex == 0.f)
-		{
-			textureIndex = (float)s_Data.TextureSlotIndex; // or a new slot
-			s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
-			s_Data.TextureSlotIndex++;
-		}
-
-		for (uint32_t i = 0; i < quadVertexCount; i++)
-		{
-			s_Data.QuadVertexBufferPtr->Color = color;
-			s_Data.QuadVertexBufferPtr->Position = {position.x+ Setposition[i].x,position.y+ Setposition[i].y,position.z};
-			s_Data.QuadVertexBufferPtr->TexCoord = textureCoord[i];//左下角定义	
-			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
-			s_Data.QuadVertexBufferPtr->TilingFactor = tilingFactor;
-
-			s_Data.QuadVertexBufferPtr++;
-		}
-
-		s_Data.quadIndexCount += 6;
-
-		s_Data.Stats.quadCount++;
+// 		constexpr size_t quadVertexCount = 4;
+// 		constexpr glm::vec4 color = { 1.f,1.f,1.f,1.f };
+// 		constexpr glm::vec2 textureCoord[4] = {
+// 				{0.f,0.f},
+// 				{1.f,0.f},
+// 				{1.f,1.f},
+// 				{0.f,1.f}
+// 		};
+// 
+// 
+// 		glm::vec2 Setposition[4] =
+// 		{
+// 			{0.f,0.f},
+// 			{size.x,0.f},
+// 			{size.x,size.y},
+// 			{0.f,size.y}
+// 		};
+// 		
+// 		float textureIndex = 0.f;
+// 
+// 		if (s_Data.quadIndexCount >= s_Data.MaxIndeics)
+// 			Renderer2D::FlushAndReset();
+// 
+// 		for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++) //if the texture  exist  in slots
+// 		{
+// 			
+// 			if (*texture.get() == *s_Data.TextureSlots[i].get()) //get : get raw ptr?
+// 			{
+// 				textureIndex = (float) i;
+// 				break;
+// 			}
+// 			
+// 		}
+// 
+// 		if (textureIndex == 0.f)
+// 		{
+// 			textureIndex = (float)s_Data.TextureSlotIndex; // or a new slot
+// 			s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
+// 			s_Data.TextureSlotIndex++;
+// 		}
+// 
+// 		for (uint32_t i = 0; i < quadVertexCount; i++)
+// 		{
+// 			s_Data.QuadVertexBufferPtr->Color = color;
+// 			s_Data.QuadVertexBufferPtr->Position = {position.x+ Setposition[i].x,position.y+ Setposition[i].y,position.z};
+// 			s_Data.QuadVertexBufferPtr->TexCoord = textureCoord[i];//左下角定义	
+// 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
+// 			s_Data.QuadVertexBufferPtr->TilingFactor = tilingFactor;
+// 
+// 			s_Data.QuadVertexBufferPtr++;
+// 		}
+// 
+// 		s_Data.quadIndexCount += 6;
+// 
+// 		s_Data.Stats.quadCount++;
 
 
 	}
@@ -347,10 +370,7 @@ namespace Hazel
 
 	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<SubTexture2D>& subTexture, float tilingFactor /*= 1.f*/, const glm::vec4& tintColor /*= glm::vec4(1.0f)*/)
 	{
-
-
 		DrawQuad(glm::vec3( position, 0), size, subTexture);
-
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<SubTexture2D>& subTexture, float tilingFactor /*= 1.f*/, const glm::vec4& tintColor /*= glm::vec4(1.0f)*/)
@@ -472,10 +492,12 @@ namespace Hazel
 	}
 
 
-	void Renderer2D::DrawQuad(const glm::mat4& transformat, const glm::vec4& color)
+	void Renderer2D::DrawQuad(const glm::mat4& transformat, const glm::vec4& color,int entityID)
 	{
 
 		HZ_PROFILE_FUNCTION();
+
+		
 
 		float textureIndex = 0.0f;
 		float tilingFactor = 1.f;
@@ -498,7 +520,7 @@ namespace Hazel
 			s_Data.QuadVertexBufferPtr->TexCoord = textureCoord[i];//左下角定义	
 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 			s_Data.QuadVertexBufferPtr->TilingFactor = tilingFactor;
-
+			s_Data.QuadVertexBufferPtr->EntityID = entityID;
 			s_Data.QuadVertexBufferPtr++;
 		}
 
@@ -506,7 +528,7 @@ namespace Hazel
 		s_Data.Stats.quadCount++;
 	}
 
-	void Renderer2D::DrawQuad(const glm::mat4& transformat, const Ref<Texture2D>& texture, float tilingFactor /*= 1.f*/, const glm::vec4& tintColor /*= glm::vec4(1.0f)*/)
+	void Renderer2D::DrawQuad(const glm::mat4& transformat, const Ref<Texture2D>& texture, float tilingFactor /*= 1.f*/, const glm::vec4& tintColor /*= glm::vec4(1.0f)*/, int entityID)
 	{
 		HZ_PROFILE_FUNCTION();
 
@@ -550,6 +572,7 @@ namespace Hazel
 			s_Data.QuadVertexBufferPtr->TexCoord = textureCoord[i];//左下角定义	
 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
 			s_Data.QuadVertexBufferPtr->TilingFactor = tilingFactor;
+			s_Data.QuadVertexBufferPtr->EntityID = entityID;
 
 			s_Data.QuadVertexBufferPtr++;
 		}
@@ -568,39 +591,7 @@ namespace Hazel
 
 	void Renderer2D::DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
 	{
-// 		HZ_PROFILE_FUNCTION();
-// 
-// 		if (s_Data.quadIndexCount >= s_Data.MaxIndeics)
-// 			Renderer2D::FlushAndReset();
-// 
-// 		float textureIndex = 0.f;
-// 		for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++) //if the texture  exist  in slots
-// 		{
-// 
-// 			if (*texture.get() == *s_Data.TextureSlots[i].get()) //get : get raw ptr?
-// 			{
-// 				textureIndex = (float)i;
-// 				break;
-// 			}
-// 
-// 
-// 		}
-// 		if (textureIndex == 0.f)
-// 		{
-// 			textureIndex = (float)s_Data.TextureSlotIndex; // or a new slot
-// 			s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
-// 			s_Data.TextureSlotIndex++;
-// 		}
-// 
-// 
-// 		constexpr glm::vec4 color = { 1.f,1.f,1.f,1.f };
-// 		constexpr size_t quadVertexCount = 4;
-// 		constexpr glm::vec2 textureCoord[4] = {
-// 				{0.f,0.f},
-// 				{1.f,0.f},
-// 				{1.f,1.f},
-// 				{0.f,1.f}
-// 		};
+
 		glm::mat4 transform = glm::translate(glm::mat4(1.f), position)
 			*
 			glm::rotate(glm::mat4(1.f), rotation, glm::vec3(0.f, 0.f, 1.f)) //使用默认就是弧度 //换算成 弧度
@@ -608,24 +599,6 @@ namespace Hazel
 			glm::scale(glm::mat4(1.0f), glm::vec3(size, 0.f));
 
 		DrawQuad(transform, texture, tilingFactor, tintColor);
-
-// 		for (uint32_t i = 0; i < quadVertexCount; i++)
-// 		{
-// 			s_Data.QuadVertexBufferPtr->Color = color;
-// 			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.quadVertexPosition[i];
-// 			s_Data.QuadVertexBufferPtr->TexCoord = textureCoord[i];//左下角定义	
-// 			s_Data.QuadVertexBufferPtr->TexIndex = textureIndex;
-// 			s_Data.QuadVertexBufferPtr->TilingFactor = tilingFactor;
-// 
-// 			s_Data.QuadVertexBufferPtr++;
-// 		}
-// 
-// 
-// 		s_Data.quadIndexCount += 6;
-// 		s_Data.Stats.quadCount++;
-
-
-
 	}
 
 	void Renderer2D::DrawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const Ref<SubTexture2D>& subTexture, float tilingFactor /*= 1.f*/, const glm::vec4& tintColor /*= glm::vec4(1.0f)*/)
