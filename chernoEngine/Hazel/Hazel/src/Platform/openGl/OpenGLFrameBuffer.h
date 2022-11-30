@@ -14,12 +14,13 @@ namespace Hazel
 		virtual ~OpenGlFrameBuffer(); //析构需要在其基类中存在....不然被视为基类时不会调用该类的析构函数/或者没有析构函数
 
 
-		virtual int ReadPixel(uint32_t attachmentIndex ,int x,int y) override;
+		virtual int8_t ReadPixel(uint32_t attachmentIndex ,int x,int y) override;
 		void Invalidate(); //无效化...变成空白帧
 		virtual void Bind() const override;	
 		virtual void UnBind() const override;
 		virtual const FrameBufferSpecification& GetSpecification() const override { return m_specification; }; //最好还是const....安全第一...
 		virtual  uint32_t GetColorAttachMentRendererID(uint32_t index =0) const { return m_colorAttachmentIDs[index]; }; //最好还是const....安全第一...
+		virtual void ClearColorAttachment(uint32_t attachmentIndex, int value) override;
 
 
 		virtual void ReSize(uint32_t width, uint32_t height) override;

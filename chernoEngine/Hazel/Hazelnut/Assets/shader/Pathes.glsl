@@ -22,6 +22,7 @@ struct VertexOutput
 	float TilingFactor;
 };
 
+//这里的out 也用了layout概念
 layout (location = 0) out VertexOutput Output;
 layout (location = 3) out flat float v_TexIndex;
 layout (location = 4) out flat int v_EntityID;
@@ -101,4 +102,5 @@ void main()
 
 	o_Color = texColor;
 	o_EntityID = v_EntityID;
+
 }

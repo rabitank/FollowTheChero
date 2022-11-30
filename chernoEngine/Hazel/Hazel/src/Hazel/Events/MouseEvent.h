@@ -7,7 +7,7 @@
 namespace Hazel
 {
 
-	class HAZEL_API MouseMoveEvent :public Event
+	class  MouseMoveEvent :public Event
 	{
 	public:
 		MouseMoveEvent(float x, float y)
@@ -29,7 +29,7 @@ namespace Hazel
 	};
 
 
-	class HAZEL_API MouseScorllEvent :public Event
+	class  MouseScorllEvent :public Event
 	{
 	public:
 		MouseScorllEvent(float offsetx,float offsety)
@@ -54,7 +54,7 @@ namespace Hazel
 		float m_OffSetx, m_OffSety;
 	};
 
-	class HAZEL_API MouseButtonEvent:public Event  //类内写的函数定义会被视为inline
+	class  MouseButtonEvent:public Event  //类内写的函数定义会被视为inline
 	{
 	public:
 
@@ -67,7 +67,7 @@ namespace Hazel
 	};
 
 
-	class HAZEL_API MouseButtonPressedEvent :public MouseButtonEvent 
+	class  MouseButtonPressedEvent :public MouseButtonEvent 
 	{
 	public:
 
@@ -83,7 +83,7 @@ namespace Hazel
 		EVENT_CLASS_TYPE(MouseButtonPressed);
 
 	};
-	class HAZEL_API MouseButtonReleasedEvent :public MouseButtonEvent
+	class  MouseButtonReleasedEvent :public MouseButtonEvent
 	{
 	public:
 

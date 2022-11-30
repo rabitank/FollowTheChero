@@ -9,7 +9,7 @@
 
 namespace Hazel
 {
-	class HAZEL_API ImGuiLayer :public Layer
+	class  ImGuiLayer :public Layer
 	{ //ui ²ã
 	public:
 		ImGuiLayer();

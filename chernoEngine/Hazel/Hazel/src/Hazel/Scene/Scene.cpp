@@ -31,10 +31,12 @@ namespace Hazel
 
 		auto group = m_registry.group<TransformComponent, SpriteRendererComponent>();
 
-		for (auto entity : group)
+		for (auto entity : group) //按大纲从上到下绘制
 		{
 			auto& [transC, spriteC] = m_registry.get<TransformComponent, SpriteRendererComponent>(entity);
-			Renderer2D::DrawQuad((const glm::mat4&)transC, (const glm::vec4&)spriteC, (int)entity);
+			//Renderer2D::DrawQuad((const glm::mat4&)transC, (const glm::vec4&)spriteC,20);
+			//似乎DrawQuad设置entityID 暂时不能传递到colorAttach1
+			Renderer2D::DrawSprite((const glm::mat4&)transC, spriteC, (int)entity);
 		}
 
 		Renderer2D::EndScene();

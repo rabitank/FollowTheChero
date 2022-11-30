@@ -87,6 +87,24 @@ namespace Hazel
 
 		}
 
+		static GLenum HazelFBTextureFormatToGL(FrameBufferTextureFormat format ) 
+		{
+			switch (format)
+			{
+			case FrameBufferTextureFormat::RGB:return GL_RGB8;
+			case FrameBufferTextureFormat::RGBA8:return GL_RGBA8;
+			case FrameBufferTextureFormat::RGBA16F: return GL_RGBA16F;
+			case FrameBufferTextureFormat::RED_INTEGER:return GL_RED_INTEGER;
+			case FrameBufferTextureFormat::DEPTH24STENCIL8:return GL_DEPTH24_STENCIL8;
+			default:break;
+			}
+
+			HZ_CORE_ASSERT(false,"ErrorFBTextureFormat");
+			return 0;
+
+		}
+
+
 
 
 
@@ -125,12 +143,13 @@ namespace Hazel
 		glDeleteTextures(1,&m_depthAttachmentID);
 	}
 
-	//you should Bind FrameBufferBefore
-	int OpenGlFrameBuffer::ReadPixel(uint32_t attachmentIndex, int x, int y)
+	//you should Bind FrameBufferBefore  : smt wrong
+	int8_t OpenGlFrameBuffer::ReadPixel(uint32_t attachmentIndex, int x, int y)
 	{
 		HZ_CORE_ASSERT(attachmentIndex < m_colorAttachmentIDs.size(), "attachmentIndex is out of Index");
 		glReadBuffer(GL_COLOR_ATTACHMENT0 +attachmentIndex);
 		int pixelData;
+
 		glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, &pixelData);//width,height means select a bounds ->and we just read one Pixel
 		return pixelData;
 	}
@@ -185,7 +204,7 @@ namespace Hazel
 				case FrameBufferTextureFormat::RGB:
 					Utils::AttachColorTexture(m_colorAttachmentIDs[i], m_specification.Samples, GL_RGB8, GL_RGBA ,m_specification.width, m_specification.height,i);
 					break;
-				case FrameBufferTextureFormat::RGBA:
+				case FrameBufferTextureFormat::RGBA8:
 					Utils::AttachColorTexture(m_colorAttachmentIDs[i], m_specification.Samples, GL_RGBA8, GL_RGBA, m_specification.width, m_specification.height, i);
 					break;
 				case FrameBufferTextureFormat::RGBA16F:
@@ -266,12 +285,28 @@ namespace Hazel
 
 		glViewport(0, 0, m_specification.width, m_specification.height); //…Ë÷√ ”ø⁄
 
+
+
 	}
 
 	void OpenGlFrameBuffer::UnBind() const
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0	);
 
+	}
+
+	void OpenGlFrameBuffer::ClearColorAttachment(uint32_t attachmentIndex, int value)
+	{
+		HZ_CORE_ASSERT(attachmentIndex<m_colorAttachmentIDs.size(),"ClearColorAttachment'index is out of range")
+
+		auto& spec = m_colorAttachmentspecifications[attachmentIndex];
+		glClearTexImage(m_colorAttachmentIDs[attachmentIndex], 0,
+			Utils::HazelFBTextureFormatToGL(spec.Format), GL_INT, &value);
+
+
+
+
+		
 	}
 
 	void OpenGlFrameBuffer::ReSize(uint32_t width, uint32_t height)

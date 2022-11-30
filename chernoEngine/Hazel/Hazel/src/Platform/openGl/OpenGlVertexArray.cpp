@@ -61,11 +61,43 @@ namespace Hazel
 		uint32_t index = 0;
 		for (const auto& element : Layout) //将应用自己的Layout 和 被添加到顶点数组事件绑定起来....为了省资源?
 		{
+
+			switch (element.type)
+			{
+			case ShaderDataType::Float: 
+			case ShaderDataType::Float2:
+			case ShaderDataType::Float3:
+			case ShaderDataType::Float4:
+			case ShaderDataType::None:
+			case ShaderDataType::Mat3:
+			case ShaderDataType::Mat4:
+			{
+				glEnableVertexAttribArray(index);//启用零号顶点属性
+				glVertexAttribPointer(index, element.GetElementCount(), ShaderDataTypeToGlType(element.type),
+					element.ifNormalized ? GL_TRUE : GL_FALSE, Layout.GetStride(), (const void*)element.offset);
+				index++;
+				break;
+			}
+			case ShaderDataType::Int:
+			case ShaderDataType::Int2:
+			case ShaderDataType::Int3:
+			case ShaderDataType::Int4:
+			case ShaderDataType::Bool:
+			{//glVertexAttribIPointer for integer:Don't need to ask if nomalized //整数布局必须用glVertexAttribIPointer不然会没法正常读输入
+				glEnableVertexAttribArray(index);//启用零号顶点属性
+				glVertexAttribIPointer(index, element.GetElementCount(), ShaderDataTypeToGlType(element.type),
+					Layout.GetStride(), (const void*)element.offset);
+				index++;
+				break;
+			}
+
+			}
+			
+
 			//倒数第二个参数:每个顶点之间的字节偏移量(顶点大小), //实际意义上 类型,组件数量 两个参数
 			//倒数第一个参数:偏移量,或者说pointer指针的从0到该属性起始位的移位(就是属性的指针啊....)
-			glEnableVertexAttribArray(index);//启用零号顶点属性
-			glVertexAttribPointer(index, element.GetElementCount(), ShaderDataTypeToGlType(element.type), element.ifNormalized ? GL_TRUE : GL_FALSE, Layout.GetStride(), (const void*)element.offset);
-			index++;
+
+
 		}
 		m_vertexBuffers.push_back(vertexbuffer);
 	}

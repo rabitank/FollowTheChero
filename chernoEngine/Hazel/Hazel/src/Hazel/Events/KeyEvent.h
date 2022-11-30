@@ -5,7 +5,7 @@
 namespace Hazel
 {
 
-	class HAZEL_API KeyEvent:public Event  //类内写的函数定义会被视为inline
+	class  KeyEvent:public Event  //类内写的函数定义会被视为inline
 	{
 	public:
 		
@@ -17,7 +17,7 @@ namespace Hazel
 		int m_keycode;
 	};
 
-	class HAZEL_API KeyPressedEvent :public KeyEvent //按下按键 在按一次和长按间需要缓冲时间把这两件事区分开
+	class  KeyPressedEvent :public KeyEvent //按下按键 在按一次和长按间需要缓冲时间把这两件事区分开
 	{
 		
 
@@ -39,7 +39,7 @@ namespace Hazel
 		int m_repeatCount;
 	};
 
-	class HAZEL_API KeyReleasedEvent :public KeyEvent //按下按键 在按一次和长按间需要缓冲时间把这两件事区分开
+	class  KeyReleasedEvent :public KeyEvent //按下按键 在按一次和长按间需要缓冲时间把这两件事区分开
 	{
 
 
@@ -59,7 +59,7 @@ namespace Hazel
 
 	};
 
-	class HAZEL_API KeyTypedEvent :public KeyEvent //按下按键 只知道按了哪个键
+	class  KeyTypedEvent :public KeyEvent //按下按键 只知道按了哪个键
 	{
 
 

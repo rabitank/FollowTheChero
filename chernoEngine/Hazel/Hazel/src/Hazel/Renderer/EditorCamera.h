@@ -69,9 +69,6 @@ namespace Hazel
 
 	public:
 
-
-
-
 		//@return: fov in radians
 		inline float GetFOV() { return m_fov; }
 		inline float GetNearClip() { return m_nearClip; }

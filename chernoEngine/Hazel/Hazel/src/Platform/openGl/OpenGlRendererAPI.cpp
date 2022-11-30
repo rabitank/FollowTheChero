@@ -18,18 +18,20 @@ namespace Hazel
 	{
 		uint32_t DrawindexCount = indexCount ?indexCount: VA->GetIndexBuffer()->GetCount();
 
+		//CHANGED:glDepthMask
+		//glDepthMask(false);
 		glDrawElements(GL_TRIANGLES, DrawindexCount, GL_UNSIGNED_INT, nullptr);//已经指定过索引序列了,用nullptr,drawelement使用定义的vao/默认的vao
 		glBindTexture(GL_TEXTURE_2D, 0);//unbind texture
+		//glDepthMask(true);
 	}
 
 	void OpenGlRendererAPI::Init()
 	{
 		HZ_PROFILE_FUNCTION();
-
+		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//设置混合方式 src_alpha * texture + 1-src_a*theCurrentImage
 
-		glEnable(GL_DEPTH_TEST);
 
 	}
 

@@ -54,7 +54,7 @@ namespace Hazel
 	{
 		HZ_PROFILE_FUNCTION();
 		FrameBufferSpecification spec{ 1080,720 };
-		spec.Attachments = { { FrameBufferTextureFormat::RGBA},{ FrameBufferTextureFormat::RED_INTEGER},{FrameBufferTextureFormat::DEPTH } };
+		spec.Attachments = { { FrameBufferTextureFormat::RGBA8},{ FrameBufferTextureFormat::RED_INTEGER},{FrameBufferTextureFormat::DEPTH } };
 		m_frameBuffer = Hazel::FrameBuffer::Create(spec);
 
 		//FrameBufferSpecification IDspec{ 1080,720 };
@@ -276,6 +276,11 @@ namespace Hazel
 		{
 			ImGui::Begin("Render Stats");
 
+			std::string name = "None";
+			if (m_hoveredEntity)
+				name = m_hoveredEntity.GetComponent<TagComponent>().Tag;
+			ImGui::Text("Hovered Entity:%s", name.c_str());
+
 			ImGui::Text("Renderer2D test - stats:");
 			ImGui::Text("DrawCall:%d", stats.DrawCalls);
 			ImGui::Text("quadCount: %d", stats.quadCount);
@@ -301,9 +306,13 @@ namespace Hazel
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0,0 });
 			ImGui::Begin("ViewPort");
 
-			auto viewPortOffset = ImGui::GetCursorPos(); //Include Tab bar
+			auto viewPortOffset = ImGui::GetWindowPos(); //Include Tab bar
 
+			ImVec2 minBound = ImGui::GetWindowContentRegionMin();
+			ImVec2 maxBound = ImGui::GetWindowContentRegionMax(); //the viewPortImage rightButtom
 
+			m_viewPortBounds[0] = { minBound.x + viewPortOffset.x,minBound.y + viewPortOffset.y };
+			m_viewPortBounds[1] = { maxBound.x + viewPortOffset.x,maxBound.y + viewPortOffset.y };
 
 
 			// IsWindow...() 查询的是所在上下文的窗口的状态
@@ -328,15 +337,7 @@ namespace Hazel
 			ImGui::Image(reinterpret_cast<void*>(textureID), { m_ViewPortSize.x,m_ViewPortSize.y }, { 0,1 }, { 1,0 }); //.... 所以都是用gl的id吗...  
 
 
-			auto windowSize = ImGui::GetWindowSize();
-			ImVec2 minBound = ImGui::GetWindowPos();
-			ImVec2 maxBound{ minBound.x + windowSize.x,minBound.y + windowSize.y }; //the viewPortImage rightButtom
-			minBound.x += viewPortOffset.x;
-			minBound.y += viewPortOffset.y; //the viewPortImage leftUp pos (except tab Bar)
 
-
-			m_viewPortBounds[0] = { minBound.x,minBound.y };
-			m_viewPortBounds[1] = { maxBound.x,maxBound.y };
 
 			//Gizmos  //it should just be used in EditorTime 
 			Entity selectedentity = m_sceneHierarchyPanel.GetSelectedEntity();
@@ -362,11 +363,12 @@ namespace Hazel
 				//snap / capture .. rotation/tanslate with grids
 				bool snap = Input::IsKeyPressed((int)Keycode::Left_control);
 				glm::vec4 snapvalue = { 0.5f,15.f,0.5f,0.5f };
+				if (m_gizmoMod != -1)
+				{
+					ImGuizmo::Manipulate(glm::value_ptr(cameraViewMat), glm::value_ptr(cameraProjectMat),
+						(ImGuizmo::OPERATION)m_gizmoMod, ImGuizmo::MODE::WORLD, glm::value_ptr(transform), nullptr, snap ? &snapvalue[(int)m_gizmoMod] : nullptr);
 
-
-				ImGuizmo::Manipulate(glm::value_ptr(cameraViewMat), glm::value_ptr(cameraProjectMat),
-					(ImGuizmo::OPERATION)m_gizmoMod, ImGuizmo::MODE::WORLD, glm::value_ptr(transform), nullptr, snap ? &snapvalue[(int)m_gizmoMod] : nullptr);
-
+				}
 
 				if (ImGuizmo::IsUsing())
 				{
@@ -413,8 +415,6 @@ namespace Hazel
 					}
 #endif
 
-
-
 			}
 
 		}
@@ -440,7 +440,6 @@ namespace Hazel
 			m_editorCamera.SetViewPortSize(m_ViewPortSize.x, m_ViewPortSize.y);
 			m_frameBuffer->ReSize((uint32_t)m_ViewPortSize.x, (uint32_t)m_ViewPortSize.y);
 			m_activeScene->OnViewportResize((uint32_t)m_ViewPortSize.x, (uint32_t)m_ViewPortSize.y);
-
 		}
 
 		{
@@ -453,6 +452,8 @@ namespace Hazel
 		}
 
 		m_frameBuffer->Bind(); //every frame;
+		
+
 		{
 			HZ_PROFILE_SCOPE("Renderer Prepare ");
 			Renderer2D::ResetStats();
@@ -460,6 +461,11 @@ namespace Hazel
 			//Clear 必须
 			RenderCommand::SetClearColor({ 0.1f,0.1,0.1f,1.f });
 			RenderCommand::Clear();
+
+			//Clear	entityID Attachment to -1
+			m_frameBuffer->ClearColorAttachment(1, -1);
+
+				
 		}
 
 
@@ -467,7 +473,6 @@ namespace Hazel
 			HZ_PROFILE_SCOPE("Render Draw");
 			//CHANGED:
 			m_activeScene->OnUpdateEditor(deltaime,m_editorCamera);
-			//m_activeScene->OnUpdateRuntime(deltaime);
 		}
 
 		//calculate the relative Position
@@ -475,6 +480,7 @@ namespace Hazel
 		mx -= m_viewPortBounds[0].x; 
 		my -= m_viewPortBounds[0].y;
 		glm::vec2 viewPortSize = m_viewPortBounds[1] - m_viewPortBounds[0];
+
 		//updown y to alien with openglCoord
 		my = viewPortSize.y - my;
 
@@ -483,9 +489,12 @@ namespace Hazel
 
 		if (mouseX > 0 && mouseY > 0 && mouseX < viewPortSize.x && mouseY < viewPortSize.y)
 		{
-			int entityID = m_frameBuffer->ReadPixel(1, mouseX, mouseY);
-			HZ_CORE_TRACE("Pixel Data{0}", entityID);
-
+			int piexlID= m_frameBuffer->ReadPixel(1, mouseX, mouseY);
+			m_hoveredEntity = piexlID == -1 ? Entity() : Entity((entt::entity)piexlID, m_activeScene.get());
+		}
+		else
+		{
+			m_hoveredEntity = Entity();
 		}
 
 
@@ -499,6 +508,7 @@ namespace Hazel
 		m_editorCamera.OnEvent(e);
 		EventDispatcher dispatcher(e);
 		dispatcher.DisPatch<KeyPressedEvent>(BIND_EVENT_CALLFN(EditorLayer::OnKeyPressed));
+		dispatcher.DisPatch<MouseButtonPressedEvent>(BIND_EVENT_CALLFN(EditorLayer::OnMousebuttomPressed));
 
 	}
 
@@ -551,6 +561,14 @@ namespace Hazel
 
 		}
 
+		return false;
+	}
+
+	bool EditorLayer::OnMousebuttomPressed(MouseButtonPressedEvent& e)
+	{
+		if (e.GetMouseButtonCode() == Mouse::ButtonLeft)
+			if(m_viewPortIsHover && !ImGuizmo::IsOver())
+				m_sceneHierarchyPanel.SetSelectedEntity(m_hoveredEntity);
 		return false;
 	}
 

@@ -24,6 +24,7 @@ namespace Hazel
 
 	private:
 		bool OnKeyPressed(KeyPressedEvent& e);
+		bool OnMousebuttomPressed(MouseButtonPressedEvent& e);
 		void SaveSceneAs();
 		void OpenScene();
 		void NewScene();
@@ -79,6 +80,7 @@ namespace Hazel
 		//editorCamera
 		EditorCamera m_editorCamera;
 
+		Entity m_hoveredEntity = {};
 
 
 	};

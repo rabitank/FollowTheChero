@@ -10,7 +10,7 @@ namespace Hazel
 	{
 		None = 0,
 
-		RGB = 1, RGBA, RGBA16F, 
+		RGB = 1, RGBA8, RGBA16F, 
 		
 		RED_INTEGER,
 
@@ -80,7 +80,9 @@ namespace Hazel
 
 
 		virtual void ReSize(uint32_t width,uint32_t height) = 0;
-		virtual int ReadPixel(uint32_t attachmentIndex,int x,int y) = 0;
+		virtual int8_t ReadPixel(uint32_t attachmentIndex,int x,int y) = 0;
+
+		virtual void ClearColorAttachment(uint32_t attachmentIndex,int value) =0;
 
 		static Ref<FrameBuffer> Create(const FrameBufferSpecification& spec);
 	private:

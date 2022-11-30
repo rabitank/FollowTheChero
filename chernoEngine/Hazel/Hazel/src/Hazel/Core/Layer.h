@@ -7,7 +7,7 @@
 
 namespace Hazel
 {
-	class HAZEL_API Layer
+	class  Layer
 		/// Layer 是一种栈概念 , 负责渲染该层图像,处理该层事件,传递/响应/终止事件传递,层将在 LayerStack上根据调用顺序依次渲染并覆盖
 	{
 	public:

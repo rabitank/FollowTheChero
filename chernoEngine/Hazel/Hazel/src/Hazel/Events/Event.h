@@ -20,7 +20,7 @@ namespace Hazel
 		MouseButtonPressed,MouseButtonReleased,MouseMoved,MouseScrolled
 	};
 
-	enum HAZEL_API EventCategory //过滤器,互相将使用位与运算判断
+	enum  EventCategory //过滤器,互相将使用位与运算判断
 	{
 		None = 0,
 		EventCategoryApplication = BIT(0),//1

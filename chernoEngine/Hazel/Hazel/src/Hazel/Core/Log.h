@@ -1,14 +1,20 @@
 #pragma once
 
 #include "Base.h"
+
+// This ignores all warnings raised inside External headers
+#pragma warning(push, 0)
+
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/sinks/daily_file_sink.h"
 #include "spdlog/fmt/ostr.h" //允许 自定义类型
 
+#pragma warning(pop)
+
 namespace Hazel
 {
-	class HAZEL_API Log //spdlog 包装器
+	class Log //spdlog 包装器
 	{
 	public:
 

@@ -5,7 +5,7 @@
 namespace Hazel
 {
 
-	class HAZEL_API WindowsResizeEvent :public Event
+	class  WindowsResizeEvent :public Event
 	{
 	public:
 		WindowsResizeEvent(unsigned int width,unsigned int heights)
@@ -27,7 +27,7 @@ namespace Hazel
 	};
 
 
-	class HAZEL_API WindowsCloseEvent :public Event
+	class  WindowsCloseEvent :public Event
 	{
 	public:
 		WindowsCloseEvent() {};
@@ -43,7 +43,7 @@ namespace Hazel
 		}
 	};
 
-	class HAZEL_API AppTickEvent :public Event
+	class  AppTickEvent :public Event
 	{
 	public:
 		AppTickEvent() {};
@@ -58,7 +58,7 @@ namespace Hazel
 			return ss.str();
 		}
 	};
-	class HAZEL_API AppUpdateEvent:public Event
+	class  AppUpdateEvent:public Event
 	{
 	public:
 		AppUpdateEvent() {};
@@ -73,7 +73,7 @@ namespace Hazel
 // 			return ss.str();
 // 		}
 	};
-	class HAZEL_API AppRenderEvent :public Event
+	class  AppRenderEvent :public Event
 	{
 	public:
 		AppRenderEvent() {};

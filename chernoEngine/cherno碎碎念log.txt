@@ -49,3 +49,11 @@ P93: 使用 ImGuizmo 来提供所见即所得的操作 我们把它放到了Haze
 cherno说以后看他在线敲代码了,twatch上看. ->即时思考收获更多?
 
 P97:cherno开始创建MousePeaking分支 ->但是我不用,因为Cherno已经写好了
+
+P100:里程碑  ; 
+uniformBuffer类 将uniform作为全局的buffer存储于GPU中,buffer是全局的,意味着任何glsl都可以直接访问而不需要单独设置,glsl的一些风格将会改变,
+成为vulkan和opengl都适应的glsl.     
+交叉编译 我们的shader提高移植性的方法  
+(opengl vulkan glsl通用语法部分以及宏定义写opengl,vulkan分支) opengl - vulkan glsl -> SPIR-V cross 中间语言(对于opengl) -> SPIR-V交叉编译器 ->opengl-vulkan SPIR-V binary (本地的/离线的shader)
+SPIR-V支持,多种图形库/协议,至少支持:vulkan和opengl
+SPRI-V binary 提交到GPU 近乎直接使用,同时我们本地持有它,从中获取shader信息或者迭代

@@ -8,12 +8,12 @@ namespace Hazel
 {
 
 
-	Hazel::Ref<Hazel::UniformBuffer> UniformBuffer::Create(uint32_t size)
+	Ref<Hazel::UniformBuffer> UniformBuffer::Create(uint32_t size, uint32_t binding)
 	{
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::API::OpenGl:
-			return CreateRef<OpenGlUniformBuffer>(); //不是 public 继承方式甚至不允许转换到基类...是因为这样可以访问到基类吗?
+			return CreateRef<OpenGlUniformBuffer>(size, binding); //不是 public 继承方式甚至不允许转换到基类...是因为这样可以访问到基类吗?
 		case RendererAPI::API::None:
 			HZ_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;

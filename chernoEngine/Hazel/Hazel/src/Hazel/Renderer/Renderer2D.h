@@ -12,6 +12,8 @@
 
 #include "Hazel/Renderer/EditorCamera.h"
 
+#include "Hazel/Scene/Component.h"
+
 namespace Hazel
 {
 	class Renderer2D
@@ -53,6 +55,10 @@ namespace Hazel
 		//Scene use them
 		static void DrawQuad(const glm::mat4& transformat ,const glm::vec4& color,int entitID =-1);
 		static void DrawQuad(const glm::mat4& transformat , const Ref<Texture2D>& texture, float tilingFactor = 1.f, const glm::vec4& tintColor = glm::vec4(1.0f), int entitID = -1);
+
+		//引入component , 我觉得不是很好
+		static void DrawSprite(const glm::mat4& transformat, SpriteRendererComponent& src ,int entitID =-1);
+
 		//stats
 		struct  Statistic //统计数据结构
 		{
@@ -67,8 +73,8 @@ namespace Hazel
 
 
 	private:
-
-		static void FlushAndReset();
+		static void StartBatch();
+		static void NextBatch();
 
 
 	};

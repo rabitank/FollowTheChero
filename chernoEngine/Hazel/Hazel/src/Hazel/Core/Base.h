@@ -2,82 +2,37 @@
 //some basic macro
 #include<memory>
 
+#include "Hazel/Core/PlatformDetection.h"
 
-
-#ifdef _WIN32
-	#ifdef _WIN64
-		#define HZ_PLATFORM_WINDOWS
-	#else
-		#error "x86 Buidls are not supported"
-	#endif
-#elif defined(__APPLE__)||defined(__MACH__)
-	#include <TargetConditionals.h>
-	#if TARGET_IPHONE_SIMULATOR ==1
-		#error "IOS simulator is not supported"
-#elif TARGET_OS_IPHONE ==1
-#define HZ_PLATFORM_IOS
-#error "IOS is not supported!"
-#elif TARGET_OS_MAC ==1
-#define "MacOs is not supported!"
-#else
-#error "UnKonw Apple platform!"
-#endif
-
-#elif defined(__ANDROID__)
-#define  HZ_PLATFORM_ANDROID
-#error "Android is not supported!"
-#elif defined(__Linux__)
-#define HZ_PLATFORM_LINUX 
-#error "Linux is not supported!"
-#else
-#error "unKown platform!"
-#endif // _WIN32
-
-
-
-
-
-#ifdef HZ_PLATFORM_WINDOWS
-#if HZ_DYNAMIC_LINK
-	#ifdef HZ_BUILD_DLL
-		#define HAZEL_API __declspec(dllexport)
-	#else
-		#define HAZEL_API __declspec(dllimport)
-	#endif
-#else
-	#define HAZEL_API 
-#endif	
-
-#else
-	#error Hazel only support windows!
-#endif
 
 #ifdef HZ_DEBUG
-#define HZ_ENABLE_ASSERTS
-#endif // HZ_DEBGUG
-
-
-
-#ifdef HZ_ENABLE_ASSERTS
-#define HZ_ASSERT(x,...) {if(!(x)) {HZ_ERROR("Assertion Failed:{0}",__VA_ARGS__ );__debugbreak();} }
-#define HZ_CORE_ASSERT(x,...) {if(!(x)) {HZ_CORE_ERROR("Assertion Failed:{0}",__VA_ARGS__ );__debugbreak();} }
-
-void GlClearError();
-bool GlLogCall(const char* function, const char* file, int line);
-
-#define GLCall(x) GlClearError();x;HZ_CORE_ASSERT(GlLogCall(#x,__FILE__,__LINE__)," OpenGL Error! "); //#x ,把x变为字符串,后两个是所有编译器支持的
+#if defined(HZ_PLATFORM_WINDOWS)
+#define HZ_DEBUGBREAK() __debugbreak()
+#elif defined(HZ_PLATFORM_LINUX)
+#include <signal.h>
+#define HZ_DEBUGBREAK() raise(SIGTRAP)
 #else
-#define HZ_ASSERT(x,...)
-#define HZ_CORE_ASSERT(x,...)
-#define GLCall(x) x
-#endif // HZ_ENABLE_ASSERTS
+#error "Platform doesn't support debugbreak yet!"
+#endif
+#define HZ_ENABLE_ASSERTS
+#else
+#define HZ_DEBUGBREAK()
+#endif
 
+#define HZ_EXPAND_MACRO(x) x
+#define HZ_STRINGIFY_MACRO(x) #x
 
 #define BIT(x) (1<<x) //1位移x位
 
 //不是很懂& 和 this 干嘛?: 函数引用?,使用this,是成员函数的隐藏参数吧
 //记得 带上命名空间/类名
 #define  BIND_EVENT_CALLFN(x) std::bind(&x,this,std::placeholders::_1) 
+
+
+
+
+
+
 
 namespace Hazel
 {
@@ -100,3 +55,7 @@ namespace Hazel
 	}
 
 }
+
+
+#include "Hazel/Core/Log.h"
+#include "Hazel/Core/Assert.h"
