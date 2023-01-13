@@ -116,6 +116,7 @@ namespace Hazel
 		m_name = Filepath.substr(lastSlash, count);
 
 
+
 	}
 	OpenGlShader::OpenGlShader(const std::string& name , const std::string& vertexsrc, const std::string& fragmentsrc)
 	{
@@ -134,8 +135,10 @@ namespace Hazel
 	OpenGlShader::~OpenGlShader()
 	{
 		HZ_PROFILE_FUNCTION();
-
 		glDeleteProgram(m_rendererID);
+
+
+
 	}
 
 	void OpenGlShader::shaderCompile(const std::unordered_map<GLenum, std::string>& shadersSource)
@@ -253,21 +256,23 @@ namespace Hazel
 			//shaderFilePath.filename()似乎直接返回路径指的文件名
 			std::filesystem::path cachedPath = cacheDirectory / (shaderFilePath.filename().string() + Utils::GLShaderStageCachedVulkanFileExtension(stage)); 
 			
-			//ifstream in 写入(ios::in 写入 ios::binary 二进制字节码)
+			//ifstream in (ios::in 读出 ios::binary 二进制字节码)
 			std::ifstream in(cachedPath, std::ios::in | std::ios::binary);
 			if (in.is_open())
 			{
-				//放置光标(你可以这么理解,到end , offset =0)
+				//放置光标(你可以这么理解,放到end ,相对位置 offset =0)
 				in.seekg(0, std::ios::end);
-				auto size = in.tellg();
+				auto size = in.tellg();//告诉光标位置
 
 				in.seekg(0, std::ios::beg);
 
-				auto& data = shaderData[stage];
+				auto& data = shaderData[stage];//引用然后 写入到shaderData
 				//resize干嘛??
 				data.resize(size / sizeof(uint32_t));
 				in.read((char*)data.data(), size);
 			}
+			//如果不能in(不存在Vulkan编译后的文件),那么现场编译,shaderData的内容直接放热乎的。 ->这次的Bug原因是,上次失败的编译文件(为空)没有清楚,可以读,就没有现场编译,但是内容是空的
+			//修复就是,失败了要删除文件...但是失败了不会新建文件的啊??空文件是怎么产生的??
 			else
 			{
 				shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, Utils::GLShaderStageToShaderC(stage), m_filePath.c_str(), options);
@@ -392,6 +397,8 @@ namespace Hazel
 				glDeleteShader(id);
 		}
 
+
+		//解除连接后删除中间编译结果(像obj一样),只保留链接完成的program
 		for (auto id : shaderIDs)
 		{
 			glDetachShader(program, id);

@@ -8,7 +8,7 @@
 namespace Hazel
 {
 
-
+	extern const std::filesystem::path g_AssetsDirectory;
 
 	SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& scene)
 	{
@@ -27,25 +27,30 @@ namespace Hazel
 		//parent relation?
 		ImGui::Begin("SceneHierarchy");
 
-		m_context->m_registry.each([&](auto entityID) {
-			Entity entity{ entityID,m_context.get()};
-			DrawEntityNode(entity);
-
-			
-		});
-
-
-
-		if (ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered()) //if we click the empty part on the panel,means we don't choose any entity
-			m_selectionContext = {};
-
-		//if right-click
-		if (ImGui::BeginPopupContextWindow(0,1,false)) //弹出上下文窗口 (右键菜单)
+		if (m_context)
 		{
-			if (ImGui::MenuItem("Create Empty Entity"))//创建菜单元素并
-				m_context->CreateEntity("Empty entity");
-			ImGui::EndPopup();	
 
+			m_context->m_registry.each([&](auto entityID) {
+				Entity entity{ entityID,m_context.get() };
+				DrawEntityNode(entity);
+
+
+				});
+
+
+
+			if (ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered()) //if we click the empty part on the panel,means we don't choose any entity
+				m_selectionContext = {};
+
+			//if right-click
+			if (ImGui::BeginPopupContextWindow(0, 1, false)) //弹出上下文窗口 (右键菜单)
+			{
+				if (ImGui::MenuItem("Create Empty Entity"))//创建菜单元素并
+					m_context->CreateEntity("Empty entity");
+				ImGui::EndPopup();
+
+
+			}
 
 		}
 
@@ -276,17 +281,50 @@ namespace Hazel
 
 		if (ImGui::BeginPopup("AddComponent"))
 		{
-			if (ImGui::MenuItem("Camer"))
+			if (!m_selectionContext.HasComponent<CameraComponent>())
 			{
-				m_selectionContext.AddComponent<CameraComponent>();
-				ImGui::CloseCurrentPopup();
-			}
-			if (ImGui::MenuItem("SpriteRender"))
-			{
-				m_selectionContext.AddComponent<SpriteRendererComponent>();
-				ImGui::CloseCurrentPopup();
+				if (ImGui::MenuItem("Camera"))
+				{
+					m_selectionContext.AddComponent<CameraComponent>();
+					ImGui::CloseCurrentPopup();
+				}
 			}
 
+			if (!m_selectionContext.HasComponent<SpriteRendererComponent>())
+			{
+				if (ImGui::MenuItem("SpriteRender"))
+				{
+					m_selectionContext.AddComponent<SpriteRendererComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+
+			if (!m_selectionContext.HasComponent<CircleRendererComponent>())
+			{
+				if (ImGui::MenuItem("CircleRender"))
+				{
+					m_selectionContext.AddComponent<CircleRendererComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+
+			if (!m_selectionContext.HasComponent<Rigidbody2DComponent>())
+			{
+				if (ImGui::MenuItem("RigidBody2D"))
+				{
+					m_selectionContext.AddComponent<Rigidbody2DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+
+			if (!m_selectionContext.HasComponent<BoxCollider2DComponent>())
+			{
+				if (ImGui::MenuItem("ColliderBox2D"))
+				{
+					m_selectionContext.AddComponent<BoxCollider2DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
 			ImGui::EndPopup();
 
 		}
@@ -365,11 +403,76 @@ namespace Hazel
 				ImGui::Checkbox("FixedAspectRatio:", &comp.FixedAspectRatio);
 			});
 
-		DrawComponent<SpriteRendererComponent>("Sprite Render",entity,[](auto& compnent) 
+		DrawComponent<SpriteRendererComponent>("Sprite Render", entity, [](auto& compnent)
 		{
-			ImGui::ColorEdit4("color:", glm::value_ptr(compnent.Color));
+				ImGui::ColorEdit4("color:", glm::value_ptr(compnent.Color));
+				// Texture 
+				ImGui::Button("Texture", ImVec2(100.f, 0.f));//0.f ->autoAdjust  
+				if (ImGui::BeginDragDropTarget())
+				{
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+					{
+						const wchar_t* path = (const wchar_t*)payload->Data;
+						std::filesystem::path texturePath = std::filesystem::path(g_AssetsDirectory) / path;
+						compnent.Texture = Texture2D::Create(texturePath.string());
+					}
+					ImGui::EndDragDropTarget();
+
+				}
+				ImGui::DragFloat("Tiling Factor", &compnent.TilingFactor, 0.1f, 0.f, 100.f);
+
 		});
 
+		DrawComponent<CircleRendererComponent>("Circle Render", entity, [](auto& compnent)
+		{
+				ImGui::ColorEdit4("color:", glm::value_ptr(compnent.Color));
+				//ImGui::DragFloat("Radius ", &compnent.Radius, 0.1f, 0.f, 10.f);
+				ImGui::DragFloat("Thickness ", &compnent.Thickness, 0.025f, 0.f, 1.f);
+				ImGui::DragFloat("Fade ", &compnent.Fade, 0.00025f, 0.f, 100.f);
+
+		});
+
+		DrawComponent<Rigidbody2DComponent>("Rigidbody 2D",entity,[](auto& comp) 
+		{
+				const char* RigidBodyTypeString[] = { "Static","Dynamic","Kinematic"};
+				const char* currentBodyType = RigidBodyTypeString[(int)comp.BodyType];
+
+
+				if (ImGui::BeginCombo("bodyType", currentBodyType))
+				{
+					for (int i = 0; i < 3; i++)
+					{
+						bool isSelected = currentBodyType == RigidBodyTypeString[i]; //获得是否选中状态
+
+						if (ImGui::Selectable(RigidBodyTypeString[i], isSelected)) //绘制可选项同时检测选择点击
+						{
+							currentBodyType = RigidBodyTypeString[i]; //响应: 设置相机类型
+							comp.BodyType = (Rigidbody2DComponent::RigidBodyType)i;
+						}
+						if (isSelected)
+							ImGui::SetItemDefaultFocus(); //设为复选框默认选中的东西并显示
+					}
+					ImGui::EndCombo();
+				};
+
+				ImGui::Checkbox("FixedRotation", &comp.FixedRotation);
+
+		});
+
+		DrawComponent<BoxCollider2DComponent>("BoxCollider 2D",entity,[](auto& comp) 
+		{
+
+				ImGui::DragFloat2("Offset", glm::value_ptr(comp.Offset));
+				ImGui::DragFloat2("Size", glm::value_ptr(comp.Size));
+				ImGui::DragFloat("Density", &comp.Density,0.01f,0.f,1.f);
+				ImGui::DragFloat("Friction", &comp.Friction, 0.01f, 0.f, 1.f);
+				ImGui::DragFloat("Restitution", &comp.Restitution, 0.01f, 0.f, 1.f);
+				ImGui::DragFloat("Restitution Threshold", &comp.RestitutionThreshold, 0.01f, 0.f);
+
+		});
+
+
+			
 
 
 

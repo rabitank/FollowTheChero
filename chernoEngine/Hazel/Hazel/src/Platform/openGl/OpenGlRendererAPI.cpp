@@ -18,6 +18,7 @@ namespace Hazel
 	{
 		uint32_t DrawindexCount = indexCount ?indexCount: VA->GetIndexBuffer()->GetCount();
 
+		VA->Bind();
 		//CHANGED:glDepthMask
 		//glDepthMask(false);
 		glDrawElements(GL_TRIANGLES, DrawindexCount, GL_UNSIGNED_INT, nullptr);//已经指定过索引序列了,用nullptr,drawelement使用定义的vao/默认的vao

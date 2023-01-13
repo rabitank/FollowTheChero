@@ -1494,6 +1494,7 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
+    <ClInclude Include="src\Hazel\Core\UUID.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Hazel\Core\Application.cpp">
@@ -1634,5 +1635,6 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
+    <ClCompile Include="src\Hazel\Core\UUID.cpp" />
   </ItemGroup>
 </Project>

@@ -54,6 +54,7 @@ struct VertexOutput
 };
 
 layout (location = 0) in VertexOutput Input;
+//flat 关闭插值
 layout (location = 3) in flat float v_TexIndex;
 layout (location = 4) in flat int v_EntityID;
 
@@ -100,7 +101,7 @@ void main()
 	}
 
 	if (texColor.a == 0.0)
-		discard;
+		discard; //丢弃 -> 不会覆盖之前层的像素的数据 ->相当于return,不画了
 
 	o_Color = texColor;
 	o_EntityID = v_EntityID;

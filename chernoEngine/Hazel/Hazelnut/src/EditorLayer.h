@@ -2,7 +2,7 @@
 #include "Hazel.h"
 #include "ImGui/imgui.h"
 #include "Panels/SceneHierarchyPanel.h"
-
+#include "Panels/ContentBrowserPanel.h"
 
 namespace Hazel
 {
@@ -26,9 +26,20 @@ namespace Hazel
 		bool OnKeyPressed(KeyPressedEvent& e);
 		bool OnMousebuttomPressed(MouseButtonPressedEvent& e);
 		void SaveSceneAs();
+		void SaveScene();
 		void OpenScene();
+		void OpenScene(const std::filesystem::path& path);
 		void NewScene();
 
+		//UI Panel
+		void UI_Toolbar();
+
+		void OnScenePlay();
+		void OnSceneStop();
+
+		void OnDuplicateEntity();
+
+		void SerializeScene( Ref<Scene> scene , const std::filesystem::path& filePath);
 	private:
 		struct  ProfileResult
 		{
@@ -53,8 +64,12 @@ namespace Hazel
 #endif
 
 		Ref<Scene> m_activeScene;
+		Ref<Scene> m_editScene ;
 		Ref<FrameBuffer> m_frameBuffer;
 		//Ref<FrameBuffer> m_entityIDBuffer;
+
+		std::filesystem::path	m_editorScenePath;
+
 
 		glm::vec4 m_flatColor = { 0.2,0.3f,0.8f,0.4f };
 		glm::vec2 m_ViewPortSize;
@@ -65,9 +80,6 @@ namespace Hazel
 		Entity m_cameraEntity;
 		Entity m_secondCamera;
 		bool m_primaryCamera =false;
-
-		//UI
-		SceneHierarchyPanel m_sceneHierarchyPanel; 	
 
 
 		std::unordered_map<char, Hazel::Ref<SubTexture2D>> m_TextureMap; //for char to texture
@@ -81,6 +93,22 @@ namespace Hazel
 		EditorCamera m_editorCamera;
 
 		Entity m_hoveredEntity = {};
+		
+		//UI
+		SceneHierarchyPanel m_sceneHierarchyPanel; 	
+		ContentBrowserPanel m_contentBrowserPanel;
+
+		//EditResource
+		Ref<Texture2D> m_IconPlay;
+		Ref<Texture2D> m_IconStop;
+
+		
+		enum class SceneState
+		{
+			Edit = 0, Play = 1
+		};
+
+		SceneState m_sceneState = SceneState::Edit;
 
 
 	};

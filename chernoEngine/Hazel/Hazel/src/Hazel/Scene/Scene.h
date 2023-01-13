@@ -2,7 +2,10 @@
 #include "entt.hpp"
 
 #include "Hazel/Core/Timestep.h"
+#include "Hazel/Core/UUID.h"
 #include "Hazel/Renderer/EditorCamera.h"
+
+class b2World;
 
 namespace Hazel //100% 包装 不会让用户接触到除了hazel之外的api
 {
@@ -14,12 +17,14 @@ namespace Hazel //100% 包装 不会让用户接触到除了hazel之外的api
 		Scene();
 		~Scene();
 
+		static Ref<Scene> Copy(Ref<Scene> other);
 
 		/**
 		* @含有默认的transformComponent与Tag, brief Creates a new entity or recycles a destroyed one.
 		* @return Entity.
 		*/
 		Entity CreateEntity(const std::string& tag = std::string("Entity"));
+		Entity CreateEntityWithUUID(UUID uuid, const std::string& tag = std::string("Entity"));
 		Entity GetPrimaryCamera();
 		
 		void OnViewportResize(const uint32_t & width, const uint32_t& height) ;
@@ -27,7 +32,12 @@ namespace Hazel //100% 包装 不会让用户接触到除了hazel之外的api
 		void OnUpdateRuntime(Timestep ts);
 		void OnUpdateEditor(Timestep ts,EditorCamera& camera);
 
+		void OnRuntimeStart();
+		void OnRuntimeStop();
+
 		void DestroyEntity(Entity entity);
+
+		void DuplicateEntity(Entity entity); //复制实体
 
 	private:
 		template <typename T>
@@ -41,6 +51,7 @@ namespace Hazel //100% 包装 不会让用户接触到除了hazel之外的api
 		uint32_t m_viewportWidth =0 ;
 		uint32_t m_viewportHeight =0 ;
 
+		b2World* m_physicsWorld =nullptr;
 
 		friend class Entity;
 		friend class SceneSerializer;

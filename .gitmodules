@@ -19,3 +19,6 @@
 [submodule "chernoEngine/Hazel/Hazel/vendor/ImGuizmo"]
 	path = chernoEngine/Hazel/Hazel/vendor/ImGuizmo
 	url = https://github.com/TheCherno/ImGuizmo
+[submodule "chernoEngine/Hazel/Hazel/vendor/Box2D"]
+	path = chernoEngine/Hazel/Hazel/vendor/Box2D
+	url = https://github.com/TheCherno/box2d

@@ -1,6 +1,9 @@
 #pragma once
 #include "Scene.h"
+#include "Component.h"
 #include "entt.hpp"
+
+
 
 namespace Hazel
 
@@ -22,7 +25,16 @@ namespace Hazel
 
 			HZ_CORE_ASSERT(!HasComponent<T>(), "Entity already has component");
 
-			T& component =  m_scene->m_registry.emplace <T>(m_entityHandle, std::forward<Args>(args)...);
+			T& component =  m_scene->m_registry.emplace<T>(m_entityHandle, std::forward<Args>(args)...);
+			m_scene->OnComponentAdded<T>(*this,component);
+			return component;
+
+		}
+		template<typename T ,typename... Args>
+		//return: reference of the component
+		T& AddOrReplaceComponent(Args&&... args) 
+		{
+			T& component =  m_scene->m_registry.emplace_or_replace<T>(m_entityHandle, std::forward<Args>(args)...);
 			m_scene->OnComponentAdded<T>(*this,component);
 			return component;
 
@@ -47,6 +59,9 @@ namespace Hazel
 			HZ_CORE_ASSERT(HasComponent<T>(), "Entity does not have component");
 			m_scene->m_registry.remove<T>(m_entityHandle);
 		}
+
+		UUID GetUUID() { return GetComponent<IDComponent>().ID; }
+		const std::string&  GetTag() { return GetComponent<TagComponent>().Tag; }
 
 		operator bool() const { return m_entityHandle != entt::null;} //为entity 提供bool转换 ...方便检查空entity
 		operator uint32_t() const { return (uint32_t)m_entityHandle; }

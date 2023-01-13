@@ -10,33 +10,13 @@
 #include "ImGuizmo.h"
 #include "Hazel/Math/Math.h"
 
-#include "Hazel/Renderer/EditorCamera.h"
 
 namespace Hazel
 {
+
+	extern const std::filesystem::path g_AssetsDirectory ;//外部声明的文件路径常量: contentBrowserPanel 里
+
 #if 0
-	static const uint32_t s_mapWidth = 31;
-	static const char* s_mapTiles =
-		"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
-		"WWWWWWWWWWWWWWSSSSWWWWWWWWWWWWW"
-		"WWWWWWWWWWSSSSDDDDDSRRRRWWWWWWW"
-		"WWWWWWWSSDDDDDDDDDDDDDDRRWWWWWW"
-		"WWWWWWSSSDDDDDDDDDDDDDDDRRWWWWW"
-		"WWWWSSSSSDDDDDDTDDDDDDDWWWWWWWW"
-		"WWSSSWWSSDDDDDWWWDDDDRWWWWWWWWW"
-		"WWWWWWSSDDTDDDWWWDDDDRRWWWWWWWW"
-		"WWWWSSDDDDDDDDDDDDSSSRRWWWWWWWW"
-		"WWWWWWWSSDDDDDDDTDDCWWWWWWWWWWW"
-		"WWWWWWWSSDDDDDDDDDDDDDWWWWWWWWW"
-		"WWWWWWWSSSSSSSSSSSSSSSWWWWWWWWW"
-		"WWWWWWWWWWWWSSSSSSRWWWWWWWWWWWW"
-		"WWWWWWWWWWWWWWWRSSRRRWWWWWWWWWW"
-		"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
-		"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
-		"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
-		;
-
-
 	m_TextureMap['W'] = SubTexture2D::CreateFromCroods(m_spriteSheet, { 11,11 }, { 128,128 });
 	m_TextureMap['S'] = SubTexture2D::CreateFromCroods(m_spriteSheet, { 6,11 }, { 128,128 });
 	m_TextureMap['D'] = SubTexture2D::CreateFromCroods(m_spriteSheet, { 1,11 }, { 128,128 });
@@ -65,9 +45,14 @@ namespace Hazel
 
 		//Create a simple entitiy
 		m_activeScene = CreateRef<Scene>();
-		m_sceneHierarchyPanel.SetContext(m_activeScene);
+		m_editScene = m_activeScene;
 
 		m_editorCamera = EditorCamera(30.f, 1.778f, 0.1f, 1000.f);
+
+
+		m_IconPlay= Texture2D::Create("Resources/Icon/playbuttonIcon.png");
+		m_IconStop= Texture2D::Create("Resources/Icon/stopbuttonIcon.png");
+
 
 #if 0
 		//Init the maptexture
@@ -154,6 +139,9 @@ namespace Hazel
 		m_cameraEntity.AddComponent<NativeScripComponent>().Bind<CameraController>();
 
 #endif
+
+		//m_sceneHierarchyPanel.SetContext(m_activeScene);
+
 	}
 
 	void EditorLayer::OnDetach()
@@ -299,6 +287,12 @@ namespace Hazel
 
 		}
 
+		//contentBrowserPanel
+		{
+
+			m_contentBrowserPanel.OnImGuiRender();
+		}
+
 		//ViewPort
 		{
 			HZ_PROFILE_SCOPE("ViewPortRender:");
@@ -337,6 +331,17 @@ namespace Hazel
 			ImGui::Image(reinterpret_cast<void*>(textureID), { m_ViewPortSize.x,m_ViewPortSize.y }, { 0,1 }, { 1,0 }); //.... 所以都是用gl的id吗...  
 
 
+			//Drag
+			if (ImGui::BeginDragDropTarget())
+			{
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+				{
+					const wchar_t* path = (const wchar_t*)payload->Data; //wchar_t 是windows常用的utf-16格式
+					OpenScene(std::filesystem::path (g_AssetsDirectory)/path);
+				}
+				ImGui::EndDragDropTarget();
+
+			}
 
 
 			//Gizmos  //it should just be used in EditorTime 
@@ -422,8 +427,43 @@ namespace Hazel
 		ImGui::PopStyleVar();
 		//dockSpace's end
 		ImGui::End();
+
+		UI_Toolbar();
 	}
 
+
+	void EditorLayer::UI_Toolbar()
+	{
+
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0,2 });//垂直向两个像素的填充
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, { 0,0 });//item无间距 
+		ImGui::PushStyleColor(ImGuiCol_Button, { 0,0,0,0 });
+		auto& colors = ImGui::GetStyle().Colors;
+		const auto& buttonHovered = colors[ImGuiCol_ButtonHovered];
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { buttonHovered.x,buttonHovered.y,buttonHovered.z,0.5f });
+		const auto& buttonActive = colors[ImGuiCol_ButtonActive];
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, { buttonActive.x,buttonActive.y,buttonActive.z ,0.5f });
+
+		ImGui::Begin("##toolsbar",nullptr, ImGuiWindowFlags_NoDecoration| ImGuiWindowFlags_NoScrollbar |ImGuiWindowFlags_NoScrollWithMouse);
+		Ref<Texture2D> Icon = m_sceneState == SceneState::Edit ? m_IconPlay : m_IconStop;
+
+		float size = ImGui::GetWindowHeight() - 4.0;
+		ImGui::SameLine((ImGui::GetWindowContentRegionMax().x *0.5f)- size*0.5); //this line start (offset)-> jump to useable window middle to draw
+		//无标题,id:toolsbar,无关闭按钮(p_open),无装饰
+		if (ImGui::ImageButton((ImTextureID)Icon->GetRendererID(), ImVec2(size,size), { 0.f,0.f }, {1.f,1.f},0))
+		{
+			if (m_sceneState == SceneState::Edit)
+				OnScenePlay();
+			else if(m_sceneState == SceneState::Play)
+				OnSceneStop	();
+
+		}
+		ImGui::PopStyleVar(2);
+		ImGui::PopStyleColor(3);
+
+		ImGui::End();
+
+	}
 
 
 
@@ -442,22 +482,15 @@ namespace Hazel
 			m_activeScene->OnViewportResize((uint32_t)m_ViewPortSize.x, (uint32_t)m_ViewPortSize.y);
 		}
 
-		{
-			HZ_PROFILE_SCOPE("CameraController::OnUpdate");
-			if (m_viewPortIsFocus)//没聚焦就关掉位置刷新
-			{
-				//m_cameraController.OnUpdate(deltaime); //也减少了资源耗费对吧
-				m_editorCamera.OnUpdate(deltaime);
-			}	
-		}
 
-		m_frameBuffer->Bind(); //every frame;
+
 		
 
 		{
 			HZ_PROFILE_SCOPE("Renderer Prepare ");
 			Renderer2D::ResetStats();
 
+			m_frameBuffer->Bind(); //every frame;
 			//Clear 必须
 			RenderCommand::SetClearColor({ 0.1f,0.1,0.1f,1.f });
 			RenderCommand::Clear();
@@ -468,12 +501,43 @@ namespace Hazel
 				
 		}
 
-
+		switch (m_sceneState)
 		{
-			HZ_PROFILE_SCOPE("Render Draw");
-			//CHANGED:
-			m_activeScene->OnUpdateEditor(deltaime,m_editorCamera);
+			case SceneState::Edit:
+			{
+				{
+					HZ_PROFILE_SCOPE("CameraController::OnUpdate");
+					if (m_viewPortIsFocus)//没聚焦就关掉位置刷新
+					{
+						//m_cameraController.OnUpdate(deltaime); //也减少了资源耗费对吧
+						m_editorCamera.OnUpdate(deltaime);
+					}
+				}
+
+				{
+					HZ_PROFILE_SCOPE("Render Draw");
+					//CHANGED:
+					m_editScene->OnUpdateEditor(deltaime, m_editorCamera);
+				}
+
+				break;
+			}
+			case SceneState::Play:
+			{
+				{
+					HZ_PROFILE_SCOPE("Render Draw");
+					//CHANGED:
+					m_activeScene->OnUpdateRuntime(deltaime);
+				}
+				break;
+
+			}
+
+
+
 		}
+
+
 
 		//calculate the relative Position
 		auto [mx, my] = ImGui::GetMousePos();
@@ -489,19 +553,23 @@ namespace Hazel
 
 		if (mouseX > 0 && mouseY > 0 && mouseX < viewPortSize.x && mouseY < viewPortSize.y)
 		{
+			//跟渲染有关, m_hoveredEntity的初始化问题 ,不知道为什么没有渲染时ID有初始化默认值.
 			int piexlID= m_frameBuffer->ReadPixel(1, mouseX, mouseY);
-			m_hoveredEntity = piexlID == -1 ? Entity() : Entity((entt::entity)piexlID, m_activeScene.get());
+			m_hoveredEntity = piexlID == -1  ? Entity() : Entity((entt::entity)piexlID, m_activeScene.get());
 		}
 		else
 		{
 			m_hoveredEntity = Entity();
 		}
 
-
 		m_frameBuffer->UnBind();
 
 
+
 	}
+
+
+
 
 	void EditorLayer::OnEvent(Hazel::Event& e)
 	{
@@ -530,8 +598,23 @@ namespace Hazel
 			}
 		case Key::S:
 			{
-				if (CtrlPressed && ShiftPressed)
-					SaveSceneAs();
+
+				
+				if (CtrlPressed)
+				{
+
+					if (ShiftPressed)
+					{
+						SaveSceneAs();
+						break;
+					}
+					else
+					{
+						SaveScene();
+						break;
+					}
+				}
+	
 				m_gizmoMod = m_gizmoMod == ImGuizmo::OPERATION::SCALE? -1 : ImGuizmo::OPERATION::SCALE;
 				break;
 			}
@@ -541,6 +624,13 @@ namespace Hazel
 				OpenScene();
 			break;
 		}
+		case Key::D:
+		{
+			if (CtrlPressed)
+				OnDuplicateEntity();
+			break;
+		}
+
 		case Key::G:
 		{
 			m_gizmoMod = m_gizmoMod == ImGuizmo::OPERATION::TRANSLATE ? -1 : ImGuizmo::OPERATION::TRANSLATE;
@@ -577,30 +667,122 @@ namespace Hazel
 		std::string path = PlantformUtils::SaveFile("场景文件(*.hazel)\0*.hazel\0"); //Showtext\0filter\0
 		if (!path.empty())
 		{
-			SceneSerializer sceneSerializer(m_activeScene);
-			sceneSerializer.Serialize(path);
+			SerializeScene(m_editScene,path);
+			m_editorScenePath = path;
+		}
+
+	}
+
+	void EditorLayer::SaveScene()
+	{
+		if (!m_editorScenePath.empty())
+		{
+			std::string path = m_editorScenePath.string();
+			SerializeScene(m_editScene, path);
+		}
+		else
+		{
+			SaveSceneAs();
 		}
 	}
+
+	void EditorLayer::SerializeScene(Ref<Scene> scene, const std::filesystem::path& filePath)
+	{
+		SceneSerializer sceneSerializer(scene);
+		sceneSerializer.Serialize(filePath.string());
+	}
+
 
 	void EditorLayer::OpenScene()
 	{
 		std::string path = PlantformUtils::OpenFile("场景文件(*.hazel)\0*.hazel\0");
 		if (!path.empty())
 		{
-			m_activeScene = CreateRef<Scene>();
-			m_activeScene->OnViewportResize((uint32_t)m_ViewPortSize.x, (uint32_t)m_ViewPortSize.y);
-			m_sceneHierarchyPanel.SetContext(m_activeScene);
-			SceneSerializer sceneSerializer(m_activeScene);
-			sceneSerializer.DeSerialize(path);
+			OpenScene(path);
 		}
+	}
+
+	void EditorLayer::OpenScene(const std::filesystem::path& path)
+	{
+		if (m_sceneState != SceneState::Edit)
+			OnSceneStop();
+		if (path.extension() != ".hazel")
+		{
+			HZ_CORE_WARN("Could not load {0} - not a scene file(.hazel)", path.string());
+			return;
+		}
+
+		Ref<Scene> newScene = CreateRef<Scene>();
+		newScene->OnViewportResize((uint32_t)m_ViewPortSize.x, (uint32_t)m_ViewPortSize.y);
+		//should Resize before Serializer
+		SceneSerializer sceneSerializer(newScene);
+		if (sceneSerializer.DeSerialize(path.string()))
+		{
+			m_editScene = newScene;
+			m_activeScene = m_editScene;
+			m_sceneHierarchyPanel.SetContext(m_editScene);
+
+			m_editorScenePath = path;
+
+		};
+
+
 	}
 
 	void EditorLayer::NewScene()
 	{
-		m_activeScene = CreateRef<Scene>();
-		m_activeScene->OnViewportResize((uint32_t)m_ViewPortSize.x, (uint32_t)m_ViewPortSize.y);
+		if (m_sceneState != SceneState::Edit)
+			OnSceneStop();
+		m_editScene = CreateRef<Scene>();
+		m_editScene->OnViewportResize((uint32_t)m_ViewPortSize.x, (uint32_t)m_ViewPortSize.y);
+		m_activeScene = m_editScene;
 		m_sceneHierarchyPanel.SetContext(m_activeScene);
+		
+		m_editorScenePath = std::filesystem::path(); //empty
+	
+
+		//m_activeScene = CreateRef<Scene>();
+		//m_activeScene->OnViewportResize((uint32_t)m_ViewPortSize.x, (uint32_t)m_ViewPortSize.y);
+		//m_sceneHierarchyPanel.SetContext(m_activeScene);
 	}
+
+	void EditorLayer::OnScenePlay()
+	{
+		m_sceneState = SceneState::Play;
+		m_activeScene =Scene::Copy(m_editScene);
+		m_sceneHierarchyPanel.SetContext(m_activeScene);
+
+		m_activeScene->OnRuntimeStart();
+
+	}
+
+	void EditorLayer::OnSceneStop()
+	{
+		m_sceneState = SceneState::Edit;
+		m_activeScene->OnRuntimeStop();
+		//Ref<>是共享指针,再点击play引用到新的复制eidtscene时,旧的activescene中断引用指向的scene会自动被回收的.
+
+		m_activeScene = m_editScene;
+		m_sceneHierarchyPanel.SetContext(m_editScene);
+
+
+	}
+
+	void EditorLayer::OnDuplicateEntity()
+	{
+		if (m_sceneState == SceneState::Play)
+			return;
+
+		Entity BDEntity = m_sceneHierarchyPanel.GetSelectedEntity();
+		if (BDEntity)
+		{
+			m_editScene->DuplicateEntity(BDEntity);
+			return;
+		}
+		HZ_CORE_INFO("Please choose a Entity before Duplicate");
+		return;
+	}
+
 
 }
 
