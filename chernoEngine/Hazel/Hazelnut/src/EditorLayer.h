@@ -20,7 +20,8 @@ namespace Hazel
 		virtual void OnImGuiRender() override;
 		void OnUpdate(Timestep deltaime) override;
 		void OnEvent(Event& e) override;//调度的解决判断在application 的Onevent ,不用管
-
+		
+		void OnOverlayRender() ;
 
 	private:
 		bool OnKeyPressed(KeyPressedEvent& e);
@@ -88,6 +89,9 @@ namespace Hazel
 
 		//UI:gizmo
 		int m_gizmoMod = -1;
+
+		//Visual: 
+		bool m_showPhysicsColliders = false;
 
 		//editorCamera
 		EditorCamera m_editorCamera;

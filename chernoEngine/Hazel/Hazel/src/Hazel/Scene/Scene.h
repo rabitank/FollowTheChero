@@ -39,6 +39,13 @@ namespace Hazel //100% 包装 不会让用户接触到除了hazel之外的api
 
 		void DuplicateEntity(Entity entity); //复制实体
 
+		template<typename... Components>
+		auto GetAllEntityWith()
+		{
+			return m_registry.view<Components...>();
+
+		}
+
 	private:
 		template <typename T>
 		void OnComponentAdded(Entity entity, T& component);

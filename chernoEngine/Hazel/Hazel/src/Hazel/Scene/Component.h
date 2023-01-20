@@ -189,6 +189,29 @@ namespace Hazel
 
 	};
 
+	struct CircleCollider2DComponent
+	{
+		//shape
+		glm::vec2 Offset= { 0.f,0.f };
+		float Radius = 0.5f ;
+
+		//it should belong to physics material
+		float Density = 1.f; //密度
+		float Friction = 0.5f;//摩擦系数
+		float Restitution = 0.0f; //恢复系数(弹性)
+		float RestitutionThreshold = 0.1f; //恢复阈值(柔性)
+
+			
+
+		//Storage for runtime
+		void* RuntimeFixture= nullptr; //trace a RigidBody in Runtime and delete after stop
+
+		CircleCollider2DComponent() = default;
+		CircleCollider2DComponent(const CircleCollider2DComponent& other) = default; //copy srtuct
+
+
+	};
+
 }
 
 

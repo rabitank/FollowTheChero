@@ -81,7 +81,7 @@ int main()
 		std::cout << m_name << ":" << m_age << "\n"; //不再有只用一次的结构类型了!!!
 
  	}
-	LOG("Part56:OPTIONAL数据处理"); //数据状态未知状况下的读取
+	LOG("Part56:OPTIONAL数据处理- 视频已到P76"); //数据状态未知状况下的读取
 	{
 		bool ifsuccesss = false;
 		std::optional<std::string> content = ReadFileAsString("data.txt");

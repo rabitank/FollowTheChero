@@ -43,11 +43,17 @@ namespace Hazel
 		static void DrawRotatedQuad(const glm::vec3& position, const glm::vec2& size,float rotation, const Ref<Texture2D>& texture, float tilingFactor = 1.f, const glm::vec4& tintColor = glm::vec4(1.0f));//rotation should be radians
 
 		//Scene use them
-		static void DrawQuad(const glm::mat4& transformat ,const glm::vec4& color,int entitID =-1);
+		static void DrawQuad(const glm::mat4& transformat ,const glm::vec4& color,int entityID =-1);
 		static void DrawQuad(const glm::mat4& transformat , const Ref<Texture2D>& texture, float tilingFactor = 1.f, const glm::vec4& tintColor = glm::vec4(1.0f), int entitID = -1);
 
 
-		static void DrawLine();
+		static void DrawLine(const glm::vec3& p0, const glm::vec3& p1, const glm::vec4& color, int entityID = -1);
+		static void DrawRect(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, int entityID = -1); //»­¾ØÐÎ
+		static void DrawRect(const glm::mat4& transformat, const glm::vec4& color, int entityID = -1);
+
+
+		static float GetLineWidth();
+		static void  SetLineWidth(float width);
 
 		static void DrawCircle(const glm::mat4& transformat ,const glm::vec4& color,float thichness =1.f,float fade= 0.005f, int entitID =-1);
 

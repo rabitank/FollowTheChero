@@ -260,7 +260,7 @@ namespace Hazel
 			ImGui::EndMenuBar();
 		}
 
-		//Setting
+		//Stats 
 		{
 			ImGui::Begin("Render Stats");
 
@@ -275,12 +275,18 @@ namespace Hazel
 			ImGui::Text("Vertex:%d", stats.GetTotalVertexCount());
 			ImGui::Text("Indeics:%d", stats.GetTotalIndexCount());
 
+
+			ImGui::End();
+		}
+		//Setting
+		{
+			ImGui::Begin("Settings");
+			ImGui::Checkbox("Visual Physics Collider", &m_showPhysicsColliders);
 			bool& iflock = m_editorCamera.IfLockRotation();
 			ImGui::Checkbox("Lock EditorCamer Rotation", &iflock);
 
 			ImGui::End();
 		}
-
 		//sceneHierarchyPanel
 		{
 			m_sceneHierarchyPanel.OnImGuiRender();
@@ -346,7 +352,7 @@ namespace Hazel
 
 			//Gizmos  //it should just be used in EditorTime 
 			Entity selectedentity = m_sceneHierarchyPanel.GetSelectedEntity();
-			if (selectedentity)
+			if (m_sceneState == SceneState::Edit && selectedentity)
 			{
 				ImGuizmo::SetDrawlist();
 				float windowWidth = ImGui::GetWindowWidth();
@@ -423,6 +429,8 @@ namespace Hazel
 			}
 
 		}
+
+
 		ImGui::End();
 		ImGui::PopStyleVar();
 		//dockSpace's end
@@ -562,13 +570,65 @@ namespace Hazel
 			m_hoveredEntity = Entity();
 		}
 
+		OnOverlayRender();
+
 		m_frameBuffer->UnBind();
 
 
 
 	}
 
+	void EditorLayer::OnOverlayRender()
+	{
 
+
+		if (m_sceneState == SceneState::Play)
+		{
+			auto PlayCamera = m_activeScene->GetPrimaryCamera();
+			Renderer2D::BeginScene(PlayCamera.GetComponent<CameraComponent>().Camera, PlayCamera.GetComponent<TransformComponent>().GetTransform());
+		}
+		else
+		{
+			Renderer2D::BeginScene(m_editorCamera);
+
+		}
+		//啊?? 
+		if (m_showPhysicsColliders)
+		{
+			//Circle Colliders
+			{
+				auto view = m_activeScene->GetAllEntityWith<TransformComponent, CircleCollider2DComponent>();
+				for (auto e : view)
+				{
+					auto [tc, cc] = view.get<TransformComponent, CircleCollider2DComponent>(e); // view只含有部分componennt,view的get只能获得当初view指定的component
+					glm::vec3 translation = tc.Translation + glm::vec3(cc.Offset, 0.001f);
+					glm::mat4 transformMat = glm::translate(glm::mat4(1.f), translation) * glm::scale(glm::mat4(1.f), glm::vec3(tc.Scale.x * cc.Radius * 2));
+					Renderer2D::DrawCircle(transformMat, glm::vec4(0.0f, 1.f, 0.0f, 1.f), 0.03f);
+
+				}
+
+			}		
+			//Box colliders
+			{
+				auto view = m_activeScene->GetAllEntityWith<TransformComponent, BoxCollider2DComponent>();
+				for (auto e : view)
+				{
+					auto [tc, bc] = view.get<TransformComponent, BoxCollider2DComponent>(e); // view只含有部分componennt,view的get只能获得当初view指定的component
+					glm::vec3 translation = tc.Translation + glm::vec3(bc.Offset, 0.001f);
+					glm::mat4 transformMat = glm::translate(glm::mat4(1.f), translation)
+						* glm::rotate(glm::mat4(1.f), tc.Rotation.z, glm::vec3(0.f, 0.f, 1.f))
+						* glm::scale(glm::mat4(1.f), glm::vec3(tc.Scale.x * bc.Size.x * 2, tc.Scale.y * bc.Size.y * 2, 0.f));
+					
+					Renderer2D::DrawRect(transformMat, glm::vec4(0.f, 1.f, 0.0f, 1.f));
+
+				}
+
+			}
+		}
+
+
+		Renderer2D::EndScene();
+	}
 
 
 	void EditorLayer::OnEvent(Hazel::Event& e)
@@ -579,6 +639,8 @@ namespace Hazel
 		dispatcher.DisPatch<MouseButtonPressedEvent>(BIND_EVENT_CALLFN(EditorLayer::OnMousebuttomPressed));
 
 	}
+
+
 
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
 	{

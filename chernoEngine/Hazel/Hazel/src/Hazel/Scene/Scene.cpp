@@ -11,6 +11,7 @@
 #include "box2d/b2_body.h"
 #include "box2d/b2_fixture.h" //fixture 固定物
 #include "box2d/b2_polygon_shape.h" //colliderBox shape 多边形碰撞盒
+#include "box2d/b2_circle_shape.h" //colliderCircle shape 
 
 namespace Hazel
 {
@@ -110,6 +111,7 @@ namespace Hazel
 		CopyComponent<NativeScripComponent>(dstSceneRegistry,srcSceneRegistry,enttMap);
 		CopyComponent<Rigidbody2DComponent>(dstSceneRegistry,srcSceneRegistry,enttMap);
 		CopyComponent<BoxCollider2DComponent>(dstSceneRegistry,srcSceneRegistry,enttMap);
+		CopyComponent<CircleCollider2DComponent>(dstSceneRegistry,srcSceneRegistry,enttMap);
 
 		return newScene;
 	}
@@ -124,6 +126,7 @@ namespace Hazel
 		CopyComponentIfExists<NativeScripComponent>		(newEntity, entity);
 		CopyComponentIfExists<Rigidbody2DComponent>		(newEntity, entity);
 		CopyComponentIfExists<BoxCollider2DComponent>	(newEntity, entity);
+		CopyComponentIfExists<CircleCollider2DComponent>	(newEntity, entity);
 	}
 
 
@@ -139,6 +142,7 @@ namespace Hazel
 			{
 				auto& [transC, spriteC] = m_registry.get<TransformComponent, SpriteRendererComponent>(entity);
 				Renderer2D::DrawQuad(transC.GetTransform(), spriteC.Color, (int)entity);
+				//Renderer2D::DrawRect(transC.GetTransform(), glm::vec4(0.2f, 0.2f, 0.6f, 1.f), (int)entity);
 			}
 
 		}
@@ -351,6 +355,11 @@ namespace Hazel
 	void Hazel::Scene::OnComponentAdded<BoxCollider2DComponent>(Entity entity, BoxCollider2DComponent& component)
 	{
 
+	}	
+	template <>
+	void Hazel::Scene::OnComponentAdded<CircleCollider2DComponent>(Entity entity, CircleCollider2DComponent& component)
+	{
+
 	}
 
 	Entity Scene::GetPrimaryCamera()
@@ -390,7 +399,7 @@ namespace Hazel
 			b2BodyDef bodyDef;
 			bodyDef.type = RigidBodyType2b2BodyType(rb2d.BodyType);
 			bodyDef.fixedRotation = rb2d.FixedRotation;
-			//对物体位置的控制权应该是移交而不是共享
+			//对物体位置的控制权应该是移交而不是共享 , body的位置作为原点建立的Collider相对位置坐标系
 			bodyDef.position.Set(transform.Translation.x, transform.Translation.y);
 			bodyDef.angle = transform.Rotation.z;
 			
@@ -404,6 +413,8 @@ namespace Hazel
 				b2PolygonShape shape;
 				shape.SetAsBox(transform.Scale.x*bc2d.Size.x, transform.Scale.y * bc2d.Size.y);//hx , hy  h:half
 				
+				
+
 				b2FixtureDef fixtureDef;
 				fixtureDef.shape = &shape;
 				fixtureDef.density = bc2d.Density;
@@ -413,9 +424,27 @@ namespace Hazel
 						
 				body->CreateFixture(&fixtureDef);
 			}
+
+			if(entity.HasComponent<CircleCollider2DComponent>())
+			{
+				//shape
+				auto& cc2d = entity.GetComponent<CircleCollider2DComponent>();
+				b2CircleShape shape; //Circleshape has public m_p, SuperClass b2Shape has public m_radius; 
+				shape.m_p.Set(cc2d.Offset.x,cc2d.Offset.y);
+				shape.m_radius = cc2d.Radius * transform.Scale.x; //* glm::min(transform.Scale.x, transform.Scale.y) ;
+
+
+				b2FixtureDef fixtureDef;
+
+				fixtureDef.shape = &shape;
+				fixtureDef.density = cc2d.Density;
+				fixtureDef.friction = cc2d.Friction;
+				fixtureDef.restitution = cc2d.Restitution;
+				fixtureDef.restitutionThreshold = cc2d.RestitutionThreshold;
+
+				body->CreateFixture(&fixtureDef);
+			}
 		}
-
-
 	}
 
 	void Scene::OnRuntimeStop()

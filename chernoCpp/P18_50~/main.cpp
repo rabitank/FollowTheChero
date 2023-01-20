@@ -30,7 +30,7 @@ int main()
 
 		//但是多个头文件打包可能会让你模糊cpp到底用到了哪些库
 		//一些不常用的库,你可能并不需要放进去
-		//cherno:smart point !用! 小程序就原始指针吧 
+	
 
 
 		//如果你有了 一个 name.h 就需要 一个 引用name.h 的name.cpp

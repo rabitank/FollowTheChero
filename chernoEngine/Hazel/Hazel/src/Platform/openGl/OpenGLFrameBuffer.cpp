@@ -247,6 +247,7 @@ namespace Hazel
 
 
 		HZ_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "OpenGL Error:FrameBuffer Invalidate failed!"); //检查frameBuffer是否完成配置
+		// GL_INVALID_ENUM error generated. Invalid buffer target enum. 啊?
 		glBindBuffer(GL_FRAMEBUFFER, 0);//safe!..还不确定是否使用这个帧
 
 

@@ -38,7 +38,13 @@ namespace Hazel
 		int EntityID;
 	};
 
-	
+	struct LineVertex //just for component visualization cant be recongnized as an entity
+	{
+		glm::vec3 Position;
+		glm::vec4 Color;
+
+		int EntityID;
+	};
 
 	struct  Renderer2DData
 	{
@@ -57,6 +63,11 @@ namespace Hazel
 		Ref<VertexBuffer> CircleVB;
 		Ref<Shader> CircleShader ;
 
+		Ref<VertexArray>	LineVA;
+		Ref<VertexBuffer>	LineVB;
+		Ref<Shader>			LineShader;
+		float				LineWidth =2.f;
+
 		uint32_t quadIndexCount = 0; 
 		QuadVertex* QuadVertexBufferBase =nullptr; //begin of qiadvertexArray 
 		QuadVertex* QuadVertexBufferPtr = nullptr;	//now of quadvertexArray	
@@ -64,6 +75,10 @@ namespace Hazel
 		uint32_t circleIndexCount = 0; 
 		CircleVertex* CircleVertexBufferBase =nullptr; 
 		CircleVertex* CircleVertexBufferPtr = nullptr;
+
+		uint32_t	lineVertexCount = 0; 
+		LineVertex* LineVertexBufferBase = nullptr;
+		LineVertex* LineVertexBufferPtr = nullptr;
 
 		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
 		uint32_t TextureSlotIndex = 1;
@@ -156,13 +171,23 @@ namespace Hazel
 		s_Data.CircleVA->SetIndexBuffer(SquraIB); //圆也是四个点,index不需要改变
 		s_Data.CircleVertexBufferBase = new CircleVertex[s_Data.MaxVertics];
 
+		//Lines
+		s_Data.LineVA = VertexArray::Create();
+		s_Data.LineVB = VertexBuffer::Create(s_Data.MaxVertics * sizeof(LineVertex));
+
+		s_Data.LineVB->SetLayout({
+			{Hazel::ShaderDataType::Float3 ,"a_Position"},
+			{Hazel::ShaderDataType::Float4 ,"a_Color"},
+			{Hazel::ShaderDataType::Int ,"a_EntityID"}
+			});
+		s_Data.LineVA->AddVertexBuffer(s_Data.LineVB);
+		s_Data.LineVertexBufferBase = new LineVertex[s_Data.MaxVertics];
+
+
 
 		s_Data.WhitBlock = Texture2D::Create(1, 1);
 		uint32_t OnePixel = 0xffffffff; //因为是采样...采样不在乎你原图的..
 		s_Data.WhitBlock->SetData(&OnePixel, 4);
-
-
-
 
 		int samples[s_Data.MaxTextureSlots];
 		for ( int i = 0; i < s_Data.MaxTextureSlots; i++)
@@ -170,6 +195,7 @@ namespace Hazel
 		
 		s_Data.CircleShader = Shader::Create("Assets/shader/Renderer2D_Circle.glsl");
 		s_Data.QuadShader = Shader::Create("Assets/shader/Renderer2D_Quad.glsl");
+		s_Data.LineShader = Shader::Create("Assets/shader/Renderer2D_Line.glsl");
 
 		//s_Data.QuadShader->Bind();
 		//s_Data.QuadShader->SetIntArray("u_Textures",samples,s_Data.MaxTextureSlots);
@@ -194,6 +220,9 @@ namespace Hazel
 		
 		s_Data.circleIndexCount= 0;
 		s_Data.CircleVertexBufferPtr = s_Data.CircleVertexBufferBase;
+
+		s_Data.lineVertexCount= 0;
+		s_Data.LineVertexBufferPtr = s_Data.LineVertexBufferBase;
 
 		s_Data.TextureSlotIndex = 1; //begin
 	}
@@ -276,6 +305,18 @@ namespace Hazel
 			s_Data.CircleShader->Bind();
 			RenderCommand::DrawIndexed(s_Data.CircleVA, s_Data.circleIndexCount);
 			s_Data.Stats.DrawCalls++;
+		}		
+		
+		if (s_Data.lineVertexCount)
+		{
+			uint32_t datasize = (uint8_t*)s_Data.LineVertexBufferPtr - (uint8_t*)s_Data.LineVertexBufferBase;//是空指针的步长.
+			s_Data.LineVB->SetData(s_Data.LineVertexBufferBase, datasize);
+
+			s_Data.LineShader->Bind();
+			RenderCommand::SetLineWidth(s_Data.LineWidth);
+			RenderCommand::DrawLines(s_Data.LineVA, s_Data.lineVertexCount);
+
+			s_Data.Stats.DrawCalls++;
 		}
 
 	}
@@ -317,13 +358,6 @@ namespace Hazel
 		// 2560 1664
 		glm::mat4 tansformMat = glm::translate(glm::mat4(1.f), position) * glm::scale(glm::mat4(1.f), glm::vec3(size, 0.f));
 		DrawQuad(tansformMat,texture,tilingFactor,tintColor);
-	}
-
-	void Renderer2D::DrawLine()
-	{
-		HZ_PROFILE_FUNCTION();
-
-
 	}
 
 
@@ -437,6 +471,54 @@ namespace Hazel
 		s_Data.Stats.quadCount++;
 	}
 
+
+	void Renderer2D::DrawLine(const glm::vec3& p0, const glm::vec3& p1, const glm::vec4& color, int entityID )
+	{
+		s_Data.LineVertexBufferPtr->Color = color;
+		s_Data.LineVertexBufferPtr->Position = p0;
+		s_Data.LineVertexBufferPtr->EntityID = entityID;
+		s_Data.LineVertexBufferPtr++;
+
+		s_Data.LineVertexBufferPtr->Color = color;
+		s_Data.LineVertexBufferPtr->Position = p1;
+		s_Data.LineVertexBufferPtr->EntityID = entityID;
+		s_Data.LineVertexBufferPtr++;
+		s_Data.lineVertexCount += 2;
+
+	}
+
+
+	void Renderer2D::DrawRect(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, int entityID /*= -1*/)
+	{
+		glm::mat4 tansformMat = glm::translate(glm::mat4(1.f), position) * glm::scale(glm::mat4(1.f), glm::vec3(size, 0.f));
+		DrawRect(tansformMat,  color , entityID);
+	}
+
+	void Renderer2D::DrawRect(const glm::mat4& transformat, const glm::vec4& color, int entityID /*= -1*/)
+	{
+		glm::vec3 lineVertices[4];
+		for (int i = 0; i < 4; i++)
+		{
+			lineVertices[i] = transformat * s_Data.quadVertexPosition[i];
+		}
+
+		DrawLine(lineVertices[0], lineVertices[1], color, entityID);
+		DrawLine(lineVertices[1], lineVertices[2], color, entityID);
+		DrawLine(lineVertices[2], lineVertices[3], color, entityID);
+		DrawLine(lineVertices[3], lineVertices[0], color, entityID);
+
+	}
+
+	float Renderer2D::GetLineWidth()
+	{
+		return s_Data.LineWidth;
+	}
+
+	void Renderer2D::SetLineWidth(float width)
+	{
+		s_Data.LineWidth = width;
+	}
+
 	void Renderer2D::DrawCircle(const glm::mat4& transformat, const glm::vec4& color, float thickness /*=1.f*/, float fade/*= 0.005f*/, int entityID /*=-1*/)
 	{
 		HZ_PROFILE_FUNCTION();
@@ -452,6 +534,7 @@ namespace Hazel
 			s_Data.CircleVertexBufferPtr->Color = color;
 			s_Data.CircleVertexBufferPtr->WorldPosition = transformat * s_Data.quadVertexPosition[i];
 			s_Data.CircleVertexBufferPtr->LocalPosition = s_Data.quadVertexPosition[i]* 2.0f; // for localUV 4 points
+			s_Data.CircleVertexBufferPtr->LocalPosition.z = 1.0f;
 			s_Data.CircleVertexBufferPtr->Thickness= thickness;
 			s_Data.CircleVertexBufferPtr->Fade = fade;
 			s_Data.CircleVertexBufferPtr->EntityID = entityID;
